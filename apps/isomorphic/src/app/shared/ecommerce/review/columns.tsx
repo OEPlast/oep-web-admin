@@ -91,15 +91,9 @@ export const productsReviewsColumns = [
   }),
   columnHelper.accessor('createdAt', {
     id: 'createdAt',
-    size: 150,
+    size: 180,
     header: 'Created',
     cell: ({ row }) => <DateCell date={row.original.createdAt} />,
-  }),
-  columnHelper.display({
-    id: 'status',
-    size: 120,
-    header: 'Status',
-    cell: ({ row }) => getStatusBadge(row.original.status!),
   }),
   columnHelper.display({
     id: 'action',

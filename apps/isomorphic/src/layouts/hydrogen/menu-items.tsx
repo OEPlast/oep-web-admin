@@ -74,19 +74,8 @@ export const menuItems = [
   },
   {
     name: 'Products',
-    href: '#',
+    href: routes.eCommerce.products,
     icon: <PiPackageDuotone />,
-    dropdownItems: [
-      {
-        name: 'All Products',
-        href: routes.eCommerce.products,
-        badge: '',
-      },
-      {
-        name: 'Create Product',
-        href: routes.eCommerce.createProduct,
-      },
-    ],
   },
   {
     name: 'Categories',
@@ -100,7 +89,7 @@ export const menuItems = [
   },
   {
     name: 'Returns',
-    href: routes.eCommerce.orders,
+    href: routes.eCommerce.returns,
     icon: <IoReturnDownBack />,
   },
   {
@@ -136,18 +125,18 @@ export const menuItems = [
     ],
   },
   {
-    name: 'Coupon',
-    href: routes.invoice.builder,
+    name: 'Coupons',
+    href: routes.eCommerce.coupons,
     icon: <PiNewspaperClippingDuotone />,
   },
   {
     name: 'Banner',
-    href: routes.invoice.builder,
+    href: routes.eCommerce.banners,
     icon: <MdOutlineCampaign />,
   },
   {
     name: 'Flash Sale',
-    href: routes.invoice.builder,
+    href: routes.eCommerce.flashSales,
     icon: <MdOutlineSell />,
   },
   {

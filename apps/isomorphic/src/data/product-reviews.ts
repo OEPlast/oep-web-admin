@@ -35,7 +35,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 4,
     createdAt: new Date('2022-11-12T13:43:07.334Z'),
   },
@@ -56,7 +55,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-03-09T20:11:21.277Z'),
   },
@@ -76,7 +74,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-08-05T22:34:06.843Z'),
   },
@@ -97,7 +94,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 4,
     createdAt: new Date('2023-04-29T23:36:04.580Z'),
   },
@@ -117,7 +113,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-04-25T02:18:32.327Z'),
   },
@@ -138,7 +133,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 2,
     createdAt: new Date('2022-11-26T06:55:37.822Z'),
   },
@@ -159,7 +153,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 4,
     createdAt: new Date('2022-09-08T07:29:49.952Z'),
   },
@@ -178,7 +171,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 2,
     createdAt: new Date('2023-02-02T14:34:50.655Z'),
   },
@@ -198,7 +190,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-08-14T05:10:13.336Z'),
   },
@@ -218,7 +209,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-08-16T12:17:10.416Z'),
   },
@@ -238,7 +228,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 2,
     createdAt: new Date('2023-01-09T20:30:19.472Z'),
   },
@@ -258,7 +247,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-02-07T18:07:53.234Z'),
   },
@@ -279,7 +267,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-08-14T05:48:39.101Z'),
   },
@@ -299,7 +286,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2022-11-28T22:54:11.147Z'),
   },
@@ -320,7 +306,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2022-11-01T01:05:24.896Z'),
   },
@@ -341,7 +326,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-07-25T09:53:52.751Z'),
   },
@@ -362,7 +346,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-01-16T21:53:25.463Z'),
   },
@@ -382,7 +365,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 2,
     createdAt: new Date('2023-01-16T23:50:33.073Z'),
   },
@@ -403,7 +385,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-01-15T00:41:20.987Z'),
   },
@@ -424,7 +405,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-07-08T14:40:13.878Z'),
   },
@@ -444,7 +424,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2023-01-06T15:28:20.645Z'),
   },
@@ -465,7 +444,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2022-09-01T22:39:24.001Z'),
   },
@@ -485,7 +463,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 5,
     createdAt: new Date('2022-11-09T13:51:57.982Z'),
   },
@@ -505,7 +482,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-02-11T12:10:59.935Z'),
   },
@@ -525,7 +501,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 4,
     createdAt: new Date('2023-04-30T22:32:51.750Z'),
   },
@@ -545,7 +520,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 3,
     createdAt: new Date('2023-03-26T16:53:07.336Z'),
   },
@@ -565,7 +539,6 @@ export const productReviews = [
         avatarIds
       )}.webp`,
     },
-    status: getRandomArrayElement(reviewStatus),
     rating: 2,
     createdAt: new Date('2023-06-21T15:55:13.465Z'),
   },
