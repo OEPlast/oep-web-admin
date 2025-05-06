@@ -5,6 +5,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { Avatar, Button, Checkbox, Text, Title } from 'rizzui';
 import { CouponTableMoreAction } from '@core/components/table-utils/coupon-table-more';
 import { CouponsDataType } from './table';
+import Link from 'next/link';
 
 const columnHelper = createColumnHelper<CouponsDataType>();
 
@@ -37,7 +38,12 @@ export const couponsColumns = [
     header: 'Code',
     enableSorting: false,
     cell: ({ row }) => (
-      <Text className="text-sm text-gray-500">{row.original.coupon}</Text>
+      <Link
+        href={'/ecommerce/coupons/' + row.original.coupon}
+        className="hover:underline"
+      >
+        <Text className="text-sm text-gray-500">{row.original.coupon}</Text>
+      </Link>
     ),
   }),
   columnHelper.display({

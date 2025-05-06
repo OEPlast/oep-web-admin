@@ -3,7 +3,7 @@ import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
 import Link from 'next/link';
 import { metaObject } from '@/config/site.config';
-// import CreateCoupon from '@/app/shared/ecommerce/coupons/create-coupon'; // To be implemented
+import CreateCoupon from '@/app/shared/ecommerce/coupon/create-coupon'; // To be implemented
 
 export const metadata = {
   ...metaObject('Create a Coupon'),
@@ -39,8 +39,7 @@ export default function CreateCouponPage() {
           </Button>
         </Link>
       </PageHeader>
-      {/* <CreateCoupon /> */}
-      <div>Coupon creation form goes here</div>
+      <CreateCoupon />
     </>
   );
 }
