@@ -3,7 +3,7 @@ import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
 import Link from 'next/link';
 import { metaObject } from '@/config/site.config';
-// import CreateFlashSale from '@/app/shared/ecommerce/flash-sales/create-flash-sale'; // To be implemented
+import CreateSales from '@/app/shared/ecommerce/sales/create-sales';
 
 export const metadata = {
   ...metaObject('Create a Flash Sale'),
@@ -39,7 +39,7 @@ export default function CreateFlashSalePage() {
           </Button>
         </Link>
       </PageHeader>
-      {/* <CreateFlashSale /> */}
+      <CreateSales />
       <div>Flash sale creation form goes here</div>
     </>
   );

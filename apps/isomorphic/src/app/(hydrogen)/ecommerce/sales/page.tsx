@@ -21,7 +21,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.flashSales,
-      name: 'Flash Sales',
+      name: 'Sales',
     },
     {
       name: 'All',
