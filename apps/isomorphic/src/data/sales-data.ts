@@ -94,7 +94,7 @@ export const salesData = [
     title: 'Limited Deal: Wireless Headphones',
     product: {
       stock: 50,
-      _id: '664fdf8a24fbb2a2c03eabe0',
+      _id: '664fdf8a24fbb2a2c03eabe2',
       name: 'Wireless Headphones',
       slug: 'wireless-headphones-soundpro',
       coverImage: 'https://example.com/images/wireless-headphones.jpg',

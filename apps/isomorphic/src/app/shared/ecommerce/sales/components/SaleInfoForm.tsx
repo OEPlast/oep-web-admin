@@ -53,6 +53,7 @@ interface SaleInfoFormProps {
   setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filteredProducts: typeof salesData; // Assuming salesData is correctly typed
   handleSearch: (query: string) => void;
+  isEditMode?: boolean; // Added isEditMode prop
 }
 
 export default function SaleInfoForm({
@@ -66,6 +67,7 @@ export default function SaleInfoForm({
   setDrawerOpen,
   filteredProducts,
   handleSearch,
+  isEditMode, // Destructure isEditMode
 }: SaleInfoFormProps) {
   return (
     <>

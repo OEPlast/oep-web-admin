@@ -35,7 +35,6 @@ export default async function FlashSaleDetailsPage({ params }: any) {
         </Link>
       </PageHeader>
       {/* <FlashSaleView /> */}
-      <div>Flash sale details view goes here</div>
     </>
   );
 }

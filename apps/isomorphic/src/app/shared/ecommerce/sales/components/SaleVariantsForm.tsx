@@ -254,42 +254,42 @@ export default function SaleVariantsForm({
               />
             )}
             <div className="pt-1 text-sm text-gray-600">
-              {!watch(`variants.${index}.attributeName`) ||
-              watch(`variants.${index}.attributeName`) === 'All' ? (
-                <span>Product Stock: {selectedProduct.stock}</span>
-              ) : watch(`variants.${index}.attributeValue`) === 'All' ? (
-                <span>
-                  Total Attribute Stock:{' '}
-                  {selectedProduct.attributes
-                    .find(
-                      (attr) =>
-                        attr.name === watch(`variants.${index}.attributeName`)
-                    )
-                    ?.children.reduce(
-                      (total, child) => total + child.stock,
+              {(() => {
+                const attributeName = variant.attributeName;
+                const attributeValue = variant.attributeValue;
+                // Show product stock when no specific attribute selected or 'All'
+                if (!attributeName || attributeName === 'All') {
+                  return <span>Product Stock: {selectedProduct.stock}</span>;
+                }
+                // Show sum of attribute stocks when attributeValue is 'All'
+                if (attributeValue === 'All') {
+                  const attr = selectedProduct.attributes.find(
+                    (attr) => attr.name === attributeName
+                  );
+                  const sumStock =
+                    attr?.children.reduce(
+                      (sum, child) => sum + child.stock,
                       0
-                    ) || 0}
-                </span>
-              ) : (
-                <span>
-                  Specific Variant Stock:{' '}
-                  {selectedProduct.attributes
-                    .find(
-                      (attr) =>
-                        attr.name === watch(`variants.${index}.attributeName`)
-                    )
-                    ?.children.find(
-                      (child) =>
-                        child.name === watch(`variants.${index}.attributeValue`)
-                    )?.stock || 0}
-                </span>
-              )}
+                    ) || 0;
+
+                  return <span>Attribute Stock: {sumStock}</span>;
+                }
+                // Show specific variant stock
+                const attr = selectedProduct.attributes.find(
+                  (attr) => attr.name === attributeName
+                );
+                const mainChild = attr?.children.find(
+                  (child) => child.name === attributeValue
+                );
+
+                return <span>Variant Stock: {mainChild?.stock || 0}</span>;
+              })()}
             </div>
             {variants.length > 1 && (
               <Button
                 type="button"
                 onClick={() => handleRemoveVariant(index)}
-                className="mt-2 w-full bg-red-500 text-white hover:bg-red-600 sm:w-auto"
+                className="mt-2 w-full bg-red-500 text-white hover:bg-red-600 hover:text-white sm:w-auto"
                 variant="flat"
               >
                 <BiTrash className="mr-1.5 h-4 w-4" /> Remove Variant
