@@ -340,38 +340,4 @@ export const menuItems = [
     href: routes.tables.dnd,
     icon: <PiArrowsOutDuotone />,
   },
-  // label start
-  {
-    name: 'Pages',
-  },
-  {
-    name: 'Welcome',
-    href: routes.welcome,
-    icon: <PiShootingStarDuotone />,
-  },
-  {
-    name: 'Coming soon',
-    href: routes.comingSoon,
-    icon: <PiRocketLaunchDuotone />,
-  },
-  {
-    name: 'Access Denied',
-    href: routes.accessDenied,
-    icon: <PiFolderLockDuotone />,
-  },
-  {
-    name: 'Not Found',
-    href: routes.notFound,
-    icon: <PiBinocularsDuotone />,
-  },
-  {
-    name: 'Maintenance',
-    href: routes.maintenance,
-    icon: <PiHammerDuotone />,
-  },
-  {
-    name: 'Blank',
-    href: routes.blank,
-    icon: <PiNoteBlankDuotone />,
-  },
 ];

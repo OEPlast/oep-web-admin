@@ -6,9 +6,6 @@ import cn from '@core/utils/class-names';
 import { useScrollableSlider } from '@core/hooks/use-scrollable-slider';
 import { PiCaretLeftBold, PiCaretRightBold } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
-import { useLayout } from '@/layouts/use-layout';
-import { LAYOUT_OPTIONS } from '@/config/enums';
-import { useBerylliumSidebars } from '@/layouts/beryllium/beryllium-utils';
 
 const menuItems = [
   {
@@ -43,7 +40,6 @@ const menuItems = [
 
 export default function ProfileSettingsNav() {
   const pathname = usePathname();
-  const { layout } = useLayout();
   const {
     sliderEl,
     sliderPrevBtn,
@@ -51,19 +47,10 @@ export default function ProfileSettingsNav() {
     scrollToTheRight,
     scrollToTheLeft,
   } = useScrollableSlider();
-  const { expandedLeft } = useBerylliumSidebars();
   return (
     <div
       className={cn(
-        'sticky z-20 -mx-4 -mt-4 border-b border-muted bg-white px-4 py-0 font-medium text-gray-500 dark:bg-gray-50 sm:-mt-2 md:-mx-5 md:px-5 lg:-mx-8 lg:mt-0 lg:px-8 xl:-mx-6 xl:px-6 2xl:top-20 3xl:-mx-[33px] 3xl:px-[33px] 4xl:-mx-10 4xl:px-10',
-        layout === LAYOUT_OPTIONS.LITHIUM
-          ? 'top-[66px] sm:top-[70px] md:top-[73px]'
-          : layout === LAYOUT_OPTIONS.BERYLLIUM
-            ? 'top-[62px] sm:top-[72px] 2xl:top-[72px]'
-            : 'top-[62px] md:top-[71px]',
-        layout === LAYOUT_OPTIONS.BERYLLIUM &&
-          expandedLeft &&
-          'xl:-ms-1 xl:px-0 3xl:-ms-2 3xl:ps-0 4xl:-ms-2'
+        'sticky z-20 -mx-4 -mt-4 border-b border-muted bg-white px-4 py-0 font-medium text-gray-500 dark:bg-gray-50 sm:-mt-2 md:-mx-5 md:px-5 lg:-mx-8 lg:mt-0 lg:px-8 xl:-mx-6 xl:px-6 2xl:top-20 3xl:-mx-[33px] 3xl:px-[33px] 4xl:-mx-10 4xl:px-10'
       )}
     >
       <div className="relative flex items-center overflow-hidden">

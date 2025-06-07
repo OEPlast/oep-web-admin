@@ -7,9 +7,6 @@ import RecentPayments from '@/app/shared/logistics/customer-profile/recent-payme
 import RecentShipments from '@/app/shared/logistics/customer-profile/recent-shipments';
 import PersonalInformation from '@/app/shared/logistics/customer-profile/personal-info';
 import { getRandomArrayElement } from '@core/utils/get-random-array-element';
-import { useLayout } from '@/layouts/use-layout';
-import { LAYOUT_OPTIONS } from '@/config/enums';
-import { useBerylliumSidebars } from '@/layouts/beryllium/beryllium-utils';
 
 interface CustomerProfileProps {
   className?: string;
@@ -28,8 +25,6 @@ export default function CustomerProfile({ className }: CustomerProfileProps) {
 }
 
 function CustomerCoverPhoto() {
-  const { layout } = useLayout();
-  const { expandedLeft } = useBerylliumSidebars();
   const coverPhoto = getRandomArrayElement([
     '1648583076906-60338fa01f07',
     '1655962342982-57cae2d061cf',
@@ -38,12 +33,7 @@ function CustomerCoverPhoto() {
   return (
     <figure
       className={cn(
-        'relative -mx-6 flex h-[150px] items-end justify-end bg-gray-50 bg-gradient-to-r from-[#F8E1AF] to-[#F6CFCF] @5xl:h-[200px] 3xl:-mx-8 3xl:h-[250px] 4xl:-mx-10 4xl:h-[300px]',
-        layout === LAYOUT_OPTIONS.HELIUM &&
-          'xl:-ms-[19px] 2xl:-ms-6 3xl:-ms-6 4xl:-ms-9',
-        layout === LAYOUT_OPTIONS.BERYLLIUM &&
-          expandedLeft &&
-          'xl:-ms-3 3xl:-ms-[10px] 4xl:-ms-[11px]'
+        'relative -mx-6 flex h-[150px] items-end justify-end bg-gray-50 bg-gradient-to-r from-[#F8E1AF] to-[#F6CFCF] @5xl:h-[200px] 3xl:-mx-8 3xl:h-[250px] 4xl:-mx-10 4xl:h-[300px]'
       )}
     >
       <Image
