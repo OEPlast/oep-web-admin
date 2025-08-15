@@ -7,6 +7,7 @@ export const routes = {
     ediProduct: (slug: string) => `/ecommerce/products/${slug}/edit`,
     categories: '/ecommerce/categories',
     createCategory: '/ecommerce/categories/create',
+    categoryDetails: (id: string) => `/ecommerce/categories/${id}`,
     editCategory: (id: string) => `/ecommerce/categories/${id}/edit`,
     orders: '/ecommerce/orders',
     createOrder: '/ecommerce/orders/create',
@@ -147,7 +148,7 @@ export const routes = {
   maintenance: '/maintenance',
   blank: '/blank',
   auth: {
-    signUp1: '/auth/sign-up-1',
+    signUp1: '/auth/sign-up',
     signUp2: '/auth/sign-up-2',
     signUp3: '/auth/sign-up-3',
     signUp4: '/auth/sign-up-4',

@@ -6,6 +6,7 @@ export const categories = [
     name: 'Bag',
     slug: 'bag',
     description: 'Practical Granite Chicken',
+    sub_categories: 2,
     products: 19,
   },
   {
@@ -15,6 +16,7 @@ export const categories = [
     name: 'Sunglass',
     slug: 'sunglass',
     description: 'Oriental Plastic Gloves',
+    sub_categories: 6,
     products: 19,
   },
   {
@@ -24,6 +26,7 @@ export const categories = [
     name: 'Watch',
     slug: 'watch',
     description: 'Recycled Frozen Gloves',
+    sub_categories: 0,
     products: 5,
   },
   {
@@ -33,6 +36,7 @@ export const categories = [
     name: 'Sneakers',
     slug: 'sneakers',
     description: 'Luxurious Soft Shoes',
+    sub_categories: 0,
     products: 12,
   },
   {
@@ -42,6 +46,7 @@ export const categories = [
     name: 'Chair',
     slug: 'chair',
     description: 'Fantastic Wooden Chairs',
+    sub_categories: 0,
     products: 35,
   },
   {
@@ -51,6 +56,7 @@ export const categories = [
     name: 'Tools',
     slug: 'tools',
     description: 'Recycled Frozen Gloves',
+    sub_categories: 0,
     products: 18,
   },
 
@@ -61,6 +67,7 @@ export const categories = [
     name: 'Kids',
     slug: 'kids',
     description: 'Recycled Frozen Gloves',
+    sub_categories: 9,
     products: 15,
   },
 ];

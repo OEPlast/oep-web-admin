@@ -45,23 +45,8 @@ const parentCategoryOption = [
   },
 ];
 
-// Type option
-const typeOption = [
-  {
-    value: 'fresh vegetables',
-    label: 'Fresh Vegetables',
-  },
-  {
-    value: 'diet foods',
-    label: 'Diet Foods',
-  },
-  {
-    value: 'green vegetables',
-    label: 'Green Vegetables',
-  },
-];
-
 // main category form component for create and update category
+
 export default function CreateCategory({
   id,
   category,
@@ -73,21 +58,20 @@ export default function CreateCategory({
 }) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(false);
 
   const onSubmit: SubmitHandler<CategoryFormInput> = (data) => {
-    // set timeout ony required to display loading state of the create category button
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      console.log('createCategory data ->', data);
       setReset({
         name: '',
         slug: '',
-        type: '',
         parentCategory: '',
         description: '',
         images: '',
       });
+      setSlugTouched(false);
     }, 600);
   };
 
@@ -127,13 +111,29 @@ export default function CreateCategory({
                 <Input
                   label="Category Name"
                   placeholder="category name"
-                  {...register('name')}
+                  {...register('name', {
+                    onChange: (e) => {
+                      const value = e.target.value;
+                      if (!slugTouched) {
+                        // auto-populate slug in lower-case
+                        setValue(
+                          'slug',
+                          value.toLowerCase().replace(/\s+/g, '-')
+                        );
+                      }
+                    },
+                  })}
                   error={errors.name?.message}
                 />
                 <Input
                   label="Slug"
                   placeholder="slug"
-                  {...register('slug')}
+                  {...register('slug', {
+                    onChange: (e) => {
+                      setSlugTouched(true);
+                      setValue('slug', e.target.value);
+                    },
+                  })}
                   error={errors.slug?.message}
                 />
                 <Controller
@@ -147,21 +147,6 @@ export default function CreateCategory({
                       onChange={onChange}
                       label="Parent Category"
                       error={errors?.parentCategory?.message as string}
-                      getOptionValue={(option) => option.label}
-                    />
-                  )}
-                />
-                <Controller
-                  name="type"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      dropdownClassName="!z-0"
-                      options={typeOption}
-                      value={value}
-                      onChange={onChange}
-                      label="Display Type"
-                      error={errors?.type?.message as string}
                       getOptionValue={(option) => option.label}
                     />
                   )}
@@ -204,9 +189,6 @@ export default function CreateCategory({
               isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
             )}
           >
-            <Button variant="outline" className="w-full @xl:w-auto">
-              Save as Draft
-            </Button>
             <Button
               type="submit"
               isLoading={isLoading}

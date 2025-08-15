@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Text, Title, Tooltip } from 'rizzui';
 import { CategoryDataType } from './table';
+import EyeIcon from '@core/components/icons/eye';
 
 const columnHelper = createColumnHelper<CategoryDataType>();
 
@@ -50,19 +51,19 @@ export const categoriesColumns = [
       </Title>
     ),
   }),
-  columnHelper.display({
-    id: 'description',
-    size: 250,
-    header: 'Description',
-    cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.description}</Text>
-    ),
-  }),
   columnHelper.accessor('slug', {
     id: 'slug',
     size: 200,
     header: 'Slug',
     cell: ({ getValue }) => <Text>{getValue()}</Text>,
+  }),
+  columnHelper.display({
+    id: 'subCategories',
+    size: 120,
+    header: 'Sub Categories',
+    cell: ({ row }) => (
+      <div className="ps-6">{row.original.sub_categories}</div>
+    ),
   }),
   columnHelper.display({
     id: 'products',
@@ -80,6 +81,13 @@ export const categoriesColumns = [
       },
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
+        <Tooltip content={'View Category'} placement="top" color="invert">
+          <Link href={routes.eCommerce.categoryDetails(row.original.id)}>
+            <ActionIcon size="sm" variant="outline">
+              <EyeIcon className="h-4 w-4" />
+            </ActionIcon>
+          </Link>
+        </Tooltip>
         <Tooltip content={'Edit Category'} placement="top" color="invert">
           <Link href={routes.eCommerce.editCategory(row.original.id)}>
             <ActionIcon size="sm" variant="outline">

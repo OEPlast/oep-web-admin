@@ -133,7 +133,7 @@ export const routes = {
   maintenance: "/maintenance",
   blank: "/blank",
   auth: {
-    signUp1: "/auth/sign-up-1",
+    signUp1: "/auth/sign-up",
     signUp2: "/auth/sign-up-2",
     signUp3: "/auth/sign-up-3",
     signUp4: "/auth/sign-up-4",

@@ -14,6 +14,7 @@ import NextProgress from '@core/components/next-progress';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import '@/app/globals.css';
+import ReactQueryProvider from '@/providers/react-query';
 
 export const metadata = {
   title: siteConfig.title,
@@ -39,15 +40,17 @@ export default async function RootLayout({
         className={cn(inter.variable, lexendDeca.variable, 'font-inter')}
       >
         <AuthProvider session={session}>
-          <ThemeProvider>
-            <NextProgress />
-            <JotaiProvider>
-              {children}
-              <Toaster />
-              <GlobalDrawer />
-              <GlobalModal />
-            </JotaiProvider>
-          </ThemeProvider>
+          <ReactQueryProvider>
+            <ThemeProvider>
+              <NextProgress />
+              <JotaiProvider>
+                {children}
+                <Toaster />
+                <GlobalDrawer />
+                <GlobalModal />
+              </JotaiProvider>
+            </ThemeProvider>
+          </ReactQueryProvider>
         </AuthProvider>
       </body>
     </html>
