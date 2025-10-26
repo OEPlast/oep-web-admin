@@ -1,16 +1,13 @@
-import { campaignsData, CampaignDataType } from '@/data/campaigns-data';
-import { notFound } from 'next/navigation';
-import OneCampaign from '@/app/shared/ecommerce/campaigns/one-campaign';
-import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
+import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
+import CampaignDetails from '@/app/shared/ecommerce/campaign/campaign-details';
+import { Button } from 'rizzui';
 import Link from 'next/link';
 
-// Simulate fetch campaign by id
-async function fetchCampaignById(id: string): Promise<CampaignDataType | null> {
-  const campaign = campaignsData.find((c) => c._id === id);
-  return campaign || null;
-}
+export const metadata = {
+  ...metaObject('Campaign Details'),
+};
 
 interface CampaignDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -20,14 +17,9 @@ export default async function CampaignDetailsPage({
   params,
 }: CampaignDetailsPageProps) {
   const { id } = await params;
-  const campaign = await fetchCampaignById(id);
-
-  if (!campaign) {
-    notFound();
-  }
 
   const pageHeader = {
-    title: `Campaign -- ${campaign.title}`,
+    title: 'Campaign Details',
     breadcrumb: [
       {
         href: routes.eCommerce.dashboard,
@@ -38,7 +30,7 @@ export default async function CampaignDetailsPage({
         name: 'Campaigns',
       },
       {
-        name: campaign.title,
+        name: 'Details',
       },
     ],
   };
@@ -55,7 +47,7 @@ export default async function CampaignDetailsPage({
           </Button>
         </Link>
       </PageHeader>
-      <OneCampaign campaign={campaign} id={id} />
+      <CampaignDetails id={id} />
     </>
   );
 }

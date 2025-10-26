@@ -1,10 +1,7 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
-import { Input } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
-import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fields';
 
 interface ProductIdentifiersProps {
   className?: string;
@@ -13,42 +10,16 @@ interface ProductIdentifiersProps {
 export default function ProductIdentifiers({
   className,
 }: ProductIdentifiersProps) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
   return (
     <FormGroup
       title="Product Identifiers"
-      description="Edit your product identifiers here"
+      description="SKU and other identifiers are managed in the Summary tab"
       className={cn(className)}
     >
-      <Input
-        label="Global Trade Item Number"
-        placeholder="12345"
-        {...register('tradeNumber')}
-        error={errors.tradeNumber?.message as string}
-      />
-      <Input
-        label="Manufacturer Part Number"
-        placeholder="145782"
-        {...register('manufacturerNumber')}
-        error={errors.manufacturerNumber?.message as string}
-      />
-      <Input
-        label="Brand Name"
-        placeholder="brand name"
-        {...register('brand')}
-        error={errors.brand?.message as string}
-      />
-      <Input
-        label="Product UPC/EAN "
-        placeholder="145782"
-        {...register('upcEan')}
-        error={errors.upcEan?.message as string}
-      />
-      <CustomFields />
+      <div className="col-span-full text-center py-8 text-gray-500">
+        <p>This section is reserved for future identifier fields.</p>
+        <p className="text-sm mt-2">Please use the Summary tab to manage SKU.</p>
+      </div>
     </FormGroup>
   );
 }

@@ -182,7 +182,7 @@ export default function MainTable<TData extends Record<string, any>>({
       </Box>
 
       {isEmpty(table.getRowModel().rows) && (
-        <Box className="py-5 text-center lg:py-8">
+        <Box className={cn("py-5 text-center lg:py-8", stickyHeader && "max-h-[600px] overflow-y-auto", classNames?.container)}>
           <Empty /> <Text className="mt-3">No Data</Text>
         </Box>
       )}

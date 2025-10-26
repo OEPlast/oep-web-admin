@@ -1,19 +1,19 @@
 'use client';
 
 import DeletePopover from '@core/components/delete-popover';
-import { getRatings } from '@core/components/table-utils/get-ratings';
-import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
-import { getStockStatus } from '@core/components/table-utils/get-stock-status';
 import { routes } from '@/config/routes';
-import { ProductType } from '@/data/products-data';
-import EyeIcon from '@core/components/icons/eye';
+import { Product } from '@/hooks/queries/useProducts';
 import PencilIcon from '@core/components/icons/pencil';
-import AvatarCard from '@core/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
+import Image from 'next/image';
+import { getCdnUrl } from '@core/utils/cdn-url';
+import ProductStatusBadge from '../ProductStatusBadge';
+import StockStatus from '../StockStatus';
+import { PiStar, PiCopySimple } from 'react-icons/pi';
 
-const columnHelper = createColumnHelper<ProductType>();
+const columnHelper = createColumnHelper<Product>();
 
 export const productsListColumns = [
   columnHelper.display({
@@ -42,54 +42,93 @@ export const productsListColumns = [
     header: 'Product',
     enableSorting: false,
     cell: ({ row }) => (
-      <AvatarCard
-        src={row.original.image}
-        name={row.original.name}
-        description={row.original.category}
-        avatarProps={{
-          name: row.original.name,
-          size: 'lg',
-          className: 'rounded-lg',
-        }}
-      />
+      <div className="flex items-center gap-3">
+        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded border border-gray-200">
+          <Image
+            src={getCdnUrl(row.original.description_images?.[0]?.url || '')}
+            alt={row.original.name}
+            fill
+            className="object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/placeholder.png';
+            }}
+          />
+        </div>
+        <div className="flex flex-col">
+          <Link
+            href={routes.eCommerce.ediProduct(row.original._id)}
+            className="font-medium text-gray-900 hover:text-primary"
+          >
+            {row.original.name}
+          </Link>
+          <span className="text-xs text-gray-500">
+            {row.original.category?.name || 'Uncategorized'}
+          </span>
+        </div>
+      </div>
     ),
   }),
   columnHelper.display({
     id: 'sku',
     size: 150,
     header: 'SKU',
-    cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
+    cell: ({ row }) => (
+      <Text className="text-sm font-medium text-gray-700">
+        {row.original.sku}
+      </Text>
+    ),
   }),
   columnHelper.accessor('stock', {
     id: 'stock',
     size: 200,
     header: 'Stock',
-    cell: ({ row }) => getStockStatus(row.original.stock),
+    cell: ({ row }) => (
+      <StockStatus
+        stock={row.original.stock}
+        lowStockThreshold={row.original.lowStockThreshold}
+      />
+    ),
   }),
   columnHelper.accessor('price', {
     id: 'price',
     size: 150,
     header: 'Price',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.price}</Text>
+      <Text className="font-medium text-gray-900">
+        ${row.original.price.toFixed(2)}
+      </Text>
     ),
   }),
   columnHelper.display({
     id: 'rating',
-    size: 200,
+    size: 150,
     header: 'Rating',
-    cell: ({ row }) => getRatings(row.original.rating),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1">
+        <PiStar className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+        <span className="text-sm font-medium">
+          {row.original.totalRating
+            ? row.original.totalRating.toFixed(1)
+            : 'N/A'}
+        </span>
+        {row.original.reviewCount !== undefined && (
+          <span className="text-xs text-gray-500">
+            ({row.original.reviewCount})
+          </span>
+        )}
+      </div>
+    ),
   }),
   columnHelper.accessor('status', {
     id: 'status',
     size: 120,
     header: 'Status',
     enableSorting: false,
-    cell: ({ row }) => getStatusBadge(row.original.status),
+    cell: ({ row }) => <ProductStatusBadge status={row.original.status} />,
   }),
   columnHelper.display({
     id: 'action',
-    size: 120,
+    size: 150,
     cell: ({
       row,
       table: {
@@ -99,41 +138,44 @@ export const productsListColumns = [
       <Flex align="center" justify="end" gap="3" className="pe-4">
         <Tooltip
           size="sm"
-          content={'Edit Product'}
+          content="Edit Product"
           placement="top"
           color="invert"
         >
-          <Link href={routes.eCommerce.ediProduct(row.original.id)}>
+          <Link href={routes.eCommerce.ediProduct(row.original._id)}>
             <ActionIcon
               as="span"
               size="sm"
               variant="outline"
-              aria-label={'Edit Product'}
+              aria-label="Edit Product"
             >
               <PencilIcon className="h-4 w-4" />
             </ActionIcon>
           </Link>
         </Tooltip>
+
         <Tooltip
           size="sm"
-          content={'View Product'}
+          content="Duplicate Product"
           placement="top"
           color="invert"
         >
-          <Link href={routes.eCommerce.productDetails(row.original.id)}>
-            <ActionIcon
-              as="span"
-              size="sm"
-              variant="outline"
-              aria-label={'View Product'}
-            >
-              <EyeIcon className="h-4 w-4" />
-            </ActionIcon>
-          </Link>
+          <ActionIcon
+            size="sm"
+            variant="outline"
+            aria-label="Duplicate Product"
+            onClick={() => {
+              const metaWithDuplicate = meta as any;
+              metaWithDuplicate?.handleDuplicateRow?.(row.original);
+            }}
+          >
+            <PiCopySimple className="h-4 w-4" />
+          </ActionIcon>
         </Tooltip>
+
         <DeletePopover
-          title={`Delete the product`}
-          description={`Are you sure you want to delete this #${row.original.id} product?`}
+          title="Delete the product"
+          description={`Are you sure you want to delete "${row.original.name}"?`}
           onDelete={() =>
             meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
           }

@@ -8,9 +8,9 @@ export const formParts = {
   productIdentifiers: 'productIdentifiers',
   shipping: 'shipping',
   seo: 'seo',
-  deliveryEvent: 'deliveryEvent',
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
+  customFields: 'customFields',
 };
 
 export const menuItems = [
@@ -27,7 +27,7 @@ export const menuItems = [
     value: formParts.pricingInventory,
   },
   {
-    label: 'Product Identifiers & Custom Fields',
+    label: 'Product Identifiers',
     value: formParts.productIdentifiers,
   },
   {
@@ -35,12 +35,20 @@ export const menuItems = [
     value: formParts.shipping,
   },
   {
+    label: 'Variant Options',
+    value: formParts.variantOptions,
+  },
+  {
+    label: 'Tags & Category',
+    value: formParts.tagsAndCategory,
+  },
+    {
     label: 'SEO',
     value: formParts.seo,
   },
   {
-    label: 'Variant Options',
-    value: formParts.variantOptions,
+    label: 'Custom Fields',
+    value: formParts.customFields,
   },
 ];
 

@@ -19,7 +19,7 @@ function CreateBannerModalView() {
           <PiXBold className="h-auto w-5" />
         </ActionIcon>
       </div>
-      <CreateBanner isModalView={false} />
+      <CreateBanner isModalView={true} />
     </div>
   );
 }

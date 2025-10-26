@@ -11,22 +11,19 @@ import FormNav, {
   formParts,
 } from '@/app/shared/ecommerce/product/create-edit/form-nav';
 import ProductSummary from '@/app/shared/ecommerce/product/create-edit/product-summary';
-import { defaultValues } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 import ProductMedia from '@/app/shared/ecommerce/product/create-edit/product-media';
 import PricingInventory from '@/app/shared/ecommerce/product/create-edit/pricing-inventory';
 import ProductIdentifiers from '@/app/shared/ecommerce/product/create-edit/product-identifiers';
 import ShippingInfo from '@/app/shared/ecommerce/product/create-edit/shipping-info';
 import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
-import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
 import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
 import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
 import FormFooter from '@core/components/form-footer';
-import {
-  CreateProductInput,
-  productFormSchema,
-} from '@/validators/create-product.schema';
+import { productSchema, CreateProductInput } from '@/validators/product-schema';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
+import { Product } from '@/hooks/queries/useProducts';
+import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fields';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -34,40 +31,86 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.pricingInventory]: PricingInventory,
   [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
-  [formParts.seo]: ProductSeo,
-  [formParts.deliveryEvent]: DeliveryEvent,
   [formParts.variantOptions]: ProductVariants,
   [formParts.tagsAndCategory]: ProductTaxonomies,
+  [formParts.seo]: ProductSeo,
+  [formParts.customFields]: CustomFields,
 };
 
 interface IndexProps {
-  slug?: string;
+  mode?: 'create' | 'edit';
   className?: string;
-  product?: CreateProductInput;
+  product?: Product;
+  onSubmit: (data: CreateProductInput) => void;
+  isLoading?: boolean;
+}
+
+function defaultValues(product?: Product): Partial<CreateProductInput> {
+  if (!product) {
+    return {
+      sku: 0,
+      name: '',
+      description: '',
+      price: 0,
+      category: '',
+      tags: [],
+      description_images: [],
+      specifications: [],
+      dimension: [],
+      shipping: {
+        addedCost: 0,
+        increaseCostBy: 0,
+        addedDays: 0,
+      },
+      
+      attributes: [],
+      pricingTiers: [],
+      stock: 0,
+      lowStockThreshold: 5,
+      status: 'inactive',
+      slug: '',
+    };
+  }
+
+  return {
+    sku: product.sku,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    category: product.category?._id || product.category as any,
+    tags: product.tags || [],
+    description_images: product.description_images || [],
+    specifications: product.specifications || [],
+    dimension: product.dimension || [],
+    shipping: product.shipping || {
+      addedCost: 0,
+      increaseCostBy: 0,
+      addedDays: 0,
+    },
+    attributes: product.attributes || [],
+    pricingTiers: product.pricingTiers || [],
+    stock: product.stock,
+    lowStockThreshold: product.lowStockThreshold,
+    status: product.status,
+    slug: product.slug,
+  };
 }
 
 export default function CreateEditProduct({
-  slug,
+  mode = 'create',
   product,
   className,
+  onSubmit,
+  isLoading = false,
 }: IndexProps) {
   const { layout } = useLayout();
-  const [isLoading, setLoading] = useState(false);
   const methods = useForm<CreateProductInput>({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(productSchema),
     defaultValues: defaultValues(product),
   });
 
-  const onSubmit: SubmitHandler<CreateProductInput> = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('product_data', data);
-      toast.success(
-        <Text as="b">Product successfully {slug ? 'updated' : 'created'}</Text>
-      );
-      methods.reset();
-    }, 600);
+  const handleSubmit: SubmitHandler<CreateProductInput> = (data) => {
+    onSubmit(data);
   };
 
   return (
@@ -79,26 +122,40 @@ export default function CreateEditProduct({
       />
       <FormProvider {...methods}>
         <form
-          onSubmit={methods.handleSubmit(onSubmit)}
+          onSubmit={methods.handleSubmit(handleSubmit)}
           className={cn(
             'relative z-[19] [&_label.block>span]:font-medium',
             className
           )}
         >
           <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
-              <Element
-                key={key}
-                name={formParts[key as keyof typeof formParts]}
-              >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" />}
-              </Element>
-            ))}
+            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => {
+              const componentKey = formParts[key as keyof typeof formParts];
+              
+              // Pass additional props to ProductSummary
+              if (componentKey === formParts.summary) {
+                return (
+                  <Element key={key} name={componentKey}>
+                    <Component 
+                      className="pt-7 @2xl:pt-9 @3xl:pt-11" 
+                      mode={mode}
+                      existingSlug={product?.slug}
+                    />
+                  </Element>
+                );
+              }
+              
+              return (
+                <Element key={key} name={componentKey}>
+                  <Component className="pt-7 @2xl:pt-9 @3xl:pt-11" />
+                </Element>
+              );
+            })}
           </div>
 
           <FormFooter
             isLoading={isLoading}
-            submitBtnText={slug ? 'Update Product' : 'Create Product'}
+            submitBtnText={mode === 'edit' ? 'Update Product' : 'Create Product'}
           />
         </form>
       </FormProvider>

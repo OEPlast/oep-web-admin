@@ -1,6 +1,5 @@
 import { routes } from '@/config/routes';
-import CategoryTable from '@/app/shared/ecommerce/category/category-list/table';
-import CategoryPageHeader from './category-page-header';
+import CategoriesClient from './CategoriesClient';
 import { metaObject } from '@/config/site.config';
 
 export const metadata = {
@@ -15,11 +14,7 @@ const pageHeader = {
       name: 'E-Commerce',
     },
     {
-      href: routes.eCommerce.categories,
       name: 'Categories',
-    },
-    {
-      name: 'List',
     },
   ],
 };
@@ -27,11 +22,8 @@ const pageHeader = {
 export default function CategoriesPage() {
   return (
     <>
-      <CategoryPageHeader
-        title={pageHeader.title}
-        breadcrumb={pageHeader.breadcrumb}
-      />
-      <CategoryTable />
+
+      <CategoriesClient  title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
     </>
   );
 }

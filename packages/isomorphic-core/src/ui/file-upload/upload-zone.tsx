@@ -32,7 +32,7 @@ interface UploadZoneProps {
   accept?: string; // File types to accept (e.g., 'image/*', 'application/pdf')
 }
 
-interface FileType {
+export interface FileType {
   name: string;
   url: string;
   size: number;
@@ -84,8 +84,10 @@ export default function UploadZone({
         fromHistory: true,
       };
 
-      if (typeof currentValue === "string") {
-        setValue(name, newFile);
+      
+
+      if (typeof currentValue === "string" || !multiple) {
+        setValue(name, newFile.path);
       } else if (Array.isArray(currentValue)) {
         // Check if file already exists
         const exists = currentValue.some((f: any) => f.path === historyFile.path);
@@ -186,10 +188,11 @@ export default function UploadZone({
           },
         });
 
+        
         if (response.data?.data) {
           const uploadedFiles: UploadedFile[] = response.data.data.map((file: any) => ({
             path: file.path,
-            url: file.path, // Store path as url for consistency (will be prefixed with CDN when displayed)
+            url: getCdnUrl(file.path), 
             size: file.size,
             mimetype: file.mimetype,
             originalName: file.originalName,
@@ -201,12 +204,12 @@ export default function UploadZone({
 
           // Clear selected files
           setFiles([]);
-
+          
           // Update form value
-          if (typeof initialValue === "string") {
-            setValue(name, uploadedFiles[0]);
+          if (!multiple || typeof initialValue === "string") {
+            setValue(name, uploadedFiles[0].path);
           } else {
-            setValue(name, uploadedFiles);
+            setValue(name, uploadedFiles[0].path);
           }
 
           toast.success(
@@ -232,7 +235,7 @@ export default function UploadZone({
         if (response.data?.data) {
           const uploadedFile: UploadedFile = {
             path: response.data.data.path,
-            url: response.data.data.path, // Store path as url for consistency (will be prefixed with CDN when displayed)
+            url: getCdnUrl(response.data.data.path), 
             size: response.data.data.size,
             mimetype: response.data.data.mimetype,
             originalName: response.data.data.originalName,
@@ -348,64 +351,35 @@ export default function UploadZone({
       </div>
 
       {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {uploadedItems.map((file: any, index: number) => (
-            <div key={index} className={cn("relative")}>
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview name={file.name} url={file.url} />
-                
-                {/* Check icon for files from history */}
-                {file.fromHistory && (
-                  <div className="absolute left-0 top-0 rounded-full bg-green-500 p-1.5">
-                    <PiCheckBold className="h-4 w-4 text-white" />
-                  </div>
-                )}
-                
-                <button
-                  type="button"
-                  className="absolute right-0 top-0 rounded-full bg-gray-700 p-1.5 transition duration-300"
-                  onClick={() => {
-                    // Remove the file from uploadedItems
-                    const newUploadedItems = [...uploadedItems];
-                    newUploadedItems.splice(index, 1);
+        <>
+          {/* Show uploaded files separately */}
 
-                    // Update value based on initial format
-                    if (typeof initialValue === "string") {
-                      setValue(name, "");
-                    } else {
-                      setValue(name, newUploadedItems);
-                    }
-                    
-                    // Force re-render to show the change immediately
-                    setForceUpdate(prev => prev + 1);
-                  }}>
-                  <PiTrashBold className="text-white" />
-                </button>
-              </figure>
-              <MediaCaption name={file.name} size={file.size} />
+          {/* Show pending uploads (not yet uploaded) separately */}
+          {!isEmpty(notUploadedItems) && (
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
+              {notUploadedItems.map((file: any, index: number) => (
+                <div key={index} className={cn("relative")}>
+                  <figure className="group relative h-40 rounded-md bg-gray-50">
+                    <MediaPreview name={file.name} url={file.preview} />
+                    {isUploading ? (
+                      <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
+                        <LoadingSpinner />
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(index)}
+                        className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100">
+                        <PiTrashBold className="text-white" />
+                      </button>
+                    )}
+                  </figure>
+                  <MediaCaption name={file.path} size={file.size} />
+                </div>
+              ))}
             </div>
-          ))}
-          {notUploadedItems.map((file: any, index: number) => (
-            <div key={index} className={cn("relative")}>
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview name={file.name} url={file.preview} />
-                {isUploading ? (
-                  <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
-                    <LoadingSpinner />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100">
-                    <PiTrashBold className="text-white" />
-                  </button>
-                )}
-              </figure>
-              <MediaCaption name={file.path} size={file.size} />
-            </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {error && <FieldError error={error} />}
@@ -444,16 +418,6 @@ function MediaPreview({ name, url }: { name: string; url: string }) {
   // Use blob URLs as-is (for local previews), otherwise construct CDN URL
   const isBlob = url.startsWith('blob:');
   const fullUrl = isBlob ? url : getCdnUrl(url);
-  
-  if (endsWith(name, ".pdf")) {
-    return (
-      <object data={fullUrl} type="application/pdf" width="100%" height="100%">
-        <p>
-          Alternative text - include a link <a href={fullUrl}>to the PDF!</a>
-        </p>
-      </object>
-    );
-  }
   
   // Use regular img for blob URLs, Next Image for CDN URLs
   return isBlob ? (

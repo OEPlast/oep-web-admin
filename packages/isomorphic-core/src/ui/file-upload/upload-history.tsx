@@ -55,8 +55,7 @@ export default function UploadHistory({ className, onSelectFromHistory }: Upload
   return (
     <div className={cn("mt-5 rounded-lg border border-gray-200", className)}>
       {/* Header */}
-      <button
-        type="button"
+      <div
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
       >
@@ -86,7 +85,7 @@ export default function UploadHistory({ className, onSelectFromHistory }: Upload
             <PiCaretDown className="h-5 w-5 text-gray-600" />
           )}
         </div>
-      </button>
+      </div>
 
       {/* Content */}
       {isOpen && (
@@ -95,7 +94,7 @@ export default function UploadHistory({ className, onSelectFromHistory }: Upload
             {history.map((file, index) => (
               <div key={`${file.path}-${index}`} className="group relative">
                 {/* Image/File Preview */}
-                <figure className="relative h-32 overflow-hidden rounded-lg bg-gray-100">
+                <figure className="relative h-32 aspect-square overflow-hidden rounded-lg bg-gray-100">
                   {file.mimetype.startsWith("image/") ? (
                     <Image
                       fill

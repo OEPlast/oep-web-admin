@@ -1,105 +1,59 @@
 'use client';
 
-import { useCallback } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import { Input, Switch, Button, ActionIcon } from 'rizzui';
+import { useFormContext } from 'react-hook-form';
+import { Input } from 'rizzui';
 import cn from '@core/utils/class-names';
-import FormGroup from '@/app/shared/form-group';
-import { locationShipping } from '@/app/shared/ecommerce/product/create-edit/form-utils';
-import TrashIcon from '@core/components/icons/trash';
-import { PiPlusBold } from 'react-icons/pi';
+import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 
 export default function ShippingInfo({ className }: { className?: string }) {
   const {
-    control,
     register,
     formState: { errors },
   } = useFormContext();
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'locationShipping',
-  });
-
-  const addCustomField = useCallback(
-    () => append([...locationShipping]),
-    [append]
-  );
-
   return (
-    <FormGroup
+    <VerticalFormBlockWrapper
       title="Shipping"
-      description="Add your shipping info here"
+      description="Configure additional shipping costs and delivery times for this product"
       className={cn(className)}
     >
-      <Controller
-        name="freeShipping"
-        control={control}
-        render={({ field: { value, onChange } }) => (
-          <Switch
-            label="Free Shipping"
-            className="col-span-full"
-            value={value}
-            checked={value}
-            onChange={onChange}
-          />
-        )}
-      />
-
-      <Input
-        label="Shipping Price"
-        placeholder="150.00"
-        {...register('shippingPrice')}
-        error={errors.shippingPrice?.message as string}
-        prefix={'$'}
-        type="number"
-      />
-      <Controller
-        name="locationBasedShipping"
-        control={control}
-        render={({ field: { value, onChange } }) => (
-          <Switch
-            label="Location Based Shipping"
-            className="col-span-full"
-            value={value}
-            checked={value}
-            onChange={onChange}
-          />
-        )}
-      />
-
-      {fields.map((item, index) => (
-        <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
+      <div className="col-span-full space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Input
-            label="Location Name"
-            placeholder="location name"
-            className="flex-grow"
-            {...register(`locationShipping.${index}.name`)}
+            type="number"
+            label="Added Cost ($)"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            {...register('shipping.addedCost', { valueAsNumber: true })}
+            error={(errors.shipping as any)?.addedCost?.message}
+            prefix="$"
           />
           <Input
-            label="Shipping Charge"
-            placeholder="150.00"
-            className="flex-grow"
-            {...register(`locationShipping.${index}.value`)}
+            type="number"
+            label="Increase Cost By (%)"
+            placeholder="0"
+            step="0.01"
+            min="0"
+            max="100"
+            {...register('shipping.increaseCostBy', { valueAsNumber: true })}
+            error={(errors.shipping as any)?.increaseCostBy?.message}
+            suffix="%"
           />
-          {fields.length > 1 && (
-            <ActionIcon
-              onClick={() => remove(index)}
-              variant="flat"
-              className="mt-7 shrink-0"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </ActionIcon>
-          )}
+          <Input
+            type="number"
+            label="Added Days"
+            placeholder="0"
+            min="0"
+            {...register('shipping.addedDays', { valueAsNumber: true })}
+            error={(errors.shipping as any)?.addedDays?.message}
+            suffix="days"
+          />
         </div>
-      ))}
-      <Button
-        onClick={addCustomField}
-        variant="outline"
-        className="col-span-full ml-auto w-auto"
-      >
-        <PiPlusBold className="me-2 h-4 w-4" strokeWidth={2} /> Add Item
-      </Button>
-    </FormGroup>
+        <p className="text-sm text-gray-500">
+          These values will be added to the base shipping cost and delivery time calculated from the shipping zone.
+        </p>
+      </div>
+    </VerticalFormBlockWrapper>
   );
 }

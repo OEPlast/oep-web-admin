@@ -88,12 +88,6 @@ export const menuItems = [
     permission: { resource: ['categories'], action: 'read' }
   },
   {
-    name: 'Orders',
-    href: routes.eCommerce.orders,
-    icon: <PiShoppingCartDuotone />,
-    permission: { resource: ['orders'], action: 'read' }
-  },
-  {
     name: 'Returns',
     href: routes.eCommerce.returns,
     icon: <IoReturnDownBack />,
@@ -101,9 +95,24 @@ export const menuItems = [
   },
   {
     name: 'Reviews',
-    href: routes.eCommerce.reviews,
     icon: <GoPeople />,
-    permission: { resource: ['reviews'], action: 'read' }
+        href: '#',
+    permission: { resource: ['reviews'], action: 'read' },
+    dropdownItems: [
+      {
+        name: 'All reviews',
+        href: routes.eCommerce.reviews,
+      },
+      {
+        name: 'Reviews by Product',
+        href: routes.eCommerce.reviewsByProduct ,
+      },
+      {
+        name: 'Reviews by User',
+        href: routes.eCommerce.reviewsByUser,
+      },
+     
+    ],
   },
   {
     name: 'Coupons',
@@ -118,7 +127,7 @@ export const menuItems = [
     permission: { resource: ['banners'], action: 'read' } 
   },
   {
-    name: 'Flash Sale',
+    name: 'Sale',
     href: routes.eCommerce.flashSales,
     icon: <MdOutlineSell />,
     permission: { resource: ['sales'], action: 'read' }
@@ -135,11 +144,49 @@ export const menuItems = [
     icon: <PiUserDuotone />,
     permission: { resource: ['users'], action: 'read' }
   },
+   {
+    name: 'Orders',
+    href: routes.eCommerce.orders,
+    icon: <PiShoppingCartDuotone />,
+    permission: { resource: ['orders'], action: 'read' }
+  },
+    {
+    name: 'Transactions',
+    href: routes.transactions.list,
+    icon: <MdPayments />,
+    permission: { resource: ['transactions'], action: 'read' }
+  },
   {
-    name: 'Gallery',
-    href: routes.file.manager,
-    icon: <PiFoldersDuotone />,
-    permission: { resource: ['gallery'], action: 'read' }
+    name: 'Logistics',
+    href: '#',
+    icon: <PiPackageDuotone />,
+    permission: { resource: ['logistics'], action: 'read' },
+    dropdownItems: [
+      {
+        name: 'Shipment List',
+        href: routes.logistics.shipmentList,
+      },
+      {
+        name: 'Shipment Details',
+        href: routes.logistics.shipmentDetails(DUMMY_ID),
+      },
+      {
+        name: 'Create Shipment',
+        href: routes.logistics.createShipment,
+      },
+      {
+        name: 'Edit Shipment',
+        href: routes.logistics.editShipment(DUMMY_ID),
+      },
+      {
+        name: 'Customer Profile',
+        href: routes.logistics.customerProfile,
+      },
+      {
+        name: 'Tracking',
+        href: routes.logistics.tracking(DUMMY_ID),
+      },
+    ],
   },
     {
     name: 'Invoice',
@@ -180,44 +227,6 @@ export const menuItems = [
     href: routes.rolesPermissions,
     icon: <PiFolderLockDuotone />,
     permission: { resource: ['roles'], action: 'read' }
-  },
-  {
-    name: 'Transactions',
-    href: routes.rolesPermissions,
-    icon: <MdPayments />,
-    permission: { resource: ['transactions'], action: 'read' }
-  },
-  {
-    name: 'Logistics',
-    href: '#',
-    icon: <PiPackageDuotone />,
-    permission: { resource: ['logistics'], action: 'read' },
-    dropdownItems: [
-      {
-        name: 'Shipment List',
-        href: routes.logistics.shipmentList,
-      },
-      {
-        name: 'Shipment Details',
-        href: routes.logistics.shipmentDetails(DUMMY_ID),
-      },
-      {
-        name: 'Create Shipment',
-        href: routes.logistics.createShipment,
-      },
-      {
-        name: 'Edit Shipment',
-        href: routes.logistics.editShipment(DUMMY_ID),
-      },
-      {
-        name: 'Customer Profile',
-        href: routes.logistics.customerProfile,
-      },
-      {
-        name: 'Tracking',
-        href: routes.logistics.tracking(DUMMY_ID),
-      },
-    ],
   },
   {
     name: 'Store Settings',

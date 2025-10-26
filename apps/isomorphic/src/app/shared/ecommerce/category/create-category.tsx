@@ -9,11 +9,12 @@ import { Button, Input, Select, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import {
-  CategoryFormInput,
-  categoryFormSchema,
+  CreateCategoryFormInput,
+  createCategoryFormSchema,
 } from '@/validators/create-category.schema';
 import UploadZone from '@core/ui/file-upload/upload-zone';
 import HorizontalFormBlockWrapper from '@/app/shared/HorizontalFormBlockWrapper';
+import { useParentCategoryOptions } from '@/hooks/queries/useParentCategoryOptions';
 
 // const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
 //   ssr: false,
@@ -25,26 +26,6 @@ const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
 
-// Parent category option
-const parentCategoryOption = [
-  {
-    value: 'fruits',
-    label: 'Fruits',
-  },
-  {
-    value: 'grocery',
-    label: 'Grocery',
-  },
-  {
-    value: 'meat',
-    label: 'Meat',
-  },
-  {
-    value: 'cat food',
-    label: 'Cat Food',
-  },
-];
-
 // main category form component for create and update category
 
 export default function CreateCategory({
@@ -54,13 +35,16 @@ export default function CreateCategory({
 }: {
   id?: string;
   isModalView?: boolean;
-  category?: CategoryFormInput;
+  category?: CreateCategoryFormInput;
 }) {
+  const { data: parentOptions = [], isLoading: categoriesLoading } = useParentCategoryOptions();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
 
-  const onSubmit: SubmitHandler<CategoryFormInput> = (data) => {
+  const onSubmit: SubmitHandler<CreateCategoryFormInput> = (data) => {
+    console.log(data);
+    
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -76,12 +60,12 @@ export default function CreateCategory({
   };
 
   return (
-    <Form<CategoryFormInput>
-      validationSchema={categoryFormSchema}
+    <Form<CreateCategoryFormInput>
+      validationSchema={createCategoryFormSchema}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
-        mode: 'onChange',
+        mode: 'onSubmit',
         defaultValues: category,
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
@@ -93,6 +77,7 @@ export default function CreateCategory({
         setValue,
         formState: { errors, isValid },
       }) => (
+
         <>
           <div className="flex-grow pb-10">
             <div
@@ -137,17 +122,25 @@ export default function CreateCategory({
                   error={errors.slug?.message}
                 />
                 <Controller
-                  name="parentCategory"
+                  name="parent"
                   control={control}
                   render={({ field: { onChange, value } }) => (
                     <Select
                       dropdownClassName="!z-0"
-                      options={parentCategoryOption}
-                      value={value}
-                      onChange={onChange}
+                      options={parentOptions}
+                      value={parentOptions.filter((opt) => value?.includes(opt.value))}
+                      onChange={(selectedOptions: any) => {
+                        const values = selectedOptions
+                          ? selectedOptions.map((opt: any) => opt.value)
+                          : [];
+                        onChange(values);
+                      }}
+                      multiple
+                      searchable
+                      clearable
+                      disabled={categoriesLoading}
                       label="Parent Category"
-                      error={errors?.parentCategory?.message as string}
-                      getOptionValue={(option) => option.label}
+                      error={errors?.parent?.message as string}
                     />
                   )}
                 />
@@ -193,6 +186,7 @@ export default function CreateCategory({
               type="submit"
               isLoading={isLoading}
               className="w-full @xl:w-auto"
+              onClick={() => console.log('Category form errors', errors)}
             >
               {id ? 'Update' : 'Create'} Category
             </Button>

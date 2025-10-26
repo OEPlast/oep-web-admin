@@ -6,9 +6,10 @@ import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Text, Title, Tooltip } from 'rizzui';
+import { ActionIcon, Checkbox, Switch, Text, Title, Tooltip } from 'rizzui';
 import { BannerType } from '../banner-types';
-import { Row } from '@react-email/row';
+import { useToggleBannerActive } from '@/hooks/mutations/useBannerMutations';
+import { getCdnUrl } from '@core/utils/cdn-url';
 
 const columnHelper = createColumnHelper<BannerType>();
 
@@ -33,7 +34,7 @@ export const bannersColumns = [
       <figure className="relative aspect-[3/2] w-40 overflow-hidden rounded-lg bg-gray-100">
         <Image
           alt={row.original.name}
-          src={row.original.imageUrl}
+          src={getCdnUrl(row.original.imageUrl)}
           fill
           sizes="(max-width: 768px) 100vw"
           className="object-cover"
@@ -67,9 +68,24 @@ export const bannersColumns = [
   }),
   columnHelper.accessor('active', {
     id: 'active',
-    size: 100,
-    header: 'Active',
-    cell: ({ getValue }) => <Text>{getValue() ? 'Yes' : 'No'}</Text>,
+    size: 120,
+    header: 'Status',
+    cell: ({ row }) => {
+      const toggleActive = useToggleBannerActive();
+      
+      return (
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={row.original.active}
+            onChange={() => toggleActive.mutate(row.original._id)}
+            disabled={toggleActive.isPending}
+          />
+          <Text className="text-xs">
+            {row.original.active ? 'Active' : 'Inactive'}
+          </Text>
+        </div>
+      );
+    },
   }),
   columnHelper.accessor('createdAt', {
     id: 'createdAt',
@@ -98,7 +114,7 @@ export const bannersColumns = [
         </Tooltip>
         <DeletePopover
           title={`Delete the banner`}
-          description={`Are you sure you want to delete this #${row.original._id} banner?`}
+          description={`Are you sure you want to delete this banner "${row.original.name}"?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
         />
       </div>

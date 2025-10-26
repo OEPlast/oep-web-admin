@@ -171,6 +171,7 @@ function Upload(
         <div className="flex flex-col items-center @2xl:flex-row">
           <UploadIcon
             className={cn(
+              'max-w-[100px] aspect-square',
               variant !== 'outline' && !props.disabled
                 ? inputClasses.lightTextColor[color]
                 : 'text-gray-300',

@@ -4,9 +4,7 @@ import { routes } from '@/config/routes';
 import { Button } from 'rizzui/button';
 import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
-import CreateBanner from '@/app/shared/ecommerce/banners/create-banner';
-import { banners } from '@/data/banners';
-// import CreateBanner from '@/app/shared/ecommerce/banners/create-banner'; // To be implemented
+import BannerEditClient from './BannerEditClient';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -51,7 +49,7 @@ export default async function EditBannerPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <CreateBanner id={id} banner={banners[0]} />
+      <BannerEditClient bannerId={id} />
     </>
   );
 }

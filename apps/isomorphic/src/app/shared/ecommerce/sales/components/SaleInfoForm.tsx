@@ -6,11 +6,13 @@ import {
   UseFormRegister,
   UseFormSetValue,
 } from 'react-hook-form';
-import { Button, Drawer, Input, Select, Text } from 'rizzui';
+import { Button, Drawer, Input, Select, Text, Loader } from 'rizzui';
 import { CreateSalesInput } from '@/validators/create-sale.schema';
 import { LuReplace } from 'react-icons/lu';
-import { salesData } from '@/data/sales-data'; // Assuming salesData is correctly typed
 import { useState } from 'react';
+import { PiMagnifyingGlassBold } from 'react-icons/pi';
+import { useProducts, useProductSearch } from '@/hooks/queries/useProducts';
+import { useDebounce } from '@/hooks/use-debounce';
 
 const typeOptions = [
   { value: 'Flash', label: 'Flash' },
@@ -48,12 +50,12 @@ interface SaleInfoFormProps {
       }[];
     }[];
   } | null;
-  setSelectedProduct: React.Dispatch<React.SetStateAction<any | null>>; // Adjust 'any' to the correct product type
+  setSelectedProduct: React.Dispatch<React.SetStateAction<any | null>>;
   isDrawerOpen: boolean;
   setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  filteredProducts: typeof salesData; // Assuming salesData is correctly typed
-  handleSearch: (query: string) => void;
-  isEditMode?: boolean; // Added isEditMode prop
+  filteredProducts: any[]; // This prop is no longer used but kept for compatibility
+  handleSearch: (query: string) => void; // This prop is no longer used but kept for compatibility
+  isEditMode?: boolean;
 }
 
 export default function SaleInfoForm({
@@ -65,10 +67,28 @@ export default function SaleInfoForm({
   setSelectedProduct,
   isDrawerOpen,
   setDrawerOpen,
-  filteredProducts,
-  handleSearch,
-  isEditMode, // Destructure isEditMode
+  isEditMode,
 }: SaleInfoFormProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  // Fetch initial products (first 20) when drawer opens
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts(
+    { page: 1, limit: 20 },
+  );
+
+  // Search products when user types (debounced)
+  const { data: searchResults, isLoading: isSearching } = useProductSearch(
+    debouncedSearch,
+    isDrawerOpen && debouncedSearch.trim().length > 0
+  );
+
+  // Determine which products to display
+  const displayedProducts = searchQuery.trim() 
+    ? (searchResults || []) 
+    : (productsData?.data || []);
+
+  const isLoading = isLoadingProducts || isSearching;
   return (
     <>
       <Input
@@ -115,50 +135,88 @@ export default function SaleInfoForm({
             Select Product
           </Button>
         )}
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Input
-            placeholder="Search products..."
-            onChange={(e) => handleSearch(e.target.value)}
-            className="mb-4"
-          />
-          <div className="space-y-2">
-            {filteredProducts.slice(0, 40).map((sale) => (
-              <div
-                key={sale.product._id}
-                className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
-                onClick={() => {
-                  setValue('product', sale.product._id);
-                  setSelectedProduct({
-                    _id: sale.product._id,
-                    name: sale.product.name,
-                    image: sale.product.coverImage,
-                    stock: sale.product.stock,
-                    slug: sale.product.slug,
-                    category: sale.product.category,
-                    subCategories: sale.product.subCategories,
-                    attributes: sale.product.attributes,
-                  });
-                  setValue('variants', [
-                    {
-                      attributeName: 'All', // Reset to 'All'
-                      attributeValue: 'All', // Reset to 'All'
-                      discount: 10,
-                      maxBuys: 0,
-                      boughtCount: 0,
-                      // limit is part of the main sale, not variant here based on schema
-                    },
-                  ]);
-                  setDrawerOpen(false);
-                }}
-              >
-                <img
-                  src={sale.product.coverImage}
-                  alt={sale.product.name}
-                  className="h-8 w-8 rounded-md object-cover"
-                />
-                <span>{sale.product.name}</span>
+        <Drawer isOpen={isDrawerOpen} onClose={() => {
+          setDrawerOpen(false);
+          setSearchQuery('');
+        }}>
+          <div className="p-4">
+            <Text className="mb-4 text-lg font-semibold">Select Product</Text>
+            <Input
+              placeholder="Search by name, SKU, or ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mb-4"
+              prefix={<PiMagnifyingGlassBold className="size-4" />}
+              clearable
+              onClear={() => setSearchQuery('')}
+            />
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader variant="spinner" size="lg" />
+                <Text className="ml-3 text-gray-600">
+                  {searchQuery ? 'Searching...' : 'Loading products...'}
+                </Text>
               </div>
-            ))}
+            ) : displayedProducts.length === 0 ? (
+              <div className="py-8 text-center">
+                <Text className="text-gray-500">
+                  {searchQuery 
+                    ? 'No products found matching your search' 
+                    : 'No products available'}
+                </Text>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                {displayedProducts.map((product) => (
+                  <div
+                    key={product._id}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent p-3 transition-all hover:border-gray-300 hover:bg-gray-50"
+                    onClick={() => {
+                      setValue('product', product._id);
+                      setSelectedProduct({
+                        _id: product._id,
+                        name: product.name,
+                        image: product.coverImage || product.image || '',
+                        stock: product.stock,
+                        slug: product.slug,
+                        category: product.category,
+                        subCategories: product.subCategories || { _id: '', name: '' },
+                        attributes: product.attributes || [],
+                      });
+                      setValue('variants', [
+                        {
+                          attributeName: 'All',
+                          attributeValue: 'All',
+                          discount: 10,
+                          maxBuys: 0,
+                          boughtCount: 0,
+                        },
+                      ]);
+                      setDrawerOpen(false);
+                      setSearchQuery('');
+                    }}
+                  >
+                    <img
+                      src={product.coverImage || product.image || '/placeholder.png'}
+                      alt={product.name}
+                      className="h-12 w-12 flex-shrink-0 rounded-md border border-gray-200 object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <Text className="font-medium truncate">{product.name}</Text>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>{product.category?.name || 'No category'}</span>
+                        {product.stock !== undefined && (
+                          <>
+                            <span>•</span>
+                            <span>Stock: {product.stock}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Drawer>
         {errors.product && (

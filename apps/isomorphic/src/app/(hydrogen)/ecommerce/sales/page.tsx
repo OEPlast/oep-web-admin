@@ -9,11 +9,11 @@ import { metaObject } from '@/config/site.config';
 // import ExportButton from '@/app/shared/export-button'; // Optional
 
 export const metadata = {
-  ...metaObject('Flash Sales'),
+  ...metaObject('Sales'),
 };
 
 const pageHeader = {
-  title: 'Flash Sales',
+  title: 'Sales',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -41,7 +41,7 @@ export default function FlashSalesPage() {
           >
             <Button as="span" className="w-full @lg:w-auto">
               <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-              Create Flash Sale
+              Create Sale
             </Button>
           </Link>
         </div>

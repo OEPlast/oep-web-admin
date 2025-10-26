@@ -1,15 +1,34 @@
 import { z } from 'zod';
-import { messages } from '@/config/messages';
-import { fileSchema } from './common-rules';
 
-// form zod validation schema
-export const categoryFormSchema = z.object({
-  name: z.string().min(1, { message: messages.catNameIsRequired }),
-  slug: z.string().min(1, { message: messages.slugIsRequired }),
-  parentCategory: z.string().optional(),
+// Create category schema - for new categories
+export const createCategoryFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Category name must be at least 2 characters')
+    .max(32, 'Category name must not exceed 32 characters'),
   description: z.string().optional(),
-  images: z.array(fileSchema).optional(),
+  image: z.string().optional().or(z.literal('')),
+  slug: z.string().min(1, 'Slug is required'),
+  banner: z.string().optional().or(z.literal('')),
+  parent: z.array(z.string()).default([]).optional(),
 });
 
-// generate form types from zod validation schema
-export type CategoryFormInput = z.infer<typeof categoryFormSchema>;
+// Update category schema - includes server fields
+export const updateCategoryFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Category name must be at least 2 characters')
+    .max(32, 'Category name must not exceed 32 characters'),
+  description: z.string().optional(),
+  image: z.string().optional().or(z.literal('')),
+  banner: z.string().optional().or(z.literal('')),
+  parent: z.array(z.string()).optional().default([]),
+  _id: z.string().optional(),
+  slug: z.string().min(1, 'Slug is required'),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+// TypeScript types inferred from schemas
+export type CreateCategoryFormInput = z.infer<typeof createCategoryFormSchema>;
+export type UpdateCategoryFormInput = z.infer<typeof updateCategoryFormSchema>;

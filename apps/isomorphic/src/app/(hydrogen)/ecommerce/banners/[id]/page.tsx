@@ -3,7 +3,7 @@ import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
 import Link from 'next/link';
 import BannerDetails from './Client';
-import { banners } from '@/data/banners';
+
 export default async function BannerDetailsPage({ params }: any) {
   const id = (await params).id;
   const pageHeader = {
@@ -34,7 +34,7 @@ export default async function BannerDetailsPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <BannerDetails banner={banners[0]} />
+      <BannerDetails bannerId={id} />
     </>
   );
 }

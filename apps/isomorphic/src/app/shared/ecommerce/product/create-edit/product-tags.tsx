@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input, Button } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
@@ -8,71 +8,86 @@ import { useFormContext } from 'react-hook-form';
 import { PiTagBold, PiXBold } from 'react-icons/pi';
 
 export default function ProductTags({ className }: { className?: string }) {
-  const [tags, setTags] = useState<string[]>([]);
+  const { watch, setValue } = useFormContext();
+  const formTags = watch('tags') || [];
+  const [tags, setTags] = useState<string[]>(formTags);
+
+  useEffect(() => {
+    setTags(formTags);
+  }, [formTags]);
+
   return (
     <FormGroup
-      title="Product Tags"
-      description="Add your product's tag or category here"
+      title="Product Tags & Category"
+      description="Tags are already managed in Summary tab. Category selection is also in Summary."
       className={cn(className)}
     >
-      <ItemCrud name="Tag" items={tags} setItems={setTags} />
+      <ItemCrud tags={tags} setTags={setTags} setValue={setValue} />
     </FormGroup>
   );
 }
 
 interface ItemCrudProps {
-  name: string;
-  items: string[];
-  setItems: React.Dispatch<React.SetStateAction<string[]>>;
+  tags: string[];
+  setTags: React.Dispatch<React.SetStateAction<string[]>>;
+  setValue: any;
 }
 
-function ItemCrud({ name, items, setItems }: ItemCrudProps) {
-  const { register, setValue } = useFormContext();
+function ItemCrud({ tags, setTags, setValue }: ItemCrudProps) {
   const [itemText, setItemText] = useState<string>('');
 
   function handleItemAdd(): void {
     if (itemText.trim() !== '') {
-      const newItem: string = itemText;
-
-      setItems([...items, newItem]);
-      setValue('tags', [...items, newItem]);
+      const newTags = [...tags, itemText.trim()];
+      setTags(newTags);
+      setValue('tags', newTags);
       setItemText('');
     }
   }
 
   function handleItemRemove(text: string): void {
-    const updatedItems = items.filter((item) => item !== text);
-    setItems(updatedItems);
+    const updatedTags = tags.filter((item) => item !== text);
+    setTags(updatedTags);
+    setValue('tags', updatedTags);
+  }
+
+  function handleKeyPress(e: React.KeyboardEvent): void {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleItemAdd();
+    }
   }
 
   return (
-    <div>
-      <div className="flex items-center">
+    <div className="col-span-full">
+      <div className="flex items-center gap-4">
         <Input
           value={itemText}
-          placeholder={`Enter a ${name}`}
+          placeholder="Enter a tag"
           onChange={(e) => setItemText(e.target.value)}
+          onKeyPress={handleKeyPress}
           prefix={<PiTagBold className="h-4 w-4" />}
-          className="w-full"
+          className="flex-grow"
         />
-        <input type="hidden" {...register('tags', { value: items })} />
         <Button
+          type="button"
           onClick={handleItemAdd}
-          className="ms-4 shrink-0 text-sm @lg:ms-5"
+          className="shrink-0"
         >
-          Add {name}
+          Add Tag
         </Button>
       </div>
 
-      {items.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {items.map((text, index) => (
+      {tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((text, index) => (
             <div
               key={index}
-              className="flex items-center rounded-full border border-gray-300 py-1 pe-2.5 ps-3 text-sm font-medium text-gray-700"
+              className="flex items-center rounded-full border border-gray-300 bg-gray-50 py-1.5 pe-2.5 ps-3.5 text-sm font-medium text-gray-700"
             >
               {text}
               <button
+                type="button"
                 onClick={() => handleItemRemove(text)}
                 className="ps-2 text-gray-500 hover:text-gray-900"
               >

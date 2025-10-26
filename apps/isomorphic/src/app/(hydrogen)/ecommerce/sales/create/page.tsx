@@ -6,11 +6,11 @@ import { metaObject } from '@/config/site.config';
 import CreateSales from '@/app/shared/ecommerce/sales/create-sales';
 
 export const metadata = {
-  ...metaObject('Create a Flash Sale'),
+  ...metaObject('Create a Sale'),
 };
 
 const pageHeader = {
-  title: 'Create A Flash Sale',
+  title: 'Create A Sale',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -18,7 +18,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.flashSales,
-      name: 'Flash Sales',
+      name: 'Sales',
     },
     {
       name: 'Create',

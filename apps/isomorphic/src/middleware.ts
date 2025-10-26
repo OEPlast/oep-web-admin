@@ -20,6 +20,6 @@ export const config = {
     '/file/:path*',
     '/file-manager',
     '/invoice/:path*',
-    '/forms/profile-settings/:path*',
+    '/account/profile-settings/:path*',
   ],
 };

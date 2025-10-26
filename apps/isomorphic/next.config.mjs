@@ -53,6 +53,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'oeptest.b-cdn.net',
       },
+       {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
     ],
   },
   reactStrictMode: true,

@@ -1,14 +1,15 @@
 'use client';
-import { BannerFormInput } from '@/validators/create-banner.schema';
-import { useState, useEffect } from 'react';
+import { CreateBannerFormInput } from '@/validators/create-banner.schema';
+import { useState, useEffect, useRef } from 'react';
 import HorizontalFormBlockWrapper from '@/app/shared/HorizontalFormBlockWrapper';
-import UploadZone from '@core/ui/file-upload/upload-zone';
+import UploadZone, { FileType } from '@core/ui/file-upload/upload-zone';
 import { PiTrashBold } from 'react-icons/pi';
 import { Text } from 'rizzui';
+import { getCdnUrl } from '@core/utils/cdn-url';
 
 type BannerImageBlockProps = {
   imageUrl: string;
-  setValue: (name: keyof BannerFormInput, value: string) => void;
+  setValue: (name: keyof CreateBannerFormInput, value: string) => void;
   getValues: (name: string) => any;
   error?: string | undefined;
 };
@@ -19,22 +20,12 @@ export const BannerImageBlock: React.FC<BannerImageBlockProps> = ({
   setValue,
   getValues,
 }) => {
-  const [localImageUrl, setLocalImageUrl] = useState(imageUrl || '');
+  const [localImageUrl, setLocalImageUrl] = useState(() => getCdnUrl(imageUrl) || '');
 
-  // Sync local state when form value changes
-  useEffect(() => {
-    if (imageUrl !== undefined) {
-      setLocalImageUrl(imageUrl);
-    }
-  }, [imageUrl]);
-
-  // Sync form value when local state changes
-  useEffect(() => {
-    if (localImageUrl !== imageUrl) {
-      setValue('imageUrl', localImageUrl);
-    }
-  }, [localImageUrl, imageUrl, setValue]);
-
+  const removeLocalImage = () => {
+    setLocalImageUrl('');
+    setValue('imageUrl', '');
+  }
   return (
     <HorizontalFormBlockWrapper
       title="Banner Image"
@@ -45,15 +36,15 @@ export const BannerImageBlock: React.FC<BannerImageBlockProps> = ({
         <div className="col-span-full">
           <div className="relative">
             <figure className="group relative h-40 w-full max-w-sm rounded-md bg-gray-50">
-              <img
+               <img
                 src={localImageUrl}
                 alt="Banner preview"
                 className="h-full w-full rounded-md object-contain"
-              />
+              /> 
               <button
                 type="button"
                 className="absolute right-2 top-2 rounded-full bg-gray-700/70 p-1.5 transition duration-300 hover:bg-red-500"
-                onClick={() => setLocalImageUrl('')}
+                onClick={removeLocalImage}
               >
                 <PiTrashBold className="text-white" />
               </button>
@@ -74,11 +65,11 @@ export const BannerImageBlock: React.FC<BannerImageBlockProps> = ({
               | 'category'
               | '_id'
               | 'createdAt',
-            value: string
-          ) => {
-            setValue(name as keyof BannerFormInput, value);
+            value: FileType[]
+          ) => {            
+            setValue(name as keyof CreateBannerFormInput, value[0]?.path || '');
             if (name === 'imageUrl') {
-              setLocalImageUrl(value);
+              setLocalImageUrl(value[0]?.url || '');
             }
           }}
           className="col-span-full"

@@ -3,7 +3,7 @@ import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
 import Link from 'next/link';
 import { metaObject } from '@/config/site.config';
-import CreateCampaign from '@/app/shared/ecommerce/campaigns/create-campaign';
+import CreateCampaign from '@/app/shared/ecommerce/campaign/create-campaign';
 
 export const metadata = {
   ...metaObject('Create a Campaign'),

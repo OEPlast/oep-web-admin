@@ -10,7 +10,7 @@ export default async function FlashSaleDetailsPage({ params }: any) {
   const id = (await params).id;
   const initialSale = await getSaleById('6650011221a3cfb8eaf01aa1');
   const pageHeader = {
-    title: `Flash Sale #${id}`,
+    title: `Sale #${id}`,
     breadcrumb: [
       {
         href: routes.eCommerce.dashboard,
@@ -33,7 +33,7 @@ export default async function FlashSaleDetailsPage({ params }: any) {
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         >
           <Button as="span" className="w-full @lg:w-auto">
-            Edit Flash Sale
+            Edit Sale
           </Button>
         </Link>
       </PageHeader>

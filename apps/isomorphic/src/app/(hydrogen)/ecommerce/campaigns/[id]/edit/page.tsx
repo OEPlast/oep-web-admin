@@ -1,11 +1,10 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { routes } from '@/config/routes';
-import { Button } from 'rizzui/button';
+import { Button } from 'rizzui';
 import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
-import EditCampaignWrapper from './edit-campaign-wrapper';
-import { campaignsData } from '@/data/campaigns-data';
+import EditCampaign from '@/app/shared/ecommerce/campaign/edit-campaign';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -27,23 +26,18 @@ const pageHeader = {
       href: routes.eCommerce.campaign,
       name: 'Campaigns',
     },
+    {
+      name: 'Edit',
+    },
   ],
 };
 
-export default async function EditCampaignPage({ params }: any) {
-  const id = (await params).id;
-  const campaign = campaignsData.find((c) => c._id === id);
+export default async function EditCampaignPage({ params }: Props) {
+  const { id } = await params;
 
   return (
     <>
-      <PageHeader
-        title={pageHeader.title}
-        breadcrumb={[
-          ...pageHeader.breadcrumb,
-          { name: id, href: '/' },
-          { name: 'Edit' },
-        ]}
-      >
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <Link
           href={routes.eCommerce.campaign}
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
@@ -53,7 +47,7 @@ export default async function EditCampaignPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <EditCampaignWrapper campaign={campaign} />
+      <EditCampaign id={id} />
     </>
   );
 }

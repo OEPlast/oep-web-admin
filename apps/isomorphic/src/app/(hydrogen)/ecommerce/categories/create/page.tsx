@@ -1,4 +1,4 @@
-import CreateCategory from '@/app/shared/ecommerce/category/create-category';
+import CreateCategory from '@/app/shared/ecommerce/categories/create-category';
 import PageHeader from '@/app/shared/page-header';
 import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
@@ -39,6 +39,7 @@ export default function CreateCategoryPage() {
           </Button>
         </Link>
       </PageHeader>
+      <br />
       <CreateCategory />
     </>
   );

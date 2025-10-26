@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const pageHeader = {
-  title: 'Edit Flash Sale',
+  title: 'Edit Sale',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -27,7 +27,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.flashSales,
-      name: 'Flash Sales',
+      name: 'Sales',
     },
     {
       name: 'Edit',

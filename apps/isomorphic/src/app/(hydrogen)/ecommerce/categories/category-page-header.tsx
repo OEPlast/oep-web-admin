@@ -3,7 +3,7 @@
 import React from 'react';
 import PageHeader from '@/app/shared/page-header';
 import { Button, Title, ActionIcon } from 'rizzui';
-import CreateCategory from '@/app/shared/ecommerce/category/create-category';
+import CreateCategory from '@/app/shared/ecommerce/categories/create-category';
 import { PiPlusBold, PiXBold } from 'react-icons/pi';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 

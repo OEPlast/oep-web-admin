@@ -10,7 +10,6 @@ export const routes = {
     categoryDetails: (id: string) => `/ecommerce/categories/${id}`,
     editCategory: (id: string) => `/ecommerce/categories/${id}/edit`,
     orders: '/ecommerce/orders',
-    createOrder: '/ecommerce/orders/create',
     orderDetails: (id: string) => `/ecommerce/orders/${id}`,
     editOrder: (id: string) => `/ecommerce/orders/${id}/edit`,
     returns: '/ecommerce/returns',
@@ -34,6 +33,8 @@ export const routes = {
     CampaignDetails: (id: string) => `/ecommerce/campaigns/${id}`,
     editCampaign: (id: string) => `/ecommerce/campaigns/${id}/edit`,
     reviews: '/ecommerce/reviews',
+    reviewsByProduct: '/ecommerce/reviews/by-product',
+    reviewsByUser: '/ecommerce/reviews/by-user',
     shop: '/ecommerce/shop',
     cart: '/ecommerce/cart',
     checkout: '/ecommerce/checkout',
@@ -105,6 +106,10 @@ export const routes = {
   },
   eventCalendar: '/event-calendar',
   rolesPermissions: '/roles-permissions',
+  transactions: {
+    list: '/transactions',
+    details: (id: string) => `/transactions/${id}`,
+  },
   users: {
     list: '/users',
     details: (id: string) => `/users/${id}`,
@@ -138,10 +143,10 @@ export const routes = {
   multiStep: '/multi-step',
   multiStep2: '/multi-step-2',
   forms: {
-    profileSettings: '/forms/profile-settings',
-    notificationPreference: '/forms/profile-settings/notification',
-    personalInformation: '/forms/profile-settings/profile',
-    newsletter: '/forms/newsletter',
+    profileSettings: '/account/profile-settings',
+    notificationPreference: '/account/profile-settings/notification',
+    personalInformation: '/account/profile-settings/profile',
+    newsletter: '/account/newsletter',
   },
   emailTemplates: '/email-templates',
   profile: '/profile',
@@ -178,8 +183,8 @@ export const routes = {
   },
   signIn: '/signin',
   storefront: {
-    signUpPage : `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/register`,
-    forgotPasswordPage : `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/forgot-password`,
-    homePage : `${process.env.NEXT_PUBLIC_STOREFRONT_URL}`
-  }
+    signUpPage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/register`,
+    forgotPasswordPage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/forgot-password`,
+    homePage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}`,
+  },
 };

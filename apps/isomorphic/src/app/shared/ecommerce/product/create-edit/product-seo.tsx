@@ -6,42 +6,33 @@ import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 
 export default function ProductSeo({ className }: { className?: string }) {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { register, watch, formState: { errors } } = useFormContext();
+
+  const productName = watch('name');
+  const slug = watch('slug');
+
+  // Generate slug from product name as placeholder
+  const generatedSlug = productName 
+    ? productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+    : '';
 
   return (
     <FormGroup
       title="Search Engine Optimization"
-      description="Add your product's seo info here"
+      description="Configure SEO-friendly URL slug for this product"
       className={cn(className)}
     >
       <Input
-        label="Page Title"
-        placeholder="page title"
-        {...register('pageTitle')}
-        error={errors.pageTitle?.message as string}
+        label="URL Slug"
+        placeholder={generatedSlug || "enter-product-slug"}
+        {...register('slug')}
+        error={errors.slug?.message as string}
+        prefix={<span className="text-gray-500">products/</span>}
+        helperText="URL-friendly identifier for this product. Leave empty to auto-generate from product name."
       />
-      <Input
-        label="Meta Keywords"
-        placeholder="meta keywords"
-        {...register('metaKeywords')}
-        error={errors.metaKeywords?.message as string}
-      />
-      <Input
-        label="Meta Description"
-        placeholder="meta description"
-        {...register('metaDescription')}
-        error={errors.metaDescription?.message as string}
-      />
-      <Input
-        label="Product URL"
-        type="url"
-        placeholder="https://"
-        {...register('productUrl')}
-        error={errors.productUrl?.message as string}
-      />
+      <p className="text-sm text-gray-500 col-span-full">
+        The slug will be automatically generated from the product name if left empty. You can also customize it manually.
+      </p>
     </FormGroup>
   );
 }

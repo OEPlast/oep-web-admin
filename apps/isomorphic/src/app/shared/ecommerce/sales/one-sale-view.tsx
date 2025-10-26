@@ -104,7 +104,7 @@ export default function OneSaleView({
                     {statusText}
                   </Badge>
                   {sale.type === 'Flash' && (
-                    <Tooltip content="Flash Sale">
+                    <Tooltip content="Sale">
                       <PiLightningFill className="text-amber-500" size={24} />
                     </Tooltip>
                   )}

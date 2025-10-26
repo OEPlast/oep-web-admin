@@ -1,15 +1,7 @@
 'use client';
 
-import DateFiled from '@core/components/controlled-table/date-field';
-import PriceField from '@core/components/controlled-table/price-field';
-import StatusField from '@core/components/controlled-table/status-field';
 import { FilterDrawerView } from '@core/components/controlled-table/table-filter';
-import {
-  renderOptionDisplayValue,
-  statusOptions,
-} from '@/app/shared/invoice/form-utils';
 import ToggleColumns from '@core/components/table-utils/toggle-columns';
-import { getDateRangeStateValues } from '@core/utils/get-formatted-date';
 import { type Table as ReactTableType } from '@tanstack/react-table';
 import { useState } from 'react';
 import {
@@ -18,11 +10,25 @@ import {
   PiTrash,
   PiTrashDuotone,
 } from 'react-icons/pi';
-import { Button, Flex, Input } from 'rizzui';
+import { Button, Flex, Input, Select } from 'rizzui';
+import { useParentCategoryOptions } from '@/hooks/queries/useParentCategoryOptions';
 
 interface TableToolbarProps<T extends Record<string, any>> {
   table: ReactTableType<T>;
 }
+
+const statusOptions = [
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Archived', value: 'archived' },
+];
+
+const availabilityOptions = [
+  { label: 'In Stock', value: 'in-stock' },
+  { label: 'Low Stock', value: 'low-stock' },
+  { label: 'Out of Stock', value: 'out-of-stock' },
+];
 
 export default function Filters<TData extends Record<string, any>>({
   table,
@@ -38,18 +44,19 @@ export default function Filters<TData extends Record<string, any>>({
     <Flex align="center" justify="between" className="mb-4">
       <Input
         type="search"
-        placeholder="Search by product name..."
+        placeholder="Search by product name or SKU..."
         value={table.getState().globalFilter ?? ''}
         onClear={() => table.setGlobalFilter('')}
         onChange={(e) => table.setGlobalFilter(e.target.value)}
         inputClassName="h-9"
         clearable={true}
         prefix={<PiMagnifyingGlassBold className="size-4" />}
+        className="w-full max-w-md"
       />
 
       <FilterDrawerView
         isOpen={openDrawer}
-        drawerTitle="Table Filters"
+        drawerTitle="Product Filters"
         setOpenDrawer={setOpenDrawer}
       >
         <div className="grid grid-cols-1 gap-6">
@@ -63,20 +70,21 @@ export default function Filters<TData extends Record<string, any>>({
             color="danger"
             variant="outline"
             className="h-[34px] gap-2 text-sm"
-            onClick={() =>
-              meta?.handleMultipleDelete &&
-              meta.handleMultipleDelete(
-                table.getSelectedRowModel().rows.map((r) => r.original.id)
-              )
-            }
+            onClick={() => {
+              const metaWithDelete = meta as any;
+              metaWithDelete?.handleMultipleDelete &&
+                metaWithDelete.handleMultipleDelete(
+                  table.getSelectedRowModel().rows.map((r) => r.original._id)
+                );
+            }}
           >
             <PiTrash size={18} />
-            Delete
+            Delete {table.getSelectedRowModel().rows.length} items
           </Button>
         ) : null}
 
         <Button
-          variant={'outline'}
+          variant="outline"
           onClick={() => setOpenDrawer(!openDrawer)}
           className="h-9 pe-3 ps-2.5"
         >
@@ -93,48 +101,50 @@ export default function Filters<TData extends Record<string, any>>({
 function FilterElements<T extends Record<string, any>>({
   table,
 }: TableToolbarProps<T>) {
-  const priceFieldValue = (table.getColumn('amount')?.getFilterValue() ?? [
-    '',
-    '',
-  ]) as string[];
-  const createdDate =
-    table.getColumn('createdAt')?.getFilterValue() ?? ([null, null] as any);
-  const dueDate =
-    table.getColumn('dueDate')?.getFilterValue() ?? ([null, null] as any);
+  const { data: categories } = useParentCategoryOptions();
+
+  const categoryValue = table.getColumn('category')?.getFilterValue() as
+    | string
+    | undefined;
+  const statusValue = table.getColumn('status')?.getFilterValue() as
+    | string
+    | undefined;
+
   const isFiltered =
     table.getState().globalFilter || table.getState().columnFilters.length > 0;
+
   return (
     <>
-      <PriceField
-        value={priceFieldValue}
-        onChange={(v) => table.getColumn('amount')?.setFilterValue(v)}
-        label="Amount"
-      />
-      <DateFiled
-        selectsRange
-        dateFormat={'dd-MMM-yyyy'}
-        className="w-full"
-        placeholderText="Select created date"
-        endDate={getDateRangeStateValues(createdDate[1])!}
-        selected={getDateRangeStateValues(createdDate[0])}
-        startDate={getDateRangeStateValues(createdDate[0])!}
-        onChange={(date) => table.getColumn('createdAt')?.setFilterValue(date)}
-        inputProps={{
-          label: 'Created Date',
+      <Select
+        label="Category"
+        placeholder="Select category"
+        options={categories || []}
+        value={categoryValue}
+        onChange={(value: any) => {
+          table.getColumn('category')?.setFilterValue(value?.value || '');
         }}
-      />
-      <StatusField
-        options={statusOptions}
-        value={table.getColumn('status')?.getFilterValue() ?? []}
-        onChange={(e) => table.getColumn('status')?.setFilterValue(e)}
-        getOptionValue={(option: { value: any }) => option.value}
-        getOptionDisplayValue={(option: { value: any }) =>
-          renderOptionDisplayValue(option.value as string)
+        getOptionValue={(option: any) => option.value}
+        displayValue={(selected: string) =>
+          categories?.find((c: any) => c.value === selected)?.label ?? ''
         }
-        displayValue={(selected: string) => renderOptionDisplayValue(selected)}
-        dropdownClassName="!z-20 h-auto"
-        className={'w-auto'}
+        clearable
+        onClear={() => table.getColumn('category')?.setFilterValue('')}
+      />
+
+      <Select
         label="Status"
+        placeholder="Select status"
+        options={statusOptions}
+        value={statusValue}
+        onChange={(value: any) => {
+          table.getColumn('status')?.setFilterValue(value?.value || '');
+        }}
+        getOptionValue={(option: any) => option.value}
+        displayValue={(selected: string) =>
+          statusOptions.find((s) => s.value === selected)?.label ?? ''
+        }
+        clearable
+        onClear={() => table.getColumn('status')?.setFilterValue('')}
       />
 
       {isFiltered && (
@@ -147,7 +157,7 @@ function FilterElements<T extends Record<string, any>>({
           variant="flat"
           className="h-9 bg-gray-200/70"
         >
-          <PiTrashDuotone className="me-1.5 h-[17px] w-[17px]" /> Clear
+          <PiTrashDuotone className="me-1.5 h-[17px] w-[17px]" /> Clear Filters
         </Button>
       )}
     </>

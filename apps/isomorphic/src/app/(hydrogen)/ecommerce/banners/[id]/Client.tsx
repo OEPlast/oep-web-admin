@@ -1,17 +1,30 @@
-import Link from 'next/link';
+'use client';
+
 import { PiCheckCircleFill, PiXCircleFill } from 'react-icons/pi';
+import { useBanner } from '@/hooks/queries/useBanners';
+import { Text } from 'rizzui';
 
-type BannerDetailsProps = {
-  _id: string;
-  name: string;
-  imageUrl: string;
-  pageLink: string;
-  active: boolean;
-  category: string;
-  createdAt: Date;
-};
+const BannerDetails = ({ bannerId }: { bannerId: string }) => {
+  const { data: banner, isLoading, error } = useBanner(bannerId);
 
-const BannerDetails = ({ banner }: { banner: BannerDetailsProps }) => {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Text>Loading banner details...</Text>
+      </div>
+    );
+  }
+
+  if (error || !banner) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Text className="text-red-600">
+          Error loading banner: {error?.message || 'Banner not found'}
+        </Text>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-8 flex flex-col gap-8 @md:flex-row @md:items-start">
       {/* Image */}
@@ -58,7 +71,7 @@ const BannerDetails = ({ banner }: { banner: BannerDetailsProps }) => {
         <div className="flex flex-col gap-1 text-gray-400">
           <div className="text-md font-bold text-gray-500">Created:</div>
           <span>
-            {banner.createdAt.toLocaleDateString('en-US', {
+            {new Date(banner.createdAt).toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
