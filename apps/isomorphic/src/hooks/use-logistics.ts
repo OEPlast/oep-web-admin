@@ -62,6 +62,7 @@ export function useLogisticsCountries(
       }
       return response.data;
     },
+    placeholderData: [],
     staleTime: 5 * 60 * 1000, // 5 minutes
     ...options,
   });

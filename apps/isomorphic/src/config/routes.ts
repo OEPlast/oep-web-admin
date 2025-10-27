@@ -41,13 +41,13 @@ export const routes = {
     trackingId: (id: string) => `/ecommerce/tracking/${id}`,
     // Moved under eCommerce: Shipment and Logistics
     shipment: {
-      dashboard: '/ecommerce/shipment',
-      shipmentList: '/ecommerce/shipment/shipments',
-      customerProfile: '/ecommerce/shipment/customer-profile',
-      createShipment: '/ecommerce/shipment/shipments/create',
-      editShipment: (id: string) => `/ecommerce/shipment/shipments/${id}/edit`,
-      shipmentDetails: (id: string) => `/ecommerce/shipment/shipments/${id}`,
-      tracking: (id: string) => `/ecommerce/shipment/tracking/${id}`,
+      dashboard: '/ecommerce/shipments',
+      shipmentList: '/ecommerce/shipments',
+      customerProfile: '/ecommerce/shipments/customer-profile',
+      createShipment: '/ecommerce/shipments/create',
+      editShipment: (id: string) => `/ecommerce/shipments/${id}/edit`,
+      shipmentDetails: (id: string) => `/ecommerce/shipments/${id}`,
+      tracking: (id: string) => `/ecommerce/shipments/tracking/${id}`,
     },
     logistics: {
       home: '/ecommerce/logistics',

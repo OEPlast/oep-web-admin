@@ -220,6 +220,7 @@ export const useProductSearch = (searchQuery: string, enabled: boolean = true) =
       
       return response.data;
     },
+    placeholderData: [],
     enabled: enabled && searchQuery.trim().length > 0,
     staleTime: 30 * 1000, // 30 seconds
   });

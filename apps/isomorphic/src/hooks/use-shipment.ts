@@ -46,8 +46,10 @@ export const useShipments = (filters: ShipmentFilters = {}) => {
       const response = await apiClient.get(
         `${api.shipment.list}?${params.toString()}`
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -61,8 +63,10 @@ export const useShipment = (shipmentId: string) => {
     queryKey: shipmentKeys.detail(shipmentId),
     queryFn: async (): Promise<Shipment> => {
       const response = await apiClient.get(api.shipment.byId(shipmentId));
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     enabled: !!shipmentId,
     staleTime: 5 * 60 * 1000,
   });
@@ -76,8 +80,10 @@ export const useShipmentTracking = (shipmentId: string) => {
     queryKey: shipmentKeys.tracking(shipmentId),
     queryFn: async (): Promise<TrackingResponse> => {
       const response = await apiClient.get(api.shipment.tracking(shipmentId));
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     enabled: !!shipmentId,
     staleTime: 2 * 60 * 1000, // 2 minutes (tracking updates frequently)
   });
@@ -93,8 +99,10 @@ export const useShipmentsByStatus = (status: string, page = 1, limit = 20) => {
       const response = await apiClient.get(
         `${api.shipment.byStatus(status)}?page=${page}&limit=${limit}`
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     enabled: !!status,
     staleTime: 5 * 60 * 1000,
   });
@@ -110,8 +118,10 @@ export const usePublicTracking = (trackingNumber: string) => {
       const response = await apiClient.get(
         api.shipment.publicTracking(trackingNumber)
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     enabled: !!trackingNumber && trackingNumber.length > 5,
     staleTime: 2 * 60 * 1000,
   });
@@ -126,8 +136,10 @@ export const useCreateShipment = () => {
   return useMutation({
     mutationFn: async (data: CreateShipmentInput): Promise<Shipment> => {
       const response = await apiClient.post(api.shipment.create, data);
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: shipmentKeys.lists() });
       toast.success('Shipment created successfully!');
@@ -152,8 +164,10 @@ export const useUpdateShipment = (shipmentId: string) => {
         api.shipment.update(shipmentId),
         data
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: shipmentKeys.detail(shipmentId),
@@ -203,7 +217,10 @@ export const useUpdateShipmentStatus = (shipmentId: string) => {
         api.shipment.updateStatus(shipmentId),
         data
       );
-      return response.data.data;
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -233,8 +250,10 @@ export const useAddTrackingUpdate = (shipmentId: string) => {
         api.shipment.addTracking(shipmentId),
         data
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: shipmentKeys.detail(shipmentId),
@@ -267,8 +286,10 @@ export const useBulkUpdateShipmentStatus = () => {
         api.shipment.bulkUpdateStatus,
         data
       );
-      return response.data.data;
-    },
+      if (!response.data) {
+        throw new Error('No data returned');
+      }
+      return response.data;    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: shipmentKeys.all });
       toast.success(`${data.updatedCount} shipment(s) updated successfully!`);

@@ -21,6 +21,7 @@ export const useParentCategoryOptions = (excludeId?: string) => {
       }
       return response.data;
     },
+    placeholderData: [],
     staleTime: 10 * 60 * 1000, // 10 minutes (categories don't change often)
     refetchOnMount: false,
     refetchOnWindowFocus: false,

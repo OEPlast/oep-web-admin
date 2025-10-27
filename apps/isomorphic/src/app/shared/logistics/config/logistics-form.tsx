@@ -16,7 +16,6 @@ import {
   logisticsConfigSchema,
   type LogisticsConfigFormData,
 } from '@/validators/logistics-schema';
-import cn from '@core/utils/class-names';
 
 interface LogisticsConfigFormProps {
   configId?: string;
@@ -36,7 +35,7 @@ export default function LogisticsConfigForm({
     });
 
   const createConfig = useCreateLogisticsConfig((data) => {
-  router.push(routes.eCommerce.logistics.config);
+  router.push(routes.eCommerce.logistics.home);
   });
 
   const updateConfig = useUpdateLogisticsConfig((data) => {
@@ -49,6 +48,7 @@ export default function LogisticsConfigForm({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<LogisticsConfigFormData>({
     resolver: zodResolver(logisticsConfigSchema),
     defaultValues: {
@@ -116,7 +116,14 @@ export default function LogisticsConfigForm({
               Country Code <span className="text-red-500">*</span>
             </label>
             <Input
-              {...register('countryCode')}
+              {...register('countryCode', {
+                onChange: (e) =>
+                  setValue('countryCode', String(e.target.value || '').toUpperCase(), {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  }),
+              })}
+              inputClassName="uppercase"
               placeholder="e.g., NG, GH, KE"
               error={errors.countryCode?.message}
               disabled={isEditMode}
@@ -148,7 +155,6 @@ export default function LogisticsConfigForm({
             onClick={() =>
               appendState({
                 name: '',
-                code: '',
                 fallbackPrice: 0,
                 fallbackEtaDays: 0,
                 cities: [],
@@ -170,7 +176,6 @@ export default function LogisticsConfigForm({
               onClick={() =>
                 appendState({
                   name: '',
-                  code: '',
                   fallbackPrice: 0,
                   fallbackEtaDays: 0,
                   cities: [],
@@ -179,7 +184,7 @@ export default function LogisticsConfigForm({
               }
             >
               <PiPlusBold className="me-1.5 h-4 w-4" />
-              Add First State
+              Add State
             </Button>
           </div>
         ) : (
@@ -263,7 +268,7 @@ function StateFieldGroup({
       </div>
 
       {/* State Basic Info */}
-      <div className="mb-4 grid gap-4 @lg:grid-cols-2">
+      <div className="mb-6 grid gap-4 grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3">
         <div>
           <label className="mb-2 block text-sm font-medium">
             State Name <span className="text-red-500">*</span>
@@ -275,16 +280,7 @@ function StateFieldGroup({
           />
         </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium">
-            State Code <span className="text-red-500">*</span>
-          </label>
-          <Input
-            {...register(`states.${stateIndex}.code`)}
-            placeholder="e.g., LA"
-            error={errors.states?.[stateIndex]?.code?.message}
-          />
-        </div>
+        
 
         <div>
           <label className="mb-2 block text-sm font-medium">
@@ -324,7 +320,7 @@ function StateFieldGroup({
             variant="outline"
             size="sm"
             onClick={() =>
-              appendCity({ name: '', code: '', price: 0, etaDays: 0 })
+              appendCity({ name: '', price: undefined as unknown as number, etaDays: undefined as unknown as number })
             }
           >
             <PiPlusBold className="me-1 h-3 w-3" />
@@ -338,35 +334,39 @@ function StateFieldGroup({
           </Text>
         ) : (
           <div className="space-y-3">
+            {/* Header row - only once at the top */}
+            <div className="hidden @lg:grid @lg:grid-cols-4 @lg:gap-2">
+              <Text className="text-xs font-medium text-gray-500">City name</Text>
+              <Text className="text-xs font-medium text-gray-500">Price (₦)</Text>
+              <Text className="text-xs font-medium text-gray-500">ETA (days)</Text>
+              <Text className="text-xs font-medium text-gray-500">Action</Text>
+            </div>
             {cityFields.map((cityField, cityIndex) => (
-              <div key={cityField.id} className="grid gap-2 @lg:grid-cols-5">
+              <div key={cityField.id} className="grid gap-2 @lg:grid-cols-4">
                 <Input
                   {...register(`states.${stateIndex}.cities.${cityIndex}.name`)}
                   placeholder="City name"
                   size="sm"
+                  className="w-full"
                 />
-                <Input
-                  {...register(`states.${stateIndex}.cities.${cityIndex}.code`)}
-                  placeholder="Code"
-                  size="sm"
-                />
+                
                 <Input
                   type="number"
-                  {...register(
-                    `states.${stateIndex}.cities.${cityIndex}.price`,
-                    { valueAsNumber: true }
-                  )}
+                  {...register(`states.${stateIndex}.cities.${cityIndex}.price`, {
+                    setValueAs: (v: any) => (v === '' || v === null ? undefined : Number(v)),
+                  })}
                   placeholder="Price"
                   size="sm"
+                  className="w-full"
                 />
                 <Input
                   type="number"
-                  {...register(
-                    `states.${stateIndex}.cities.${cityIndex}.etaDays`,
-                    { valueAsNumber: true }
-                  )}
+                  {...register(`states.${stateIndex}.cities.${cityIndex}.etaDays`, {
+                    setValueAs: (v: any) => (v === '' || v === null ? undefined : Number(v)),
+                  })}
                   placeholder="ETA"
                   size="sm"
+                  className="w-full"
                 />
                 <ActionIcon
                   size="sm"
@@ -391,7 +391,7 @@ function StateFieldGroup({
             variant="outline"
             size="sm"
             onClick={() =>
-              appendLGA({ name: '', code: '', price: 0, etaDays: 0 })
+              appendLGA({ name: '', price: undefined as unknown as number, etaDays: undefined as unknown as number })
             }
           >
             <PiPlusBold className="me-1 h-3 w-3" />
@@ -405,34 +405,39 @@ function StateFieldGroup({
           </Text>
         ) : (
           <div className="space-y-3">
+            {/* Header row - only once at the top */}
+            <div className="hidden @lg:grid @lg:grid-cols-4 @lg:gap-2">
+              <Text className="text-xs font-medium text-gray-500">LGA name</Text>
+              <Text className="text-xs font-medium text-gray-500">Price (₦)</Text>
+              <Text className="text-xs font-medium text-gray-500">ETA (days)</Text>
+              <Text className="text-xs font-medium text-gray-500">Action</Text>
+            </div>
             {lgaFields.map((lgaField, lgaIndex) => (
-              <div key={lgaField.id} className="grid gap-2 @lg:grid-cols-5">
+              <div key={lgaField.id} className="grid gap-2 @lg:grid-cols-4">
                 <Input
                   {...register(`states.${stateIndex}.lgas.${lgaIndex}.name`)}
                   placeholder="LGA name"
                   size="sm"
+                  className="w-full"
                 />
-                <Input
-                  {...register(`states.${stateIndex}.lgas.${lgaIndex}.code`)}
-                  placeholder="Code"
-                  size="sm"
-                />
+                
                 <Input
                   type="number"
                   {...register(`states.${stateIndex}.lgas.${lgaIndex}.price`, {
-                    valueAsNumber: true,
+                    setValueAs: (v: any) => (v === '' || v === null ? undefined : Number(v)),
                   })}
                   placeholder="Price"
                   size="sm"
+                  className="w-full"
                 />
                 <Input
                   type="number"
-                  {...register(
-                    `states.${stateIndex}.lgas.${lgaIndex}.etaDays`,
-                    { valueAsNumber: true }
-                  )}
+                  {...register(`states.${stateIndex}.lgas.${lgaIndex}.etaDays`, {
+                    setValueAs: (v: any) => (v === '' || v === null ? undefined : Number(v)),
+                  })}
                   placeholder="ETA"
                   size="sm"
+                  className="w-full"
                 />
                 <ActionIcon
                   size="sm"

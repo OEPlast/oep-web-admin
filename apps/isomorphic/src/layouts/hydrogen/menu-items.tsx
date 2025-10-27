@@ -158,13 +158,13 @@ export const menuItems = [
   },
   {
     name: 'Logistics',
-    href: routes.eCommerce.logistics,
+    href: routes.eCommerce.logistics.home,
     icon: <PiPackageDuotone />,
     permission: { resource: ['logistics'], action: 'read' },
   },
   {
     name: 'Shipment',
-    href: routes.eCommerce.shipment,
+    href: routes.eCommerce.shipment.dashboard,
     icon: <PiAirplaneTiltDuotone />,
     permission: { resource: ['logistics'], action: 'read' },
   },

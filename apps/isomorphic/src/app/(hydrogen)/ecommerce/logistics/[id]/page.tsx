@@ -28,7 +28,7 @@ export default function LogisticsConfigDetailsPage() {
   } = useLogisticsCountry(country?.countryName || '', { enabled: !!country });
 
   const deleteCountry = useDeleteCountry(() => {
-  router.push(routes.eCommerce.logistics.config);
+  router.push(routes.eCommerce.logistics.home);
   });
 
   const pageHeader = {
@@ -37,10 +37,6 @@ export default function LogisticsConfigDetailsPage() {
       {
   href: routes.eCommerce.logistics.home,
         name: 'Logistics',
-      },
-      {
-  href: routes.eCommerce.logistics.config,
-        name: 'Configuration',
       },
       {
         name: config?.countryName || 'Details',
@@ -146,45 +142,65 @@ export default function LogisticsConfigDetailsPage() {
               No states configured yet. Click Edit to add states.
             </Text>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 w-full">
               {config.states.map((state, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-gray-200 p-4"
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <div>
-                      <Text className="font-semibold">{state.name}</Text>
-                      <Text className="text-sm text-gray-500">
-                        Code: {state.code}
-                      </Text>
-                    </div>
+                <div key={index} className="rounded-lg border border-gray-200 p-4">
+                  {/* State header */}
+                  <div className="mb-3 flex items-start justify-between gap-4">
+                    <Text className="font-semibold uppercase">{state.name}</Text>
                     <div className="text-right">
-                      <Text className="text-sm text-gray-500">
-                        Fallback Price
-                      </Text>
-                      <Text className="font-semibold">
-                        ₦{state.fallbackPrice?.toLocaleString() || 0}
-                      </Text>
+                      <div className="flex flex-col items-end gap-1">
+                        <div>
+                          <Text className="text-sm text-gray-500">Fallback Price</Text>
+                          <Text className="font-semibold">
+                            {typeof state.fallbackPrice === 'number'
+                              ? `₦${state.fallbackPrice.toLocaleString()}`
+                              : '—'}
+                          </Text>
+                        </div>
+                        <div>
+                          <Text className="text-sm text-gray-500">Fallback ETA (days)</Text>
+                          <Text className="font-semibold">
+                            {typeof (state as any).fallbackEtaDays === 'number' ? `${(state as any).fallbackEtaDays}` : '—'}
+                          </Text>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   {/* Cities */}
                   {state.cities && state.cities.length > 0 && (
-                    <div className="mb-3">
+                    <div className="mb-4">
                       <Text className="mb-2 text-sm font-medium text-gray-700">
                         Cities ({state.cities.length})
                       </Text>
-                      <div className="flex flex-wrap gap-2">
-                        {state.cities.map((city, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {city.name} - ₦{city.price?.toLocaleString() || 0}
-                          </Badge>
-                        ))}
+                      <div className="overflow-x-auto">
+                        <div className="max-h-64 w-full overflow-y-auto rounded-md border border-gray-200">
+                          <table className="w-full text-sm">
+                            <thead className="sticky top-0 z-10 bg-gray-50">
+                              <tr>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">City</th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">Price</th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">ETA (days)</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {state.cities.map((city, idx) => (
+                                <tr key={idx} className="hover:bg-gray-50">
+                                  <td className="px-3 py-2 font-medium">
+                                    <span className="truncate" title={city.name}>{city.name}</span>
+                                  </td>
+                                  <td className="px-3 py-2 text-gray-600">
+                                    {typeof city.price === 'number' ? `₦${city.price.toLocaleString()}` : '—'}
+                                  </td>
+                                  <td className="px-3 py-2 text-gray-500">
+                                    {typeof city.etaDays === 'number' ? `${city.etaDays}` : '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -195,16 +211,33 @@ export default function LogisticsConfigDetailsPage() {
                       <Text className="mb-2 text-sm font-medium text-gray-700">
                         LGAs ({state.lgas.length})
                       </Text>
-                      <div className="flex flex-wrap gap-2">
-                        {state.lgas.map((lga, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {lga.name} - ₦{lga.price?.toLocaleString() || 0}
-                          </Badge>
-                        ))}
+                      <div className="overflow-x-auto">
+                        <div className="max-h-64 w-full overflow-y-auto rounded-md border border-gray-200">
+                          <table className="w-full text-sm">
+                            <thead className="sticky top-0 z-10 bg-gray-50">
+                              <tr>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">LGA</th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">Price</th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-700">ETA (days)</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {state.lgas.map((lga, idx) => (
+                                <tr key={idx} className="hover:bg-gray-50">
+                                  <td className="px-3 py-2 font-medium">
+                                    <span className="truncate" title={lga.name}>{lga.name}</span>
+                                  </td>
+                                  <td className="px-3 py-2 text-gray-600">
+                                    {typeof lga.price === 'number' ? `₦${lga.price.toLocaleString()}` : '—'}
+                                  </td>
+                                  <td className="px-3 py-2 text-gray-500">
+                                    {typeof lga.etaDays === 'number' ? `${lga.etaDays}` : '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   )}

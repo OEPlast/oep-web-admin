@@ -26,7 +26,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 
 interface ExtendTableOptions<T extends Record<string, unknown>>
   extends Omit<TableOptions<T>, "data" | "columns" | "getCoreRowModel" | "state"> {}

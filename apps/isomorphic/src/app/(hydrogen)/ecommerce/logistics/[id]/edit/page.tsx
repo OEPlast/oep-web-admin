@@ -15,10 +15,6 @@ const pageHeader = {
       name: 'Logistics',
     },
     {
-  href: routes.eCommerce.logistics.config,
-      name: 'Configuration',
-    },
-    {
       name: 'Edit',
     },
   ],

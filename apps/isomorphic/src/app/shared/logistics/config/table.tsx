@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLogisticsCountries, useDeleteCountry } from '@/hooks/use-logistics';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
@@ -37,7 +37,7 @@ export default function LogisticsConfigTable() {
         country.countryCode.toLowerCase().includes(term)
     );
   }, [countries, searchTerm]);
-
+  
   const columns = useMemo(
     () => [
       columnHelper.accessor('countryCode', {
@@ -100,7 +100,7 @@ export default function LogisticsConfigTable() {
     [router, deleteCountry]
   );
 
-  const { table } = useTanStackTable<CountryListItem>({
+  const { table, setData } = useTanStackTable<CountryListItem>({
     tableData: filteredCountries,
     columnConfig: columns,
     options: {
@@ -113,6 +113,11 @@ export default function LogisticsConfigTable() {
       enableColumnResizing: false,
     },
   });
+
+useEffect(() => {
+    setData(filteredCountries);
+  }, [filteredCountries]);
+
 
   if (isLoading) {
     return (

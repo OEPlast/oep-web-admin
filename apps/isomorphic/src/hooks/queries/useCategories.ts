@@ -31,6 +31,13 @@ export function useCategories(
         totalPages: response.meta?.pages || 0,
       };
     },
+    placeholderData: {
+      items: [],
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: true,
     ...options,
@@ -70,6 +77,7 @@ export function useAllCategories(
       );
       return response.data?.categories || [];
     },
+    placeholderData: [],
     staleTime: 10 * 60 * 1000, // 10 minutes
     ...options,
   });

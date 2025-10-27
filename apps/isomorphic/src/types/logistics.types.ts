@@ -6,7 +6,6 @@
  */
 export interface City {
   name: string;
-  code?: string;
   price?: number;
   etaDays?: number;
 }
@@ -16,7 +15,6 @@ export interface City {
  */
 export interface LGA {
   name: string;
-  code?: string;
   price?: number;
   etaDays?: number;
 }
@@ -26,7 +24,6 @@ export interface LGA {
  */
 export interface State {
   name: string;
-  code: string;
   fallbackPrice?: number;
   fallbackEtaDays?: number;
   cities?: City[];
@@ -93,7 +90,7 @@ export interface CreateEmptyCountryInput {
  */
 export interface ShippingDestination {
   countryName: string;
-  stateCode?: string;
+  stateName?: string;
   cityName?: string;
   lgaName?: string;
 }
@@ -157,7 +154,7 @@ export interface FlatShippingInput {
   items: CartShippingItem[];
   destination: {
     countryName: string;
-    stateCode: string;
+    stateName: string;
     lgaName: string;
   };
 }
@@ -231,7 +228,6 @@ export interface EmptyCountryFormData {
  */
 export interface PublicLocation {
   name: string;
-  code: string;
 }
 
 /**
@@ -239,7 +235,6 @@ export interface PublicLocation {
  */
 export interface PublicState {
   name: string;
-  code: string;
   cities: PublicLocation[];
   lgas: PublicLocation[];
 }

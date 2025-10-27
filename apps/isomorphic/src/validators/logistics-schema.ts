@@ -10,10 +10,6 @@ export const citySchema = z.object({
     .min(1, 'City name is required')
     .trim()
     .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
-  code: z
-    .string()
-    .optional()
-    .transform((val) => val?.toUpperCase()),
   price: z
     .number({ invalid_type_error: 'Price must be a number' })
     .min(0, 'Price must be non-negative')
@@ -35,10 +31,6 @@ export const lgaSchema = z.object({
     .min(1, 'LGA name is required')
     .trim()
     .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
-  code: z
-    .string()
-    .optional()
-    .transform((val) => val?.toUpperCase()),
   price: z
     .number({ invalid_type_error: 'Price must be a number' })
     .min(0, 'Price must be non-negative')
@@ -60,12 +52,6 @@ export const stateSchema = z.object({
     .min(1, 'State name is required')
     .trim()
     .transform((val) => val.charAt(0).toUpperCase() + val.slice(1)),
-  code: z
-    .string()
-    .min(2, 'State code must be at least 2 characters')
-    .max(3, 'State code must be at most 3 characters')
-    .trim()
-    .toUpperCase(),
   fallbackPrice: z
     .number({ invalid_type_error: 'Fallback price must be a number' })
     .min(0, 'Fallback price must be non-negative')
@@ -130,7 +116,7 @@ export const quoteInputSchema = z.object({
     .default(1),
   destination: z.object({
     countryName: z.string().min(1, 'Country name is required'),
-    stateCode: z.string().optional(),
+    stateName: z.string().optional(),
     cityName: z.string().optional(),
     lgaName: z.string().optional(),
   }),
@@ -151,7 +137,7 @@ export const flatShippingInputSchema = z.object({
     .min(1, 'At least one item is required'),
   destination: z.object({
     countryName: z.string().min(1, 'Country name is required'),
-    stateCode: z.string().min(1, 'State code is required'),
+    stateName: z.string().min(1, 'State name is required'),
     lgaName: z.string().min(1, 'LGA name is required'),
   }),
 });
