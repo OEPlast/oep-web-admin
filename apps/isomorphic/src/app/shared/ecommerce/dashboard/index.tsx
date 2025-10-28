@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link';
 import Image from 'next/image';
 import { routes } from '@/config/routes';
@@ -16,25 +17,29 @@ import { PiPlusBold } from 'react-icons/pi';
 import welcomeImg from '@public/shop-illustration.png';
 import HandWaveIcon from '@core/components/icons/hand-wave';
 import TotalProfitLoss from './total-profit-loss';
-import RevenueOrders from './revenue-expense';
+import RevenueExpenseChart from './revenue-expense';
 import TopSellingProducts from './top-selling-products';
+import { PermissionAction, PermissionResource, usePermissions } from '@/hooks/queries/usePermissions';
+import { useUserProfile } from '@/hooks/queries/useUserProfile';
 
 export default function EcommerceDashboard() {
+  const {permissions,hasPermission} = usePermissions();
+  const {data} = useUserProfile()
   return (
     <div className="@container">
       <div className="grid grid-cols-1 gap-6 @4xl:grid-cols-2 @7xl:grid-cols-12 3xl:gap-8">
         <WelcomeBanner
           title={
             <>
-              Good Day, <br /> Iya chocos{' '}
+              Good Day, {data?.firstName}{' '}
               <HandWaveIcon className="inline-flex h-8 w-8" />
             </>
           }
           description={
-            'Here’s What happening on your store today. See the statistics at once.'
+            'Here’s What happening on your store today. Lets get going!!!'
           }
           media={
-            <div className="absolute -bottom-6 end-4 hidden w-[300px] @2xl:block lg:w-[320px] 2xl:-bottom-7 2xl:w-[330px]">
+            <div className="absolute -bottom-6 end-4 hidden w-[250px] @2xl:block lg:w-[270px] 2xl:-bottom-7 2xl:w-[300px]">
               <div className="relative">
                 <Image
                   src={welcomeImg}
@@ -47,25 +52,34 @@ export default function EcommerceDashboard() {
           contentClassName="@2xl:max-w-[calc(100%-340px)]"
           className="border border-muted bg-gray-0 pb-8 @4xl:col-span-2 @7xl:col-span-8 dark:bg-gray-100/30 lg:pb-9"
         >
-          <Link href={routes.eCommerce.createProduct} className="inline-flex">
-            <Button as="span" className="h-[38px] shadow md:h-10">
-              <PiPlusBold className="me-1 h-4 w-4" /> Add Product
-            </Button>
-          </Link>
+          
         </WelcomeBanner>
 
+{hasPermission([PermissionResource.ANALYTICS], PermissionAction.READ) ?
+<>
         <StatCards
-        // className="@2xl:grid-cols-3 @3xl:gap-6 @4xl:col-span-2 @7xl:col-span-8"
+        className="@2xl:grid-cols-3 @3xl:gap-6 @4xl:col-span-2 @7xl:col-span-8"
         />
+        <RevenueExpenseChart className="relative @4xl:col-span-2 @7xl:col-span-12" />
+        </>
+        
+        : null
+      }
 
-        <RevenueOrders className="relative @4xl:col-span-2 @7xl:col-span-12" />
-        <TotalProfitLoss className="relative @4xl:col-span-2 @7xl:col-span-12" />
+       {hasPermission([PermissionResource.SALES], PermissionAction.READ) ?
+      
+      <>
+      <ProfitWidget className="relative @4xl:col-span-2 @7xl:col-span-12" />
+      <TotalProfitLoss className="relative @4xl:col-span-2 @7xl:col-span-12" />
+      <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
+      <TopSellingProducts className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
+      </>
+        : null
+      }
 
-        <CustomerRetentionRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" />
-
-        <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
-        <TopSellingProducts className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
+        {hasPermission([PermissionResource.ORDERS], PermissionAction.READ) ?
         <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" />
+        : null}
       </div>
     </div>
   );

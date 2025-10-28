@@ -44,10 +44,9 @@ export const productsListColumns = [
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded border border-gray-200">
-          <Image
+          <img
             src={getCdnUrl(row.original.description_images?.[0]?.url || '')}
             alt={row.original.name}
-            fill
             className="object-cover"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/images/placeholder.png';

@@ -37,6 +37,10 @@ export interface OrdersOverviewResponse {
   completed: number;
   cancelled: number;
   failed: number;
+  comparisonPeriod: {
+    orders: number;
+    percentageChange: number;
+  };
 }
 
 export interface TransactionsOverviewResponse {
@@ -52,6 +56,10 @@ export interface UsersOverviewResponse {
   newUsers: number;
   activeUsers: number;
   inactiveUsers: number;
+  comparisonPeriod: {
+    users: number;
+    percentageChange: number;
+  };
 }
 
 export interface ProductsOverviewResponse {
@@ -85,9 +93,20 @@ export interface CouponsOverviewResponse {
  * Time-series data with revenue and expense metrics
  */
 export interface RevenueExpenseChartData {
-  month: string; // e.g., "Jan", "Feb"
+  date: string; // ISO date string (e.g., "2025-01-15")
   revenue: number;
   expense: number;
+}
+
+/**
+ * Total Profit/Loss Chart (Line Chart with 3 metrics)
+ * Time-series data showing revenue, expenses, and returns
+ */
+export interface ProfitLossChartData {
+  date: string; // ISO date string (e.g., "2025-01-15")
+  revenue: number;
+  expenses: number;
+  returns: number;
 }
 
 /**
@@ -395,6 +414,25 @@ export interface MostReviewedProductRow {
   coverImage: string | null;
   reviewCount: number;
   averageRating: number;
+}
+
+/**
+ * Low Stock Products (Stock Report)
+ * Products where stock <= lowStockThreshold
+ */
+export interface LowStockProduct {
+  productId: string;
+  name: string;
+  sku: number;
+  stock: number;
+  lowStockThreshold: number;
+  category: string;
+  coverImage: string | null;
+}
+
+export interface LowStockProductsResponse {
+  data: LowStockProduct[];
+  pagination: PaginationMeta;
 }
 
 // ============================================

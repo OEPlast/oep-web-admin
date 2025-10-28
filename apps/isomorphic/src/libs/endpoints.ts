@@ -114,6 +114,7 @@ export const api = {
 
     // Chart endpoints (14)
     revenueExpenseChart: '/admin/analytics/revenue-expense-chart',
+    profitLossChart: '/admin/analytics/profit-loss-chart',
     ordersTrend: '/admin/analytics/orders-trend',
     transactionsTrend: '/admin/analytics/transactions-trend',
     customerAcquisition: '/admin/analytics/customer-acquisition',
@@ -131,6 +132,7 @@ export const api = {
     // Table endpoints (10)
     salesByCategory: '/admin/analytics/sales-by-category',
     topSellingProducts: '/admin/analytics/top-selling-products',
+    lowStockProducts: '/admin/analytics/low-stock-products',
     ordersTable: '/admin/analytics/orders-table',
     transactionsTable: '/admin/analytics/transactions-table',
     topCustomers: '/admin/analytics/top-customers',

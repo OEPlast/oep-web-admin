@@ -5,7 +5,7 @@ import AvatarCard from '@core/ui/avatar-card';
 import DateCell from '@core/ui/date-cell';
 import { toCurrency } from '@core/utils/to-currency';
 import { createColumnHelper } from '@tanstack/react-table';
-import { OrdersDataType } from '../../ecommerce/dashboard/recent-order';
+import { OrdersDataType } from "../../ecommerce/order/order-list/columns";
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 
 const columnHelper = createColumnHelper<OrdersDataType>();

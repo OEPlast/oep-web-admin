@@ -1,67 +1,21 @@
 'use client';
 
 import WidgetCard from '@core/components/cards/widget-card';
-import DribbleIcon from '@core/components/icons/dribble';
-import FigmaIcon from '@core/components/icons/figma';
-import PlayStoreIcon from '@core/components/icons/play-store';
-import RippleIcon from '@core/components/icons/ripple';
-import Snapchat from '@core/components/icons/snapchat';
-import TelegramIcon from '@core/components/icons/telegram';
 import { DatePicker } from '@core/ui/datepicker';
 import cn from '@core/utils/class-names';
-import { ReactElement, useState } from 'react';
-import { Box, Flex, Text } from 'rizzui';
+import { useState } from 'react';
+import { Avatar, Box, Flex, Loader, Text } from 'rizzui';
+import { useCategoriesPerformance } from '@/hooks/queries/analytics/useAnalyticsCharts';
+import { formatCurrency } from '@/utils/format-currency';
+import { PiImageSquare } from 'react-icons/pi';
 
-type Product = {
-  icon: ReactElement;
-  title: string;
-  date: string;
-  price: number;
-};
-const products: Product[] = [
-  {
-    icon: <DribbleIcon className="h-auto w-7" />,
-    title: 'Dribbble App',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-  {
-    icon: <Snapchat className="h-auto w-7" />,
-    title: 'Snapchat',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-  {
-    icon: <FigmaIcon className="h-auto w-7 scale-[.8]" />,
-    title: 'Figma App',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-  {
-    icon: <PlayStoreIcon className="h-auto w-7 scale-90" />,
-    title: 'Google Play Store',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-  {
-    icon: <RippleIcon className="h-auto w-7 scale-90" />,
-    title: 'Ripple',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-  {
-    icon: <TelegramIcon className="h-auto w-7 scale-90" />,
-    title: 'Telegram',
-    date: '18 Jul . 12:30PM',
-    price: 72.59,
-  },
-];
 const currentDate = new Date();
 const previousMonthDate = new Date(
   currentDate.getFullYear(),
   currentDate.getMonth() - 1,
   currentDate.getDate()
 );
+
 export default function TopSellingProducts({
   className,
 }: {
@@ -71,6 +25,13 @@ export default function TopSellingProducts({
     previousMonthDate,
     currentDate,
   ]);
+
+  // Fetch categories performance
+  const { data: categories, isLoading, error } = useCategoriesPerformance({
+    from: rangeDate[0]?.toISOString().split('T')[0] || previousMonthDate.toISOString().split('T')[0],
+    to: rangeDate[1]?.toISOString().split('T')[0] || currentDate.toISOString().split('T')[0],
+  });
+
   return (
     <WidgetCard
       title="Top Selling Categories"
@@ -98,35 +59,72 @@ export default function TopSellingProducts({
       descriptionClassName="mt-1 flex items-center [&_.react-datepicker-wrapper]:w-full [&_.react-datepicker-wrapper]:max-w-[228px] text-gray-500"
     >
       <div className="custom-scrollbar mt-6 overflow-y-auto pe-2 @lg:mt-8 @3xl/sa:max-h-[330px] @7xl/sa:max-h-[405px]">
-        <Box className="w-full space-y-3.5 divide-y divide-gray-200/70">
-          {products.map((item, index) => (
-            <SingleProduct {...item} key={index} />
-          ))}
-        </Box>
+        {isLoading ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Loader variant="spinner" size="lg" />
+          </div>
+        ) : error ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Text className="text-red-500">Error loading categories</Text>
+          </div>
+        ) : !categories || categories.length === 0 ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Text className="text-gray-500">No categories found for this period</Text>
+          </div>
+        ) : (
+          <Box className="w-full space-y-3.5 divide-y divide-gray-200/70">
+            {categories.map((category) => (
+              <SingleCategory
+                key={category.categoryId}
+                id={category.categoryId}
+                title={category.name}
+                revenue={category.revenue}
+                orders={category.orders}
+                image={category.image}
+              />
+            ))}
+          </Box>
+        )}
       </div>
     </WidgetCard>
   );
 }
 
-function SingleProduct({
-  icon,
+function SingleCategory({
+  id,
   title,
-  date,
-  price,
-}: Product & { className?: string }) {
+  revenue,
+  orders,
+  image,
+}: {
+  id: string;
+  title: string;
+  revenue: number;
+  orders: number;
+  image: string;
+  className?: string;
+}) {
   return (
     <Flex align="end" className="pt-3.5 first:pt-0">
       <Flex justify="start" align="center" gap="3">
-        <Box className="rounded-md border border-gray-200/50 bg-gray-100 p-2">
-          {icon}
-        </Box>
+        {image ? (
+          <Avatar
+            src={image}
+            name={title}
+            className="rounded-md border border-gray-200/50 bg-gray-100"
+          />
+        ) : (
+          <Box className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200/50 bg-gray-100 p-2">
+            <PiImageSquare className="h-full w-full text-gray-400" />
+          </Box>
+        )}
         <Box className="space-y-1">
           <Text className="font-semibold text-gray-900">{title}</Text>
-          <Text className="text-xs text-gray-500">200 units sold</Text>
+          <Text className="text-xs text-gray-500">{orders} orders</Text>
         </Box>
       </Flex>
       <Text as="span" className="font-semibold text-gray-500">
-        &#8358;{price}
+        {formatCurrency(revenue)}
       </Text>
     </Flex>
   );

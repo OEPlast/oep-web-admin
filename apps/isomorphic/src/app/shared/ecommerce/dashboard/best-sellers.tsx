@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { DatePicker } from '@core/ui/datepicker';
 import WidgetCard from '@core/components/cards/widget-card';
-import { Button, Text } from 'rizzui';
-import { topProducts } from '@/data/top-products-data';
-import Rating from '@core/components/rating';
+import { DatePicker } from '@core/ui/datepicker';
+import cn from '@core/utils/class-names';
+import { useState } from 'react';
+import { Avatar, Box, Flex, Loader, Text } from 'rizzui';
+import { useTopProductsRevenue } from '@/hooks/queries/analytics/useAnalyticsCharts';
+import { formatCurrency } from '@/utils/format-currency';
+import { PiImageSquare } from 'react-icons/pi';
 
 const currentDate = new Date();
 const previousMonthDate = new Date(
@@ -21,9 +22,18 @@ export default function BestSellers({ className }: { className?: string }) {
     currentDate,
   ]);
 
+  // Fetch top products
+  const { data: products, isLoading, error } = useTopProductsRevenue({
+    from: rangeDate[0]?.toISOString().split('T')[0] || previousMonthDate.toISOString().split('T')[0],
+    to: rangeDate[1]?.toISOString().split('T')[0] || currentDate.toISOString().split('T')[0],
+    limit: 10,
+  });
+
   return (
     <WidgetCard
-      title={'Top Products'}
+      title="Best Sellers"
+      headerClassName="items-center"
+      className={cn('@container dark:bg-gray-100/50', className)}
       description={
         <>
           Overview:
@@ -43,43 +53,74 @@ export default function BestSellers({ className }: { className?: string }) {
           />
         </>
       }
-      // action={
-      //   <Button variant="text" className="whitespace-nowrap underline">
-      //     View All
-      //   </Button>
-      // }
       descriptionClassName="mt-1 flex items-center [&_.react-datepicker-wrapper]:w-full [&_.react-datepicker-wrapper]:max-w-[228px] text-gray-500"
-      className={className}
     >
-      <div className="custom-scrollbar -me-2 mt-[18px] grid max-h-[460px] gap-4 overflow-y-auto @sm:gap-5">
-        {topProducts.map((product) => (
-          <div
-            key={product.title + product.id}
-            className="flex items-start pe-2"
-          >
-            <div className="relative me-3 h-11 w-11 shrink-0 overflow-hidden rounded bg-gray-100 @sm:h-12 @sm:w-12">
-              <Image
-                src={product.thumbnail}
-                alt={product.title}
-                fill
-                sizes="(max-width: 768px) 100vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex w-full items-start justify-between">
-              <div>
-                <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700">
-                  {product.title}
-                </Text>
-                <Text className="text-gray-500">{product.price}</Text>
-              </div>
-              <div>
-                <Rating rating={product.rating} />
-              </div>
-            </div>
+      <div className="custom-scrollbar mt-6 overflow-y-auto pe-2 @lg:mt-8 @3xl/sa:max-h-[330px] @7xl/sa:max-h-[405px]">
+        {isLoading ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Loader variant="spinner" size="lg" />
           </div>
-        ))}
+        ) : error ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Text className="text-red-500">Error loading products</Text>
+          </div>
+        ) : !products || products.length === 0 ? (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <Text className="text-gray-500">No products found for this period</Text>
+          </div>
+        ) : (
+          <Box className="w-full space-y-3.5 divide-y divide-gray-200/70">
+            {products.map((product, index) => (
+              <SingleProduct
+                key={product.productId}
+                id={product.productId}
+                title={product.productName}
+                price={product.revenue}
+                image={product.coverImage}
+              />
+            ))}
+          </Box>
+        )}
       </div>
     </WidgetCard>
+  );
+}
+
+function SingleProduct({
+  id,
+  title,
+  price,
+  image,
+  className,
+}: {
+  id: string;
+  title: string;
+  price: number;
+  image: string | null;
+  className?: string;
+}) {
+  return (
+    <Flex align="end" className={cn('pt-3.5 first:pt-0', className)}>
+      <Flex justify="start" align="center" gap="3">
+        {image ? (
+          <Avatar
+            src={image}
+            name={title}
+            className="rounded-md border border-gray-200/50 bg-gray-100"
+          />
+        ) : (
+          <Box className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200/50 bg-gray-100 p-2">
+            <PiImageSquare className="h-full w-full text-gray-400" />
+          </Box>
+        )}
+        <Box className="space-y-1">
+          <Text className="font-semibold text-gray-900">{title}</Text>
+          <Text className="text-xs text-gray-500">Revenue: {formatCurrency(price)}</Text>
+        </Box>
+      </Flex>
+      <Text as="span" className="font-semibold text-gray-500">
+        {formatCurrency(price)}
+      </Text>
+    </Flex>
   );
 }
