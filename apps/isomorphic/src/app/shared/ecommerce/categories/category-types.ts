@@ -7,6 +7,7 @@ export type CategoryType = {
   slug: string;
   description?: string;
   parent: string[];
+  priority: boolean;
   createdAt: Date;
   updatedAt: Date;
   subcategoryCount?: number;
@@ -20,6 +21,7 @@ export type CategoryWithSubs = CategoryType& {
     slug: string;
     banner?: string;
     description?: string;
+    priority?: boolean;
   }>;
   parent_categories: Array<{
     _id: string;

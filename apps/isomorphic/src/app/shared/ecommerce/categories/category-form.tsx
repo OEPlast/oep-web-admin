@@ -1,7 +1,7 @@
 'use client';
 
 import { Controller, ControllerRenderProps } from 'react-hook-form';
-import { Button, Input, Loader, Textarea, Select, MultiSelect, ActionIcon } from 'rizzui';
+import { Button, Input, Loader, Textarea, Select, MultiSelect, ActionIcon, Switch } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import {
@@ -64,6 +64,7 @@ export default function CategoryForm({
           image: defaultValues?.image,
           banner: defaultValues?.banner,
           parent: defaultValues?.parent || [],
+          priority: defaultValues?.priority ?? false,
         },
       }}
       className="flex flex-grow flex-col @container [&_label]:font-medium"
@@ -168,6 +169,29 @@ export default function CategoryForm({
                         error={errors.parent?.message as string}
                         inPortal={false}
                       />
+                    )}
+                  />
+                </VeritcalFormBlockWrapper>
+
+                {/* Priority */}
+                <VeritcalFormBlockWrapper
+                  title="Priority Category"
+                  description="Mark this category as a priority category to display it prominently"
+                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                >
+                  <Controller
+                    name="priority"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={value}
+                          onChange={onChange}
+                        />
+                        <span className="text-sm text-gray-600">
+                          {value ? 'Priority category enabled' : 'Priority category disabled'}
+                        </span>
+                      </div>
                     )}
                   />
                 </VeritcalFormBlockWrapper>

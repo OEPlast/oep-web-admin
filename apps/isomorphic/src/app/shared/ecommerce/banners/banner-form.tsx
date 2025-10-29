@@ -46,6 +46,10 @@ export default function BannerForm({
     name: '',
     imageUrl: '',
     pageLink: '',
+    headerText: '',
+    mainText: '',
+    CTA: '#',
+    fullImage: true,
     active: false,
     category: 'A',
     ...defaultValues,
@@ -102,6 +106,24 @@ export default function BannerForm({
                     {...register('pageLink')}
                     error={errors.pageLink?.message}
                   />
+                  <Input
+                    label="Header Text"
+                    placeholder="Banner heading"
+                    {...register('headerText')}
+                    error={errors.headerText?.message}
+                  />
+                  <Input
+                    label="Main Text"
+                    placeholder="Banner description"
+                    {...register('mainText')}
+                    error={errors.mainText?.message}
+                  />
+                  <Input
+                    label="CTA (Call to Action)"
+                    placeholder="Shop Now"
+                    {...register('CTA')}
+                    error={errors.CTA?.message}
+                  />
                   <Controller
                     name="category"
                     control={control}
@@ -116,6 +138,26 @@ export default function BannerForm({
                         error={errors?.category?.message as string}
                         getOptionValue={(option) => option.label}
                       />
+                    )}
+                  />
+                  <Controller
+                    name="fullImage"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="flex flex-1 items-center gap-2">
+                        <label className="block font-medium">
+                          Full Image Display
+                        </label>
+                        <Switch
+                          checked={field.value ?? true}
+                          onChange={(checked) => {
+                            field.onChange(checked);
+                          }}
+                        />
+                        <span className="text-sm text-gray-500">
+                          {field.value ?? true ? 'Image fills entire banner area' : 'Image maintains aspect ratio'}
+                        </span>
+                      </div>
                     )}
                   />
                   {mode === 'update' && (

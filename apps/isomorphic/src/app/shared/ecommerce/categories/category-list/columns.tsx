@@ -62,6 +62,20 @@ export const categoriesColumns = [
       <Text className="text-xs font-mono text-gray-600">{getValue()}</Text>
     ),
   }),
+  columnHelper.accessor('priority', {
+    id: 'priority',
+    size: 100,
+    header: 'Priority',
+    cell: ({ getValue }) => (
+      <Badge
+        variant="flat"
+        color={getValue() ? 'success' : 'secondary'}
+        className="font-medium"
+      >
+        {getValue() ? 'Yes' : 'No'}
+      </Badge>
+    ),
+  }),
   columnHelper.display({
     id: 'parentCount',
     size: 100,

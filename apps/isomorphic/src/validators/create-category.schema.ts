@@ -11,6 +11,7 @@ export const createCategoryFormSchema = z.object({
   slug: z.string().min(1, 'Slug is required'),
   banner: z.string().optional().or(z.literal('')),
   parent: z.array(z.string()).default([]).optional(),
+  priority: z.boolean().default(false).optional(),
 });
 
 // Update category schema - includes server fields
@@ -23,6 +24,7 @@ export const updateCategoryFormSchema = z.object({
   image: z.string().optional().or(z.literal('')),
   banner: z.string().optional().or(z.literal('')),
   parent: z.array(z.string()).optional().default([]),
+  priority: z.boolean().default(false).optional(),
   _id: z.string().optional(),
   slug: z.string().min(1, 'Slug is required'),
   createdAt: z.date().optional(),

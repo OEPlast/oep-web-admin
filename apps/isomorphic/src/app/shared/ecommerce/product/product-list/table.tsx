@@ -16,6 +16,8 @@ import { handleApiError } from '@/libs/axios';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import TableSkeleton from './table-skeleton';
+import { useRouter } from 'next/navigation';
+import { routes } from '@/config/routes';
 
 export default function ProductsTable({
   pageSize = 10,
@@ -39,6 +41,7 @@ export default function ProductsTable({
   const deleteProduct = useDeleteProduct();
   const duplicateProduct = useDuplicateProduct();
   const [componentError, setComponentError] = useState<string | null>(null);
+  const router = useRouter();
 
   const products = productsData?.data || [];
 
@@ -70,15 +73,21 @@ export default function ProductsTable({
         handleDuplicateRow: (row: Product) => {
           if (!row._id) return;
 
+          // Show toast immediately
+          toast.loading('Duplicating product...', { id: 'duplicate-product' });
+
           duplicateProduct.mutate(row._id, {
             onSuccess: (data) => {
               setComponentError(null);
-              toast.success(`Product duplicated: ${data.name}`);
+              toast.success(`Product duplicated: ${data.name}`, { id: 'duplicate-product' });
+              
+              // Navigate to edit page of the new product
+              router.push(routes.eCommerce.ediProduct(data._id));
             },
             onError: (error) => {
               const errorMessage = handleApiError(error);
               setComponentError(errorMessage);
-              toast.error(errorMessage);
+              toast.error(errorMessage, { id: 'duplicate-product' });
             },
           });
         },

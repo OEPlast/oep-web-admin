@@ -10,6 +10,19 @@ export const updateBannerFormSchema = z.object({
     .string()
     .min(1, { message: 'Page link is required' })
     .regex(/^\/.*/, { message: 'Page link must start with /' }),
+  headerText: z
+    .string()
+    .min(1, { message: 'Header text is required' })
+    .max(200, { message: 'Header text must be 200 characters or less' }).optional(),
+  mainText: z
+    .string()
+    .min(1, { message: 'Main text is required' })
+    .max(500, { message: 'Main text must be 500 characters or less' }),
+  CTA: z
+    .string()
+    .min(1, { message: 'CTA is required' })
+    .max(100, { message: 'CTA must be 100 characters or less' }).optional(),
+  fullImage: z.boolean(),
   active: z.boolean(),
   category: z.enum(['A', 'B', 'C', 'D', 'E'], {
     message: 'Please select a valid category',
@@ -29,7 +42,20 @@ export const createBannerFormSchema = z.object({
     .string()
     .min(1, { message: 'Page link is required' })
     .regex(/^\/.*/, { message: 'Page link must start with /' }),
-  active: z.boolean().default(false).optional(),
+  headerText: z
+    .string()
+    .min(1, { message: 'Header text is required' })
+    .max(200, { message: 'Header text must be 200 characters or less' }).optional(),
+  mainText: z
+    .string()
+    .min(1, { message: 'Main text is required' })
+    .max(500, { message: 'Main text must be 500 characters or less' }).optional(),
+  CTA: z
+    .string()
+    .min(1, { message: 'CTA is required' })
+    .max(100, { message: 'CTA must be 100 characters or less' }).optional(),
+  fullImage: z.boolean(),
+  active: z.boolean().optional(),
   category: z.enum(['A', 'B', 'C', 'D', 'E'], {
     message: 'Please select a valid category',
   })
