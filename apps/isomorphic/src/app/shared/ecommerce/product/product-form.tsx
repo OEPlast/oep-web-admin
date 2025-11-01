@@ -14,6 +14,7 @@ import ProductImageManager from './ProductImageManager';
 import SkuInput from './SkuInput';
 import SlugPreview from './SlugPreview';
 import ProductStatusBadge from './ProductStatusBadge';
+import PackSizesManager from './PackSizesManager';
 
 interface ProductFormProps {
   mode: 'create' | 'update';
@@ -79,6 +80,7 @@ export default function ProductForm({
           },
           attributes: defaultValues?.attributes || [],
           pricingTiers: defaultValues?.pricingTiers || [],
+          packSizes: defaultValues?.packSizes || [],
           stock: defaultValues?.stock || 0,
           lowStockThreshold: defaultValues?.lowStockThreshold || 5,
           status: defaultValues?.status || 'inactive',
@@ -603,6 +605,24 @@ export default function ProductForm({
                       + Add Pricing Tier
                     </Button>
                   </div>
+                </VeritcalFormBlockWrapper>
+
+                {/* Pack Sizes */}
+                <VeritcalFormBlockWrapper
+                  title="Pack Sizes"
+                  description="Configure how this product can be purchased in different quantities"
+                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                >
+                  <PackSizesManager
+                    form={{
+                      register,
+                      control,
+                      setValue,
+                      getValues,
+                      watch,
+                      formState: { errors },
+                    } as any}
+                  />
                 </VeritcalFormBlockWrapper>
               </div>
             </div>

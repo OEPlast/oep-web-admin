@@ -3,7 +3,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 export default function Logo({ iconOnly = false, ...props }: IconProps) {
-  return <p className="font-extrabold text-4xl tracking-wider">OSL</p>;
+  return <p className="font-extrabold text-3xl tracking-wider">OEP</p>;
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox={`0 0 ${iconOnly ? "48 26" : "155 28"}`} {...props}>
       <rect width="10.16" height="19.93" fill="currentColor" rx="5.08" transform="rotate(29.49 -5.18 20.77) skewX(.85)" />

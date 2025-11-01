@@ -200,6 +200,20 @@ export const salesColumns = [
     ),
   }),
   columnHelper.display({
+    id: 'isHot',
+    size: 80,
+    header: 'Hot Sale',
+    cell: ({ row }) => (
+      <Badge
+        variant="flat"
+        color={row.original.isHot ? 'danger' : 'secondary'}
+        className="font-medium"
+      >
+        {row.original.isHot ? '🔥 Hot' : 'Normal'}
+      </Badge>
+    ),
+  }),
+  columnHelper.display({
     id: 'category',
     size: 150,
     header: 'Category',

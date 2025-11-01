@@ -5,6 +5,7 @@ import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
 import { ordersColumns } from './columns';
+import { useEffect } from 'react';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -17,7 +18,7 @@ export default function OrdersTable({
   onViewOrder,
   isLoading = false,
 }: OrdersTableProps) {
-  const { table } = useTanStackTable<Order>({
+  const { table, setData } = useTanStackTable<Order>({
     tableData: orders,
     columnConfig: ordersColumns(onViewOrder),
     options: {
@@ -30,6 +31,11 @@ export default function OrdersTable({
       enableColumnResizing: false,
     },
   });
+
+  useEffect(() => {    
+    setData(orders);
+  }, [orders]);
+
 
   return (
     <div>

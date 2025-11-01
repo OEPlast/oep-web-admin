@@ -1,9 +1,5 @@
-// sales client for fetching a single sale by id (mock, replace with real API later)
-import { salesData } from '@/data/sales-data';
+// Sales client using React Query hooks - no more mock data
+import { Sale } from '@/types/sales';
 
-export async function getSaleById(id: string) {
-  // In a real app, replace with fetch(`/api/sales/${id}`) or similar
-  return Promise.resolve(salesData.find((sale) => sale._id === id) || null);
-}
-
-export type Sale = (typeof salesData)[number];
+// Export the Sale type from types instead of mock data
+export type { Sale };

@@ -51,7 +51,8 @@ export default function ShippingInfo({ className }: { className?: string }) {
           />
         </div>
         <p className="text-sm text-gray-500">
-          These values will be added to the base shipping cost and delivery time calculated from the shipping zone.
+          These values will be added to the base shipping cost and delivery time
+          calculated from the shipping zone.
         </p>
       </div>
     </VerticalFormBlockWrapper>

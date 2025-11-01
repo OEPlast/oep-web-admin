@@ -59,6 +59,7 @@ export interface Sale {
   title: string;
   type: SaleType;
   isActive: boolean;
+  isHot: boolean;
   deleted?: boolean;
   startDate?: Date | string;
   endDate?: Date | string;
@@ -84,6 +85,7 @@ export interface CreateSaleInput {
   product: string; // Product ID
   type?: SaleType;
   isActive?: boolean;
+  isHot?: boolean;
   deleted?: boolean;
   campaign?: string; // Campaign ID (optional)
   startDate?: Date | string;
@@ -104,6 +106,7 @@ export interface UpdateSaleInput {
   product?: string;
   type?: SaleType;
   isActive?: boolean;
+  isHot?: boolean;
   deleted?: boolean;
   campaign?: string;
   startDate?: Date | string;

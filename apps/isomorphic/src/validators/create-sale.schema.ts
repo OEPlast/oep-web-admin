@@ -45,6 +45,7 @@ export const createSalesSchema = z
     title: z.string().min(1, { message: 'Title is required.' }),
     product: z.string().min(1, { message: 'Product is required.' }),
     isActive: z.boolean().default(true).optional(),
+    isHot: z.boolean().default(false).optional(),
     createdBy: z.string().optional(),
     updatedBy: z.string().optional(),
     type: z.enum(['Flash', 'Limited', 'Normal']),

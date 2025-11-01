@@ -3,6 +3,7 @@ import { Input, Button, Select } from 'rizzui';
 import { PiTrash } from 'react-icons/pi';
 import FormGroup from '@/app/shared/form-group';
 import cn from '@core/utils/class-names';
+import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 
 interface PricingInventoryProps {
   className?: string;
@@ -61,10 +62,10 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
         </div>
       </FormGroup>
 
-      <FormGroup
+      <VerticalFormBlockWrapper
         title="Pricing Tiers (Bulk Pricing)"
         description="Set discounted pricing based on quantity purchased"
-        className={cn(className)}
+        className={cn(className, 'max-w-[1200px]')}
       >
         <div className="col-span-full space-y-4">
           {(watch('pricingTiers') || []).map((tier: any, index: number) => (
@@ -115,7 +116,7 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
                 type="button"
                 variant="outline"
                 color="danger"
-                className="mt-6"
+                className="mt-6 hover:bg-red-500 hover:text-white max-w-[60px]"
                 onClick={() => {
                   const tiers = getValues('pricingTiers') || [];
                   setValue('pricingTiers', tiers.filter((_: any, i: number) => i !== index));
@@ -139,7 +140,7 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
             + Add Pricing Tier
           </Button>
         </div>
-      </FormGroup>
+      </VerticalFormBlockWrapper>
     </>
   );
 }

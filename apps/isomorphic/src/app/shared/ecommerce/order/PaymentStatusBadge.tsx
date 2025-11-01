@@ -13,6 +13,7 @@ const statusConfig: Record<
 > = {
   pending: { label: 'Pending', color: 'warning' },
   paid: { label: 'Paid', color: 'success' },
+  completed: { label: 'Completed', color: 'success' },
   failed: { label: 'Failed', color: 'danger' },
   refunded: { label: 'Refunded', color: 'secondary' },
   partially_refunded: { label: 'Partial Refund', color: 'warning' },

@@ -62,7 +62,7 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
         increaseCostBy: 0,
         addedDays: 0,
       },
-      
+
       attributes: [],
       pricingTiers: [],
       stock: 0,
@@ -77,7 +77,7 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     name: product.name,
     description: product.description,
     price: product.price,
-    category: product.category?._id || product.category as any,
+    category: product.category?._id || (product.category as any),
     tags: product.tags || [],
     description_images: product.description_images || [],
     specifications: product.specifications || [],
@@ -131,20 +131,20 @@ export default function CreateEditProduct({
           <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
             {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => {
               const componentKey = formParts[key as keyof typeof formParts];
-              
+
               // Pass additional props to ProductSummary
               if (componentKey === formParts.summary) {
                 return (
                   <Element key={key} name={componentKey}>
-                    <Component 
-                      className="pt-7 @2xl:pt-9 @3xl:pt-11" 
+                    <Component
+                      className="pt-7 @2xl:pt-9 @3xl:pt-11"
                       mode={mode}
                       existingSlug={product?.slug}
                     />
                   </Element>
                 );
               }
-              
+
               return (
                 <Element key={key} name={componentKey}>
                   <Component className="pt-7 @2xl:pt-9 @3xl:pt-11" />
@@ -155,7 +155,9 @@ export default function CreateEditProduct({
 
           <FormFooter
             isLoading={isLoading}
-            submitBtnText={mode === 'edit' ? 'Update Product' : 'Create Product'}
+            submitBtnText={
+              mode === 'edit' ? 'Update Product' : 'Create Product'
+            }
           />
         </form>
       </FormProvider>

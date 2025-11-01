@@ -1,14 +1,13 @@
 // UI client for displaying a single sale by id
 'use client';
-import { useEffect, useState } from 'react';
-import { getSaleById, Sale } from './one-client';
-import { Text, Badge, Tooltip, Avatar, Box } from 'rizzui';
+import React from 'react';
+import { useSaleById } from '@/hooks/queries/useSales';
+import { Sale } from '@/types/sales';
+import { Text, Badge, Tooltip, Alert } from 'rizzui';
+import { handleApiError } from '@/libs/axios';
 import {
-  PiSpinnerBallFill,
-  PiCheckCircleFill,
-  PiXCircleFill,
+  PiSpinner,
   PiLightningFill,
-  PiCalendarCheckFill,
   PiUsersThreeFill,
   PiChartLineUpFill,
   PiTagFill,
@@ -16,43 +15,48 @@ import {
   PiTrendUpFill,
 } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
-export default function OneSaleView({
-  id,
-  initialSale,
-}: {
-  id: string;
-  initialSale: Sale | null;
-}) {
-  const [sale, setSale] = useState<Sale | null>(initialSale);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!initialSale) {
-      setLoading(true);
-      getSaleById(id).then((data) => {
-        setSale(data);
-        setLoading(false);
-      });
-    }
-  }, [id, initialSale]);
+export default function OneSaleView({ id }: { id: string }) {
+  const { data: sale, isLoading, error, isError } = useSaleById(id);
 
-  if (loading) return <PiSpinnerBallFill />;
-  if (!sale) return <Text className="text-red-500">Sale not found.</Text>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <PiSpinner className="animate-spin text-2xl text-blue-500" />
+        <Text className="ml-2">Loading sale details...</Text>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert color="danger" className="m-4">
+        <strong>Error loading sale:</strong> {handleApiError(error)}
+      </Alert>
+    );
+  }
+
+  if (!sale) {
+    return (
+      <Alert color="danger" className="m-4">
+        <strong>Sale not found</strong>
+      </Alert>
+    );
+  }
 
   // 2025 modern Box UI, dynamic info, project-matching style
-  const product = (sale as any).product;
-  const productName = typeof product === 'object' ? product.name : product;
-  const productImage =
-    typeof product === 'object' ? product.coverImage : undefined;
-  const productCategory =
-    typeof product === 'object' ? product.category?.name : undefined;
-  const productSubCategory =
-    typeof product === 'object' ? product.subCategories?.name : undefined;
-  const productStock = typeof product === 'object' ? product.stock : undefined;
+  const product = sale.product;
+  const productName = product.name;
+  const productImage = product.coverImage || product.image || '';
+  const productCategory = product.category?.name;
+  const productSubCategory = product.subCategories?.name;
+  const productStock = product.stock;
   const campaign = sale.campaign || 'N/A';
   const now = Date.now();
-  const start = new Date(sale.startDate).getTime();
-  const end = new Date(sale.endDate).getTime();
+  const start = new Date(sale.startDate || sale.createdAt).getTime();
+  const end = new Date(
+    sale.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  ).getTime();
   const isActive = sale.isActive && now >= start && now <= end && !sale.deleted;
   const statusColor = isActive
     ? 'success'
@@ -66,9 +70,16 @@ export default function OneSaleView({
       : now < start
         ? 'Upcoming'
         : 'Ended';
+
+  // Calculate progress from variants
+  const totalMaxBuys = sale.variants.reduce((sum, v) => sum + v.maxBuys, 0);
+  const totalBoughtCount = sale.variants.reduce(
+    (sum, v) => sum + v.boughtCount,
+    0
+  );
   const progress =
-    sale.limit && sale.boughtCount
-      ? Math.min(100, Math.round((sale.boughtCount / sale.limit) * 100))
+    totalMaxBuys > 0
+      ? Math.min(100, Math.round((totalBoughtCount / totalMaxBuys) * 100))
       : 0;
   return (
     <div className="space-y-6">
@@ -136,11 +147,11 @@ export default function OneSaleView({
                   <div className="mb-1 flex items-center gap-2">
                     <PiUsersThreeFill className="text-green-500" size={16} />
                     <span className="text-sm font-medium text-gray-600">
-                      Limit
+                      Max Buys
                     </span>
                   </div>
                   <p className="text-lg font-semibold text-gray-900">
-                    {sale.limit}
+                    {totalMaxBuys}
                   </p>
                 </div>
 
@@ -152,7 +163,7 @@ export default function OneSaleView({
                     </span>
                   </div>
                   <p className="text-lg font-semibold text-gray-900">
-                    {sale.boughtCount ?? 0}
+                    {totalBoughtCount}
                   </p>
                 </div>
 
@@ -174,7 +185,7 @@ export default function OneSaleView({
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Sales Progress</span>
                   <span>
-                    {sale.boughtCount ?? 0} / {sale.limit} sold
+                    {totalBoughtCount} / {totalMaxBuys} sold
                   </span>
                 </div>
                 <div className="h-3 overflow-hidden rounded-full bg-gray-200">
@@ -208,7 +219,9 @@ export default function OneSaleView({
               <div>
                 <p className="text-sm font-medium text-gray-900">Start Date</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(sale.startDate).toLocaleString()}
+                  {sale.startDate
+                    ? new Date(sale.startDate).toLocaleString()
+                    : new Date(sale.createdAt).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -217,7 +230,9 @@ export default function OneSaleView({
               <div>
                 <p className="text-sm font-medium text-gray-900">End Date</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(sale.endDate).toLocaleString()}
+                  {sale.endDate
+                    ? new Date(sale.endDate).toLocaleString()
+                    : 'No end date set'}
                 </p>
               </div>
             </div>
@@ -263,15 +278,17 @@ export default function OneSaleView({
                   <Badge color="success" className="text-sm font-semibold">
                     {variant.discount}% OFF
                   </Badge>
+                  {variant.amountOff > 0 && (
+                    <Badge color="info" className="text-sm font-semibold">
+                      ${variant.amountOff} OFF
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   <span className="font-medium">Max: {variant.maxBuys}</span>
                   <span className="font-medium">
                     Sold: {variant.boughtCount}
                   </span>
-                  {typeof variant.limit === 'number' && (
-                    <span className="font-medium">Limit: {variant.limit}</span>
-                  )}
                 </div>
               </div>
             </div>
@@ -307,11 +324,15 @@ export default function OneSaleView({
           </div>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">Created By</p>
-            <p className="text-gray-600">{sale.createdBy || '-'}</p>
+            <p className="text-gray-600">
+              {sale.createdBy?.name || sale.createdBy?.email || '-'}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">Updated By</p>
-            <p className="text-gray-600">{sale.updatedBy || '-'}</p>
+            <p className="text-gray-600">
+              {sale.updatedBy?.name || sale.updatedBy?.email || '-'}
+            </p>
           </div>
         </div>
       </div>

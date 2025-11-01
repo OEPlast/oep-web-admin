@@ -25,6 +25,7 @@ import {
   PiPlusBold,
 } from 'react-icons/pi';
 import Image from 'next/image';
+import { getCdnUrl } from '@core/utils/cdn-url';
 
 interface CampaignProductsSectionProps {
   control: Control<CreateCampaignInput>;
@@ -185,7 +186,7 @@ export default function CampaignProductsSection({
                               />
                               <Image
                                 src={
-                                  product.description_images.find((img) => img.cover_image)?.url ||
+                                  getCdnUrl(product.description_images.find((img) => img.cover_image)?.url) ||
                                   '/placeholder.png'
                                 }
                                 alt={product.name}

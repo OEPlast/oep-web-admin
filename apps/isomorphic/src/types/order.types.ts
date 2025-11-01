@@ -61,6 +61,7 @@ export interface PaymentDetails {
 // Order Status Types
 export type OrderStatus =
   | 'pending'
+  | 'completed'
   | 'confirmed'
   | 'processing'
   | 'shipped'
@@ -71,6 +72,7 @@ export type OrderStatus =
 export type PaymentStatus =
   | 'pending'
   | 'paid'
+  | 'completed'
   | 'failed'
   | 'refunded'
   | 'partially_refunded';
@@ -87,6 +89,7 @@ export type ShippingMethod = 'standard' | 'express' | 'overnight' | 'pickup';
 export interface Order {
   _id: string;
   orderNumber: string;
+
   user: {
     _id: string;
     firstName: string;
@@ -95,6 +98,7 @@ export interface Order {
     avatar?: string;
   };
   items: OrderItem[];
+  totalQty?: number;
 
   // Pricing
   subtotal: number;
@@ -147,7 +151,9 @@ export interface Order {
 // API Response Types
 export interface OrdersListResponse {
   success: boolean;
-  data: Order[];
+  orders: Order[];
+  totalQty?: number;
+  totalOrders: number;
   pagination: {
     total: number;
     page: number;

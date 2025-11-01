@@ -6,7 +6,7 @@ import {
   UseFormRegister,
   UseFormSetValue,
 } from 'react-hook-form';
-import { Button, Drawer, Input, Select, Text, Loader } from 'rizzui';
+import { Button, Drawer, Input, Select, Text, Loader, Switch } from 'rizzui';
 import { CreateSalesInput } from '@/validators/create-sale.schema';
 import { LuReplace } from 'react-icons/lu';
 import { useState } from 'react';
@@ -73,20 +73,22 @@ export default function SaleInfoForm({
   const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Fetch initial products (first 20) when drawer opens
-  const { data: productsData, isLoading: isLoadingProducts } = useProducts(
-    { page: 1, limit: 20 },
-  );
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({
+    page: 1,
+    limit: 20,
+  });
 
   // Search products when user types (debounced)
   const { data: searchResults, isLoading: isSearching } = useProductSearch(
     debouncedSearch,
-    isDrawerOpen && debouncedSearch.trim().length > 0
+    isDrawerOpen && debouncedSearch.trim().length >= 2
   );
 
   // Determine which products to display
-  const displayedProducts = searchQuery.trim() 
-    ? (searchResults || []) 
-    : (productsData?.data || []);
+  const displayedProducts =
+    searchQuery.trim().length >= 2
+      ? searchResults || []
+      : productsData?.data || [];
 
   const isLoading = isLoadingProducts || isSearching;
   return (
@@ -124,8 +126,34 @@ export default function SaleInfoForm({
           />
         )}
       />
+      <Controller
+        name="isHot"
+        control={control}
+        render={({ field }) => (
+          <div className="mb-3">
+            <label className="mb-2 block text-sm font-medium">
+              Hot Sale
+              <Text className="mt-1 text-xs font-normal text-gray-500">
+                Show "Hot Sale" marquee banner and sold/available progress on
+                product cards
+              </Text>
+            </label>
+            <Switch
+              checked={field.value}
+              onChange={field.onChange}
+              label={field.value ? 'Enabled' : 'Disabled'}
+            />
+          </div>
+        )}
+      />
       <div>
         <label className="mb-1 block font-medium">Product</label>
+        {isEditMode && selectedProduct && (
+          <Text className="mb-2 text-xs text-amber-600">
+            Note: Changing product in edit mode will reset variants to default
+            values.
+          </Text>
+        )}
         {!selectedProduct && (
           <Button
             type="button"
@@ -135,10 +163,13 @@ export default function SaleInfoForm({
             Select Product
           </Button>
         )}
-        <Drawer isOpen={isDrawerOpen} onClose={() => {
-          setDrawerOpen(false);
-          setSearchQuery('');
-        }}>
+        <Drawer
+          isOpen={isDrawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+            setSearchQuery('');
+          }}
+        >
           <div className="p-4">
             <Text className="mb-4 text-lg font-semibold">Select Product</Text>
             <Input
@@ -154,19 +185,23 @@ export default function SaleInfoForm({
               <div className="flex items-center justify-center py-8">
                 <Loader variant="spinner" size="lg" />
                 <Text className="ml-3 text-gray-600">
-                  {searchQuery ? 'Searching...' : 'Loading products...'}
+                  {searchQuery.length >= 2
+                    ? 'Searching...'
+                    : 'Loading products...'}
                 </Text>
               </div>
             ) : displayedProducts.length === 0 ? (
               <div className="py-8 text-center">
                 <Text className="text-gray-500">
-                  {searchQuery 
-                    ? 'No products found matching your search' 
-                    : 'No products available'}
+                  {searchQuery.length >= 2
+                    ? 'No products found matching your search'
+                    : searchQuery.length > 0 && searchQuery.length < 2
+                      ? 'Type at least 2 characters to search'
+                      : 'No products available'}
                 </Text>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+              <div className="max-h-[500px] space-y-2 overflow-y-auto">
                 {displayedProducts.map((product) => (
                   <div
                     key={product._id}
@@ -176,33 +211,45 @@ export default function SaleInfoForm({
                       setSelectedProduct({
                         _id: product._id,
                         name: product.name,
-                        image: product.description_images.find((img) => img.cover_image)?.url || '',
+                        image:
+                          product.description_images.find(
+                            (img) => img.cover_image
+                          )?.url || '',
                         stock: product.stock,
                         slug: product.slug,
                         category: product.category,
                         // subCategories: product.subCategories || { _id: '', name: '' },
                         attributes: product.attributes || [],
                       });
-                      setValue('variants', [
-                        {
-                          attributeName: 'All',
-                          attributeValue: 'All',
-                          discount: 10,
-                          maxBuys: 0,
-                          boughtCount: 0,
-                        },
-                      ]);
+                      // Only set default variants in create mode, not edit mode
+                      if (!isEditMode) {
+                        setValue('variants', [
+                          {
+                            attributeName: 'All',
+                            attributeValue: 'All',
+                            discount: 10,
+                            maxBuys: 0,
+                            boughtCount: 0,
+                          },
+                        ]);
+                      }
                       setDrawerOpen(false);
                       setSearchQuery('');
                     }}
                   >
                     <img
-                      src={product.description_images.find((img) => img.cover_image)?.url || '/placeholder.png'}
+                      src={
+                        product.description_images.find(
+                          (img) => img.cover_image
+                        )?.url || '/placeholder.png'
+                      }
                       alt={product.name}
                       className="h-12 w-12 flex-shrink-0 rounded-md border border-gray-200 object-cover"
                     />
-                    <div className="flex-1 min-w-0">
-                      <Text className="font-medium truncate">{product.name}</Text>
+                    <div className="min-w-0 flex-1">
+                      <Text className="truncate font-medium">
+                        {product.name}
+                      </Text>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>{product.category?.name || 'No category'}</span>
                         {product.stock !== undefined && (

@@ -39,6 +39,7 @@ export default function OrdersPage() {
   });
 
   const { data, isLoading, isError, error } = useOrders(queryParams);
+console.log(data);
 
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -82,7 +83,7 @@ export default function OrdersPage() {
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <div className="mt-4 flex items-center gap-3 @lg:mt-0">
           <ExportButton
-            data={data?.data || []}
+            data={data?.orders|| []}
             fileName="order_data"
             header="Order ID,Name,Email,Avatar,Items,Price,Status,Created At,Updated At"
           />
@@ -96,7 +97,7 @@ export default function OrdersPage() {
         />
 
         <OrdersTable
-          orders={data?.data || []}
+          orders={data?.orders || []}
           onViewOrder={handleViewOrder}
           isLoading={isLoading}
         />

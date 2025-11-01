@@ -43,7 +43,7 @@ export const ordersColumns = (onViewOrder: (order: Order) => void) => [
     id: 'items',
     size: 100,
     header: 'Items',
-    cell: ({ row }) => <Text>{row.original.items.length} item(s)</Text>,
+    cell: ({ row }) => <Text>{row.original.totalQty}</Text>,
   }),
 
   columnHelper.accessor('total', {

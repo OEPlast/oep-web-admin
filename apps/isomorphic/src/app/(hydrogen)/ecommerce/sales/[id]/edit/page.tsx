@@ -5,9 +5,6 @@ import { Button } from 'rizzui/button';
 import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
 import EditSales from '@/app/shared/ecommerce/sales/edit-sales';
-import { salesData } from '@/data/sales-data';
-import { CreateSalesInput } from '@/validators/create-sale.schema';
-import { Text } from 'rizzui/typography';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -50,13 +47,7 @@ export default async function EditFlashSalePage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      {/* {!fetchedSale ? (
-        <div className="p-6">
-          <Text className="text-center text-red-500">Sale not found.</Text>
-        </div>
-      ) : ( */}
-      <EditSales saleId="sale_to_edit_123" />
-      {/* )} */}
+      <EditSales saleId={id} />
     </>
   );
 }

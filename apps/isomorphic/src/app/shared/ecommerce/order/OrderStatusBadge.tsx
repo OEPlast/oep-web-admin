@@ -16,6 +16,7 @@ const statusConfig: Record<
 > = {
   pending: { label: 'Pending', color: 'warning' },
   confirmed: { label: 'Confirmed', color: 'info' },
+  completed: { label: 'Completed', color: 'info' },
   processing: { label: 'Processing', color: 'secondary' },
   shipped: { label: 'Shipped', color: 'primary' },
   delivered: { label: 'Delivered', color: 'success' },
@@ -24,7 +25,7 @@ const statusConfig: Record<
 };
 
 export default function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status.toLowerCase() as OrderStatus];
 
   return (
     <Badge variant="flat" color={config.color} size="sm">

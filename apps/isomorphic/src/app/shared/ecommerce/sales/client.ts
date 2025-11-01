@@ -1,9 +1,15 @@
-// sales client for fetching all sales (mock, replace with real API later)
-import { salesData } from '@/data/sales-data';
+// Sales client - now using React Query hooks for real API calls
+// This file kept for type compatibility - use hooks for actual data fetching
 
+export type Sale = {
+  _id: string;
+  title: string;
+  type: string;
+  status: string;
+  // Add other Sale properties as needed
+};
+
+// This function is deprecated - use useSales hook instead
 export async function getAllSales() {
-  // In a real app, replace with fetch('/api/sales') or similar
-  return Promise.resolve(salesData);
+  throw new Error('getAllSales is deprecated - use useSales hook instead');
 }
-
-export type Sale = (typeof salesData)[number];
