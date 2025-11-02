@@ -188,6 +188,10 @@ export default function CampaignsList() {
                       {campaign.status}
                     </Badge>
                   </div>
+                  {/* Slug */}
+                  <Text className="mb-2 text-xs text-gray-500">
+                    Slug: {campaign.slug}
+                  </Text>
 
                   {/* Campaign Stats */}
                   <div className="mb-4 grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-3">

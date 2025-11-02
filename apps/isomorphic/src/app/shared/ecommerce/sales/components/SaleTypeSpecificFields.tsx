@@ -73,7 +73,7 @@ export default function SaleTypeSpecificFields({
           />
         </>
       )}
-      {saleType === 'Limited' && (
+      {/* {saleType === 'Limited' && (
         <Input
           label="Buyable Limit (Overall Sale)"
           type="number"
@@ -85,7 +85,7 @@ export default function SaleTypeSpecificFields({
           error={errors.limit?.message}
           helperText="Maximum number of times this entire sale can be used."
         />
-      )}
+      )} */}
     </>
   );
 }

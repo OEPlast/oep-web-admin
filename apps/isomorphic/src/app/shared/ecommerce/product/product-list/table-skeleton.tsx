@@ -15,7 +15,10 @@ export default function ProductTableSkeleton() {
         {/* Header */}
         <div className="grid grid-cols-7 gap-4 border-b border-gray-200 bg-gray-50 p-4">
           {[...Array(7)].map((_, i) => (
-            <div key={i} className="h-4 animate-pulse rounded bg-gray-300"></div>
+            <div
+              key={i}
+              className="h-4 animate-pulse rounded bg-gray-300"
+            ></div>
           ))}
         </div>
 
@@ -42,17 +45,6 @@ export default function ProductTableSkeleton() {
             ))}
           </div>
         ))}
-      </div>
-
-      {/* Pagination Skeleton */}
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
-        <div className="h-10 w-32 animate-pulse rounded bg-gray-200"></div>
-        <div className="flex gap-2">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 w-10 animate-pulse rounded bg-gray-200"></div>
-          ))}
-        </div>
-        <div className="h-10 w-32 animate-pulse rounded bg-gray-200"></div>
       </div>
     </div>
   );

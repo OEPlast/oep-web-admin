@@ -60,6 +60,7 @@ export default function CreateCampaign() {
       useFormProps={{
         mode: 'onSubmit',
         defaultValues: {
+          slug: '',
           title: '',
           description: '',
           image: '',

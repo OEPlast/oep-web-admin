@@ -37,16 +37,7 @@ export default async function CampaignDetailsPage({
 
   return (
     <>
-      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
-        <Link
-          href={routes.eCommerce.editCampaign(id)}
-          className="mt-4 w-full @lg:mt-0 @lg:w-auto"
-        >
-          <Button as="span" className="w-full @lg:w-auto">
-            Edit Campaign
-          </Button>
-        </Link>
-      </PageHeader>
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
       <CampaignDetails id={id} />
     </>
   );

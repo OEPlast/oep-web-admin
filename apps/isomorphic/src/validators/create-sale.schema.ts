@@ -48,11 +48,14 @@ export const createSalesSchema = z
     isHot: z.boolean().default(false).optional(),
     createdBy: z.string().optional(),
     updatedBy: z.string().optional(),
-    type: z.enum(['Flash', 'Limited', 'Normal']),
-    campaign: z.string().optional(),
-    limit: z
-      .number()
-      .min(0, { message: 'Limit must be a non-negative number.' }), // Min is 0
+    type: z.enum(['Flash',
+      
+      // 'Limited',
+      
+      'Normal']),
+    // limit: z
+    //   .number()
+    //   .min(0, { message: 'Limit must be a non-negative number.' }), // Min is 0
     startDate: z.date({ required_error: 'Start date is required.' }),
     endDate: z.date({ required_error: 'End date is required.' }),
     deleted: z.boolean(),
@@ -61,6 +64,7 @@ export const createSalesSchema = z
       .min(1, { message: 'At least one variant is required.' }),
   })
   .superRefine((data, ctx) => {
+    /*
     if (data.type === 'Limited') {
       // For 'Limited' sales, ensure maxBuys is set for all variants
       data.variants.forEach((variant, index) => {
@@ -90,6 +94,7 @@ export const createSalesSchema = z
         });
       }
     }
+      */
   });
 
 export type CreateSalesInput = z.infer<typeof createSalesSchema>;

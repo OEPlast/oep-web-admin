@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -108,6 +108,12 @@ export default function CreateEditProduct({
     resolver: zodResolver(productSchema),
     defaultValues: defaultValues(product),
   });
+
+  useEffect(()=> {
+    if (product) {
+      methods.reset(defaultValues(product));
+    }
+  },[product, methods]);
 
   const handleSubmit: SubmitHandler<CreateProductInput> = (data) => {
     onSubmit(data);

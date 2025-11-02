@@ -68,6 +68,7 @@ export interface Sale {
  */
 export interface CampaignListItem {
   _id: string;
+  slug: string;
   image: string;
   title: string;
   status: 'active' | 'inactive' | 'draft';
@@ -83,6 +84,7 @@ export interface CampaignListItem {
  */
 export interface Campaign {
   _id: string;
+  slug: string;
   image: string;
   title: string;
   description?: string;
@@ -106,6 +108,7 @@ export interface CampaignFilters {
  * Create campaign input
  */
 export interface CreateCampaignInput {
+  slug: string;
   image: string;
   title: string;
   description?: string;

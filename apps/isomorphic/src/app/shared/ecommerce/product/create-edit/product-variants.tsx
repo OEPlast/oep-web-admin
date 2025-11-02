@@ -124,7 +124,7 @@ export default function ProductVariants({ className }: { className?: string }) {
               variant="outline"
               size="sm"
             >
-              Custom
+              Add Custom Variant
             </Button>
           </div>
         </div>

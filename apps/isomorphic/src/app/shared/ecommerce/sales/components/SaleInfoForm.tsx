@@ -15,9 +15,8 @@ import { useProducts, useProductSearch } from '@/hooks/queries/useProducts';
 import { useDebounce } from '@/hooks/use-debounce';
 
 const typeOptions = [
-  { value: 'Flash', label: 'Flash' },
-  { value: 'Limited', label: 'Limited' },
   { value: 'Normal', label: 'Normal' },
+  { value: 'Flash', label: 'Flash' },
 ];
 
 interface SaleInfoFormProps {
@@ -118,9 +117,6 @@ export default function SaleInfoForm({
                 setValue('startDate', new Date());
                 setValue('endDate', new Date());
               }
-              if (selectedValue !== 'Limited') {
-                setValue('limit', 1);
-              }
             }}
             error={errors.type?.message as string}
           />
@@ -201,7 +197,7 @@ export default function SaleInfoForm({
                 </Text>
               </div>
             ) : (
-              <div className="max-h-[500px] space-y-2 overflow-y-auto">
+              <div className="h-full space-y-2 overflow-y-auto">
                 {displayedProducts.map((product) => (
                   <div
                     key={product._id}

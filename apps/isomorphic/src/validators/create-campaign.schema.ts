@@ -1,13 +1,26 @@
 import { z } from 'zod';
 
+const slugRegex = /^[a-z0-9-]+$/;
+
+const toOptionalDate = z.preprocess((v) => {
+  if (v === null || v === undefined || v === '') return undefined;
+  if (v instanceof Date) return v;
+  return undefined;
+}, z.date().optional());
 export const createCampaignSchema = z
   .object({
+    slug: z
+      .string()
+      .min(3, 'Slug must be at least 3 characters')
+      .max(64, 'Slug must be at most 64 characters')
+      .regex(slugRegex, 'Slug may only contain lowercase letters, numbers, and hyphens')
+      .transform((v) => v.trim().toLowerCase()),
     image: z.string().min(1, 'Image is required').url('Must be a valid URL'),
     title: z.string().min(3, 'Title must be at least 3 characters'),
     description: z.string().optional(),
     status: z.enum(['active', 'inactive', 'draft']).default('draft'),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
+    startDate: toOptionalDate,
+    endDate: toOptionalDate,
     products: z.array(z.string()).optional(),
     sales: z.array(z.string()).optional(),
   })

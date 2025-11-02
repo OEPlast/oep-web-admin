@@ -17,7 +17,7 @@ interface CampaignDetailsProps {
 
 export default function CampaignDetails({ id }: CampaignDetailsProps) {
   const router = useRouter();
-  const { data: campaign, isLoading } = useCampaign(id);
+  const { data: campaign, isLoading, isFetching } = useCampaign(id);
 
   const { mutate: deleteCampaign, isPending: isDeleting } = useDeleteCampaign({
     onSuccess: () => {
@@ -43,7 +43,7 @@ export default function CampaignDetails({ id }: CampaignDetailsProps) {
     router.push(routes.eCommerce.editCampaign(id));
   };
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -239,30 +239,32 @@ export default function CampaignDetails({ id }: CampaignDetailsProps) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Text className="mb-1 text-sm font-medium text-gray-700">
-              Created At
+              Start
             </Text>
             <Text className="text-gray-900">
-              {new Date(campaign.createdAt).toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {campaign.startDate
+                ? new Date(campaign.startDate).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'Infinity'}
             </Text>
           </div>
           <div>
-            <Text className="mb-1 text-sm font-medium text-gray-700">
-              Last Updated
-            </Text>
+            <Text className="mb-1 text-sm font-medium text-gray-700">Ends</Text>
             <Text className="text-gray-900">
-              {new Date(campaign.updatedAt).toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {campaign.endDate
+                ? new Date(campaign.endDate).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'Infinity'}
             </Text>
           </div>
         </div>

@@ -1,6 +1,6 @@
 // API endpoints for use with apiClient (which already has baseURL configured)
 
-import { update } from "lodash";
+import { update } from 'lodash';
 
 // No need to prefix with BASE_URL since axios instance handles that
 export const api = {
@@ -119,7 +119,8 @@ export const api = {
     transactionsTrend: '/admin/analytics/transactions-trend',
     customerAcquisition: '/admin/analytics/customer-acquisition',
     orderStatusDistribution: '/admin/analytics/order-status-distribution',
-    transactionStatusDistribution: '/admin/analytics/transaction-status-distribution',
+    transactionStatusDistribution:
+      '/admin/analytics/transaction-status-distribution',
     ratingDistribution: '/admin/analytics/rating-distribution',
     reviewSentiment: '/admin/analytics/review-sentiment',
     couponRedemptionTrend: '/admin/analytics/coupon-redemption-trend',
@@ -272,7 +273,8 @@ export const api = {
     list: '/admin/reviews',
     byId: (id: string) => `/admin/reviews/${id}`,
     byUser: (userId: string) => `/admin/reviews/user/${userId}`,
-    byProduct: (productId: string) => `/admin/reviews/products/${productId}/reviews`,
+    byProduct: (productId: string) =>
+      `/admin/reviews/products/${productId}/reviews`,
     approve: (reviewId: string) => `/admin/reviews/${reviewId}/approve`,
     delete: (reviewId: string) => `/admin/reviews/${reviewId}`,
     moodAnalytics: '/admin/reviews/analytics/mood',
@@ -280,8 +282,10 @@ export const api = {
     update: (reviewId: string) => `/admin/reviews/${reviewId}`,
     moderate: (reviewId: string) => `/admin/reviews/${reviewId}/moderate`,
     addReply: (reviewId: string) => `/admin/reviews/${reviewId}/reply`,
-    updateReply: (reviewId: string, replyId: string) => `/admin/reviews/${reviewId}/reply/${replyId}`,
-    deleteReply: (reviewId: string, replyId: string) => `/admin/reviews/${reviewId}/reply/${replyId}`
+    updateReply: (reviewId: string, replyId: string) =>
+      `/admin/reviews/${reviewId}/reply/${replyId}`,
+    deleteReply: (reviewId: string, replyId: string) =>
+      `/admin/reviews/${reviewId}/reply/${replyId}`,
   },
 
   // Settings endpoints
@@ -371,6 +375,10 @@ export const api = {
     update: (id: string) => `/admin/campaigns/${id}`, // Update campaign
     delete: (id: string) => `/admin/campaigns/${id}`, // Delete campaign
     toggleStatus: (id: string) => `/admin/campaigns/${id}/status`, // Toggle active/inactive status
+    checkSlug: (slug: string, excludeId?: string) =>
+      `/admin/campaigns/check-slug?slug=${encodeURIComponent(slug)}${
+        excludeId ? `&excludeId=${encodeURIComponent(excludeId)}` : ''
+      }`,
   },
 
   // Transaction endpoints
@@ -423,7 +431,7 @@ export const api = {
     addTracking: (id: string) => `/admin/shipment/${id}/tracking`, // POST add tracking entry
     bulkUpdateStatus: '/admin/shipment/bulk/status', // POST bulk status update
     byStatus: (status: string) => `/admin/shipment/filter/status/${status}`, // GET filter by status
-  statistics: '/admin/shipment/stats',
+    statistics: '/admin/shipment/stats',
 
     // Public/User endpoints
     publicTracking: (trackingNumber: string) =>

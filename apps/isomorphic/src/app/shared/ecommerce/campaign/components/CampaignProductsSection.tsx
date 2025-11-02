@@ -237,7 +237,7 @@ function renderOptionDisplayValue(option: any, selected: boolean) {
   return (
     <div className={cn('flex w-full items-center gap-3 px-3 py-1.5 pe-4')}>
       <Image
-        src={option.image || '/placeholder.png'}
+        src={option.image ? getCdnUrl(option.image) : '/placeholder.png'}
         alt={option.label}
         width={36}
         height={36}

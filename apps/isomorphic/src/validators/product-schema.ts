@@ -119,7 +119,6 @@ const baseProductSchema = z.object({
             name: z.string().min(1, 'Child name is required'),
             price: preprocessOptionalNumber(),
             stock: z.number().int().min(0, 'Stock cannot be negative'),
-            image: z.string().url('Invalid image URL').optional(),
             pricingTiers: z.array(pricingTierSchema).optional(),
           })
         ),

@@ -23,6 +23,7 @@ type FormProps<TFormValues extends FieldValues> = {
   serverError?: ServerErrors<Partial<TFormValues>> | null;
   resetValues?: any | null;
   className?: string;
+  methods?: UseFormReturn<TFormValues>;
 };
 
 export const Form = <
@@ -36,19 +37,23 @@ export const Form = <
   formError,
   resetValues,
   className,
+  methods: externalMethods,
   ...formProps
 }: FormProps<TFormValues>) => {
-  const methods = useForm<TFormValues>({
+  const internalMethods = useForm<TFormValues>({
     ...useFormProps,
     ...(validationSchema && { resolver: zodResolver(validationSchema) }),
   });
 
+  const methods = externalMethods || internalMethods;
   useEffect(() => {
     if (resetValues) {
       methods.reset(resetValues);
     }
   }, [resetValues, methods]);
 
+  console.log(methods.getValues());
+  
   return (
     <form
       noValidate

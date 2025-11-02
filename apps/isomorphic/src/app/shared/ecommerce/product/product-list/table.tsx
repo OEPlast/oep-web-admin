@@ -1,7 +1,10 @@
 'use client';
 
 import { useProductsEnhanced, Product } from '@/hooks/queries/useProducts';
-import { useDeleteProduct, useDuplicateProduct } from '@/hooks/mutations/useProductMutations';
+import {
+  useDeleteProduct,
+  useDuplicateProduct,
+} from '@/hooks/mutations/useProductMutations';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
@@ -18,9 +21,10 @@ import toast from 'react-hot-toast';
 import TableSkeleton from './table-skeleton';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/config/routes';
+import { PaginationState } from '@tanstack/react-table';
 
 export default function ProductsTable({
-  pageSize = 10,
+  pageSize = 20,
   hideFilters = false,
   hidePagination = false,
   hideFooter = false,
@@ -37,7 +41,20 @@ export default function ProductsTable({
   classNames?: TableClassNameProps;
   paginationClassName?: string;
 }) {
-  const { data: productsData, isLoading, error, isError } = useProductsEnhanced();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: pageSize,
+  });
+
+  const {
+    data: productsData,
+    isLoading,
+    error,
+    isError,
+  } = useProductsEnhanced({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+  });
   const deleteProduct = useDeleteProduct();
   const duplicateProduct = useDuplicateProduct();
   const [componentError, setComponentError] = useState<string | null>(null);
@@ -48,17 +65,19 @@ export default function ProductsTable({
   const { table, setData } = useTanStackTable<Product>({
     tableData: products,
     columnConfig: productsListColumns,
+
     options: {
+      manualPagination: true,
+      rowCount: productsData?.meta.total,
+      onPaginationChange: setPagination,
+
       initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: pageSize,
-        },
+        pagination,
       },
       meta: {
         handleDeleteRow: (row: Product) => {
           if (!row._id) return;
-          
+
           deleteProduct.mutate(row._id, {
             onSuccess: () => {
               setComponentError(null);
@@ -79,8 +98,10 @@ export default function ProductsTable({
           duplicateProduct.mutate(row._id, {
             onSuccess: (data) => {
               setComponentError(null);
-              toast.success(`Product duplicated: ${data.name}`, { id: 'duplicate-product' });
-              
+              toast.success(`Product duplicated: ${data.name}`, {
+                id: 'duplicate-product',
+              });
+
               // Navigate to edit page of the new product
               router.push(routes.eCommerce.ediProduct(data._id));
             },
@@ -119,11 +140,6 @@ export default function ProductsTable({
     );
   }
 
-  // Show loading skeleton
-  if (isLoading) {
-    return <TableSkeleton />;
-  }
-
   // Show error alert
   if (isError) {
     return (
@@ -136,7 +152,11 @@ export default function ProductsTable({
   // Show mutation errors
   if (componentError) {
     return (
-      <Alert color="danger" className="mb-4" onClose={() => setComponentError(null)}>
+      <Alert
+        color="danger"
+        className="mb-4"
+        onClose={() => setComponentError(null)}
+      >
         <strong>Error:</strong> {componentError}
       </Alert>
     );
@@ -145,7 +165,11 @@ export default function ProductsTable({
   return (
     <>
       {!hideFilters && <Filters table={table} />}
-      <Table table={table} variant="modern" classNames={classNames} />
+      {isLoading ? (
+        <TableSkeleton />
+      ) : (
+        <Table table={table} variant="modern" classNames={classNames} />
+      )}
       {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
       {!hidePagination && (
         <TablePagination

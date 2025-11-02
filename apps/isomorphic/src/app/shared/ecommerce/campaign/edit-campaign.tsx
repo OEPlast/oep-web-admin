@@ -41,12 +41,17 @@ export default function EditCampaign({ id }: EditCampaignProps) {
     null
   );
 
-  const { data: campaign, isLoading: isFetching } = useCampaign(id);
+  const {
+    data: campaign,
+    isLoading: isFetching,
+    refetch: refetchUseCampaign,
+  } = useCampaign(id);
 
   const { mutate: updateCampaign, isPending: isUpdating } = useUpdateCampaign({
     onSuccess: () => {
+      // refetchUseCampaign();
       toast.success('Campaign updated successfully');
-      router.push(routes.eCommerce.campaign);
+      router.push(routes.eCommerce.CampaignDetails(id));
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
@@ -115,6 +120,7 @@ export default function EditCampaign({ id }: EditCampaignProps) {
         resolver: zodResolver(createCampaignSchema),
         defaultValues: campaign
           ? {
+              slug: (campaign as any).slug || '',
               title: campaign.title,
               description: campaign.description || '',
               image: campaign.image,
@@ -178,6 +184,7 @@ export default function EditCampaign({ id }: EditCampaignProps) {
                 register={register}
                 errors={errors}
                 control={control}
+                excludeId={id}
               />
             </div>
 

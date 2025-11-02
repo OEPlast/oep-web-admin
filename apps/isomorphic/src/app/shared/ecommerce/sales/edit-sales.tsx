@@ -49,14 +49,33 @@ interface EditSalesProps {
   saleId: string;
 }
 
-function defaultValues(saleData?: Sale): CreateSalesInput {
+export default function EditSales({ saleId }: EditSalesProps) {
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
+    null
+  );
+
+  // Fetch sale data (includes product information)
+  const {
+    data: saleData,
+    isLoading,
+    isFetching,
+    error: saleError,
+    isError: isSaleError,
+  } = useSaleById(saleId);
+
+  const isLoadingSale = isLoading || isFetching;
+  // Update sale mutation
+  const updateSaleMutation = useUpdateSale();
+
+  function defaultValues(saleData?: Sale): CreateSalesInput {
+    console.log(saleData);
+
   if (!saleData) {
     return {
-      title: '',
+      title: 'l',
       type: 'Normal',
       product: '',
-      campaign: '',
-      limit: 0,
       deleted: false,
       startDate: new Date(),
       endDate: new Date(),
@@ -64,14 +83,12 @@ function defaultValues(saleData?: Sale): CreateSalesInput {
       isActive: true,
       isHot: false,
     };
-  }
+  }  
 
   return {
-    title: saleData.title || '',
-    type: saleData.type || 'Normal',
+    title: saleData.title,
+    type: saleData.type,
     product: saleData.product._id,
-    campaign: saleData.campaign || '',
-    limit: saleData.variants.reduce((sum, v) => sum + v.maxBuys, 0),
     deleted: saleData.deleted || false,
     startDate: saleData.startDate ? new Date(saleData.startDate) : new Date(),
     endDate: saleData.endDate ? new Date(saleData.endDate) : new Date(),
@@ -83,33 +100,37 @@ function defaultValues(saleData?: Sale): CreateSalesInput {
       boughtCount: v.boughtCount || 0,
     })),
     isActive: saleData.isActive,
-    isHot: saleData.isHot,
+    isHot: saleData.isHot || false,
   };
 }
-
-export default function EditSales({ saleId }: EditSalesProps) {
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
-    null
-  );
-
-  // Fetch sale data (includes product information)
-  const {
-    data: saleData,
-    isLoading: isLoadingSale,
-    error: saleError,
-    isError: isSaleError,
-  } = useSaleById(saleId);
-
-  // Update sale mutation
-  const updateSaleMutation = useUpdateSale();
-
   // Form setup
   const methods = useForm<CreateSalesInput>({
     resolver: zodResolver(createSalesSchema),
     mode: 'onChange',
     defaultValues: defaultValues(saleData),
+
   });
+
+  useEffect(() => {
+  if (saleData) {
+    methods.reset(defaultValues(saleData));
+    
+    // Set selected product
+    if (saleData.product) {
+      setSelectedProduct({
+        _id: saleData.product._id,
+        name: saleData.product.name,
+        image: saleData.product.image || '',
+        stock: saleData.product.stock || 0,
+        slug: saleData.product.slug || '',
+        category: saleData.product.category || { _id: '', name: '' },
+        subCategories: saleData.product.subCategories || { _id: '', name: '' },
+        attributes: saleData.product.attributes || [],
+        coverImage: saleData.product.coverImage,
+      });
+    }
+  }
+}, [saleData, methods]);
 
   const onSubmit: SubmitHandler<CreateSalesInput> = async (data) => {
     try {
@@ -170,11 +191,7 @@ export default function EditSales({ saleId }: EditSalesProps) {
   return (
     <Form<CreateSalesInput>
       onSubmit={onSubmit}
-      useFormProps={{
-        mode: 'onChange',
-        resolver: zodResolver(createSalesSchema),
-        defaultValues: methods.getValues(),
-      }}
+      methods={methods}
       className="isomorphic-form flex max-w-3xl flex-col justify-start gap-3 rounded-lg bg-white"
     >
       {({
