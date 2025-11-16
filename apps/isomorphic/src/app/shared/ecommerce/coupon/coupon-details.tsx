@@ -76,14 +76,14 @@ export default function CouponDetails({ id }: { id: string }) {
 
         <div>
           <div className="text-sm font-medium text-gray-600">Type</div>
-          <div className="mt-1 capitalize text-gray-900">
+          <div className="mt-1 font-semibold capitalize text-gray-900">
             {coupon.couponType.replace(/-/g, ' ')}
           </div>
         </div>
 
         <div>
           <div className="text-sm font-medium text-gray-600">Times Used</div>
-          <div className="mt-1 text-gray-900">
+          <div className="mt-1 font-semibold text-gray-900">
             {coupon.timesUsed}
             {coupon.maxUsage ? ` / ${coupon.maxUsage}` : ' (unlimited)'}
           </div>
@@ -92,9 +92,9 @@ export default function CouponDetails({ id }: { id: string }) {
         <div>
           <div className="text-sm font-medium text-gray-600">Active</div>
           <div
-            className={
+            className={`font-semibold ${
               coupon.active ? 'mt-1 text-green-600' : 'mt-1 text-red-600'
-            }
+            }`}
           >
             {coupon.active ? 'Yes' : 'No'}
           </div>
@@ -102,7 +102,7 @@ export default function CouponDetails({ id }: { id: string }) {
 
         <div>
           <div className="text-sm font-medium text-gray-600">Start Date</div>
-          <div className="mt-1 text-gray-900">
+          <div className="mt-1 font-semibold text-gray-900">
             {new Date(coupon.startDate).toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
@@ -114,7 +114,7 @@ export default function CouponDetails({ id }: { id: string }) {
 
         <div>
           <div className="text-sm font-medium text-gray-600">End Date</div>
-          <div className="mt-1 text-gray-900">
+          <div className="mt-1 font-semibold text-gray-900">
             {new Date(coupon.endDate).toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
@@ -129,20 +129,22 @@ export default function CouponDetails({ id }: { id: string }) {
             <div className="text-sm font-medium text-gray-600">
               Minimum Order Value
             </div>
-            <div className="mt-1 text-gray-900">${coupon.minOrderValue}</div>
+            <div className="mt-1 font-semibold text-gray-900">
+              ${coupon.minOrderValue}
+            </div>
           </div>
         )}
 
         <div>
           <div className="text-sm font-medium text-gray-600">Stackable</div>
-          <div className="mt-1 text-gray-900">
+          <div className="mt-1 font-semibold text-gray-900">
             {coupon.stackable ? 'Yes' : 'No'}
           </div>
         </div>
 
         <div>
           <div className="text-sm font-medium text-gray-600">Applies To</div>
-          <div className="mt-1 capitalize text-gray-900">
+          <div className="mt-1 font-semibold capitalize text-gray-900">
             {coupon.appliesTo?.scope || 'order'}
           </div>
         </div>
@@ -152,13 +154,15 @@ export default function CouponDetails({ id }: { id: string }) {
             <div className="text-sm font-medium text-gray-600">
               Max Usage Per User
             </div>
-            <div className="mt-1 text-gray-900">{coupon.maxUsagePerUser}</div>
+            <div className="mt-1 font-semibold text-gray-900">
+              {coupon.maxUsagePerUser}
+            </div>
           </div>
         )}
 
         <div className="md:col-span-2">
           <div className="text-sm font-medium text-gray-600">Created At</div>
-          <div className="mt-1 text-gray-900">
+          <div className="mt-1 font-semibold text-gray-900">
             {new Date(coupon.createdAt).toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
@@ -173,9 +177,18 @@ export default function CouponDetails({ id }: { id: string }) {
         {coupon.notes && (
           <div className="md:col-span-2">
             <div className="text-sm font-medium text-gray-600">Notes</div>
-            <div className="mt-1 text-gray-700">{coupon.notes}</div>
+            <div className="mt-1 font-semibold text-gray-700">
+              {coupon.notes}
+            </div>
           </div>
         )}
+
+        <div className="md:col-span-2">
+          <div className="text-sm font-medium text-gray-600">Show on cart</div>
+          <div className="mt-1 font-semibold text-gray-700">
+            {coupon.showOnCartPage ? 'True' : 'False'}
+          </div>
+        </div>
       </div>
 
       {!isDeleted && (

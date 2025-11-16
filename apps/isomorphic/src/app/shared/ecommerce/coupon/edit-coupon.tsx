@@ -43,7 +43,7 @@ export default function EditCoupon({ id }: { id: string }) {
 
   const updateMutation = useUpdateCoupon({
     onSuccess: () => {
-      router.push(routes.eCommerce.coupons);
+      router.push(routes.eCommerce.couponDetails(couponData?._id!));
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
@@ -107,8 +107,9 @@ export default function EditCoupon({ id }: { id: string }) {
           stackable: couponData.stackable || false,
           maxUsage: couponData.maxUsage || undefined,
           maxUsagePerUser: couponData.maxUsagePerUser || undefined,
-          allowedUser: couponData.allowedUser || '',
+          allowedUser: couponData.allowedUser || undefined,
           notes: couponData.notes || '',
+          showOnCartPage: couponData.showOnCartPage ?? false,
         },
       }}
       className="isomorphic-form flex max-w-[700px] flex-col gap-6"
@@ -421,6 +422,26 @@ export default function EditCoupon({ id }: { id: string }) {
                     <FormLabelWithTooltip
                       label="Stackable with other coupons"
                       tooltip="Allow this coupon to be combined with other coupons in the same order."
+                      placement="right-start"
+                    />
+                    <Switch
+                      checked={field.value}
+                      onChange={field.onChange}
+                      disabled={isDeleted}
+                    />
+                  </div>
+                )}
+              />
+
+              {/* Show on Cart Page Switch */}
+              <Controller
+                name="showOnCartPage"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center gap-2">
+                    <FormLabelWithTooltip
+                      label="Show on Cart Page"
+                      tooltip="Display this coupon on the cart page for customers to see and apply."
                       placement="right-start"
                     />
                     <Switch

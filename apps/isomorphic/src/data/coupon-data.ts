@@ -14,6 +14,7 @@ export type CouponDataType = {
   minOrderValue?: number;
   appliesTo?: AppliesTo;
   stackable?: boolean;
+  showOnCartPage?: boolean;
   active: boolean;
   timesUsed: number;
   maxUsage?: number | null;

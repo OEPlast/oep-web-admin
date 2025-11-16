@@ -73,6 +73,7 @@ export default function CreateCoupon() {
           active: true,
           couponType: 'normal',
           stackable: false,
+          showOnCartPage: false,
         },
       }}
       className="isomorphic-form flex max-w-[700px] flex-col gap-6"
@@ -363,6 +364,20 @@ export default function CreateCoupon() {
                       <FormLabelWithTooltip
                         label="Stackable"
                         tooltip="Allow this coupon to be combined with other coupons in the same order."
+                      />
+                      <Switch checked={field.value} onChange={field.onChange} />
+                    </div>
+                  )}
+                />
+
+                <Controller
+                  name="showOnCartPage"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <FormLabelWithTooltip
+                        label="Show on Cart"
+                        tooltip="Display this coupon on the cart page for customers to see and apply."
                       />
                       <Switch checked={field.value} onChange={field.onChange} />
                     </div>
