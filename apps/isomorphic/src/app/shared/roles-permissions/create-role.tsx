@@ -39,6 +39,7 @@ const RESOURCES = [
   'invoices',
   'logistics',
   'transactions',
+  'delivery'
 ];
 
 const ACTIONS = ['*', 'create', 'read', 'update', 'delete'];

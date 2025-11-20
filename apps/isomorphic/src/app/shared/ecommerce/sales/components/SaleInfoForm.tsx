@@ -17,6 +17,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 const typeOptions = [
   { value: 'Normal', label: 'Normal' },
   { value: 'Flash', label: 'Flash' },
+  { value: 'Limited', label: 'Limited' },
 ];
 
 interface SaleInfoFormProps {

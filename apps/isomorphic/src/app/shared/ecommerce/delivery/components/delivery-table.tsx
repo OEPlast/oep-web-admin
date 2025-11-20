@@ -10,7 +10,7 @@ import { Alert } from 'rizzui';
 import { handleApiError } from '@/libs/axios';
 import { useMyDeliveries } from '@/hooks/queries/useDeliveries';
 import type { Shipment } from '@/types/shipment.types';
-import { useDeliveriesColumns } from './deliveries-columns';
+import DeliveriesColumns from './deliveries-columns';
 import TableFooter from '@core/components/table/footer';
 // permissions handled inside useDeliveriesColumns
 import DeliveryFilters from './delivery-filters';
@@ -32,14 +32,13 @@ export default function DeliveryTable({
   paginationClassName?: string;
 }) {
   const { data, isLoading, error, isError } = useMyDeliveries({ page: 1, limit: 30 });
-  const columns = useDeliveriesColumns();
   const [componentError, setComponentError] = useState<string | null>(null);
 
   const deliveries: Shipment[] = data?.shipments || [];
 
   const { table, setData } = useTanStackTable<Shipment>({
     tableData: deliveries,
-  columnConfig: columns,
+  columnConfig: DeliveriesColumns,
     options: {
       initialState: {
         pagination: {

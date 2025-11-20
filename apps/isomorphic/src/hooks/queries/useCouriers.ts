@@ -16,10 +16,10 @@ export const useCouriers = (params?: { search?: string }) => {
   return useQuery<readonly CourierUser[]>({
     queryKey: ["couriers", params ?? {}],
     queryFn: async () => {
-      const response = await apiClient.get<{ message: string; data: CourierUser[] }>(api.users.couriers, {
+      const response = await apiClient.get<CourierUser[] >(api.users.couriers, {
         params,
       });
-      return (response.data?.data ?? []) as CourierUser[];
+      return (response.data ?? []) as CourierUser[];
     },
     placeholderData: EMPTY,
     staleTime: 5 * 60 * 1000,

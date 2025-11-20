@@ -8,12 +8,10 @@ import { PiEyeDuotone, PiPencilDuotone } from 'react-icons/pi';
 import type { Shipment, ShipmentStatus } from '@/types/shipment.types';
 import { STATUS_BADGE_CONFIG } from '@/types/shipment.types';
 import { routes } from '@/config/routes';
-import { usePermissions, PermissionAction, PermissionResource } from '@/hooks/queries/usePermissions';
 
 const columnHelper = createColumnHelper<Shipment>();
 
-function buildColumns(canView: boolean, canEdit: boolean) {
-  return [
+ const DeliveriesColumns = [
   columnHelper.display({
     id: 'trackingNumber',
     header: 'Tracking Number',
@@ -68,40 +66,28 @@ function buildColumns(canView: boolean, canEdit: boolean) {
   }),
   columnHelper.display({
     id: 'action',
+    header: 'Actions',
     size: 140,
     cell: ({ row }) => {
       return (
         <Flex align="center" justify="end" gap="3" className="pe-4">
-          {canView && (
-            <Tooltip size="sm" content="View" placement="top" color="invert">
-              <Link href={routes.eCommerce.delivery.details(row.original._id)}>
-                <ActionIcon as="span" size="sm" variant="outline" aria-label="View Delivery">
-                  <PiEyeDuotone className="h-4 w-4" />
-                </ActionIcon>
-              </Link>
-            </Tooltip>
-          )}
-          {canEdit && (
-            <Tooltip size="sm" content="Edit" placement="top" color="invert">
-              <Link href={routes.eCommerce.delivery.edit(row.original._id)}>
-                <ActionIcon as="span" size="sm" variant="outline" aria-label="Edit Delivery">
-                  <PiPencilDuotone className="h-4 w-4" />
-                </ActionIcon>
-              </Link>
-            </Tooltip>
-          )}
+          <Tooltip size="sm" content="View" placement="top" color="invert">
+            <Link href={routes.eCommerce.delivery.details(row.original._id)}>
+              <ActionIcon as="span" size="sm" variant="outline" aria-label="View Delivery">
+                <PiEyeDuotone className="h-4 w-4" />
+              </ActionIcon>
+            </Link>
+          </Tooltip>
+          <Tooltip size="sm" content="Edit" placement="top" color="invert">
+            <Link href={routes.eCommerce.delivery.edit(row.original._id)}>
+              <ActionIcon as="span" size="sm" variant="outline" aria-label="Edit Delivery">
+                <PiPencilDuotone className="h-4 w-4" />
+              </ActionIcon>
+            </Link>
+          </Tooltip>
         </Flex>
       );
     },
   }),
 ];
-}
-
-export function useDeliveriesColumns() {
-  const { hasPermission } = usePermissions();
-  const canView = hasPermission([PermissionResource.DELIVERY], PermissionAction.READ);
-  const canEdit = hasPermission([PermissionResource.DELIVERY], PermissionAction.UPDATE);
-
-  const cols = useMemo(() => buildColumns(canView, canEdit), [canView, canEdit]);
-  return cols;
-}
+export default  DeliveriesColumns;

@@ -16,29 +16,7 @@ import {
 } from 'rizzui';
 import { Form } from '@core/ui/form';
 import { EditRoleInput, editRoleSchema } from '@/validators/edit-role.schema';
-
-const RESOURCES = [
-  'products',
-  'categories',
-  'subcategories',
-  'attributes',
-  'inventory',
-  'orders',
-  'users',
-  'roles',
-  'sales',
-  'coupons',
-  'reviews',
-  'campaigns',
-  'banners',
-  'gallery',
-  'analytics',
-  'invoices',
-  'logistics',
-  'transactions',
-];
-
-const ACTIONS = ['*', 'create', 'read', 'update', 'delete'];
+import { ROLE_ACTIONS, ROLES_RESOURCES } from '@/libs/constants';
 
 interface EditRoleProps {
   role?: {
@@ -158,7 +136,7 @@ export default function EditRole({ role }: EditRoleProps) {
               Permissions
             </Title>
             <div className="max-h-[400px] space-y-3 overflow-y-auto rounded-lg border border-gray-200 p-4">
-              {RESOURCES.map((resource) => (
+              {ROLES_RESOURCES.map((resource) => (
                 <div
                   key={resource}
                   className="flex flex-col gap-2 border-b border-gray-100 pb-3 last:border-b-0 md:flex-row md:items-center md:justify-between"
@@ -176,7 +154,7 @@ export default function EditRole({ role }: EditRoleProps) {
                     }
                     className="flex flex-wrap gap-2"
                   >
-                    {ACTIONS.map((action) => (
+                    {ROLE_ACTIONS.map((action) => (
                       <AdvancedCheckbox
                         key={action}
                         name={`${resource}.${action}`}

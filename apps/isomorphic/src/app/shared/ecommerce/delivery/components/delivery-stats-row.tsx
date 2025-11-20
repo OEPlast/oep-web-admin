@@ -3,6 +3,7 @@
 import { useMyDeliveryStats } from '@/hooks/queries/useDeliveries';
 import { Loader, Text } from 'rizzui';
 import { PiReceiptDuotone, PiCheckCircleDuotone, PiXCircleDuotone, PiClockDuotone, PiArrowCounterClockwiseDuotone } from 'react-icons/pi';
+import { BiBus } from 'react-icons/bi';
 
 type Variant = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary';
 
@@ -55,9 +56,10 @@ export default function DeliveryStatsRow() {
 
   return (
     <div className="grid grid-cols-2 gap-3 @xl:grid-cols-3 @4xl:grid-cols-6">
-      <StatCard title="In Warehouse" value={stats['In-Warehouse'] ?? 0} icon={<PiReceiptDuotone className="h-5 w-5" />} variant="secondary" />
+      {/* <StatCard title="In Warehouse" value={stats['In-Warehouse'] ?? 0} icon={<PiReceiptDuotone className="h-5 w-5" />} variant="secondary" /> */}
       <StatCard title="Shipped" value={stats.Shipped ?? 0} icon={<PiClockDuotone className="h-5 w-5" />} variant="info" />
       <StatCard title="Dispatched" value={stats.Dispatched ?? 0} icon={<PiClockDuotone className="h-5 w-5" />} variant="warning" />
+      <StatCard title="In-Transit" value={stats['In-Transit'] ?? 0} icon={<BiBus className="h-5 w-5" />} variant="warning" />
       <StatCard title="Delivered" value={stats.Delivered ?? 0} icon={<PiCheckCircleDuotone className="h-5 w-5" />} variant="success" />
       <StatCard title="Returned" value={stats.Returned ?? 0} icon={<PiArrowCounterClockwiseDuotone className="h-5 w-5" />} variant="info" />
       <StatCard title="Failed" value={stats.Failed ?? 0} icon={<PiXCircleDuotone className="h-5 w-5" />} variant="danger" />

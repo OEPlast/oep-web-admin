@@ -187,46 +187,18 @@ async function editUserRoles(
   return response.data!;
 }
 
-async function getUserPermissions(userId: string): Promise<{
-  role: string;
-  roles: Role[];
-  permissions: Array<{ resource: string; actions: string[] }>;
-}> {
-  const response = await apiClient.get<any>(api.staff.permissions(userId));
-  const payload = response?.data?.data ?? response?.data ?? {};
-
-  // Normalize role name
-  const role = payload.role ?? payload.legacyRole ?? 'user';
-
-  // Roles may be present (each role with its own permissions) or a flat permissions array
-  const roles = (payload.roles ?? []) as Role[];
-
-  // If backend already supplies a `permissions` array, use it; otherwise aggregate from roles
-  let permissions: Array<{ resource: string; actions: string[] }> = [];
-  if (Array.isArray(payload.permissions) && payload.permissions.length > 0) {
-    permissions = payload.permissions;
-  } else if (Array.isArray(roles) && roles.length > 0) {
-    // Aggregate and deduplicate actions per resource
-    const map = new Map<string, Set<string>>();
-    for (const r of roles) {
-      const perms = (r.permissions ?? []) as Array<{
-        resource: string;
-        actions: string[];
-      }>;
-      for (const p of perms) {
-        const key = p.resource;
-        if (!map.has(key)) map.set(key, new Set<string>());
-        const set = map.get(key)!;
-        for (const a of p.actions || []) set.add(a);
-      }
+async function getUserPermissions(userId: string): Promise<Array<{ resource: string; actions: string[] }>> {
+  try {
+    const response = await apiClient.get<{ resource: string; actions: string[]
+    }[]>(api.staff.permissions(userId));
+    if(!response.data) {
+      throw new Error('No data received');
     }
-    permissions = Array.from(map.entries()).map(([resource, actionsSet]) => ({
-      resource,
-      actions: Array.from(actionsSet),
-    }));
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user permissions:', error);
+    return [];
   }
-
-  return { role, roles, permissions };
 }
 
 async function suspendUser(userId: string): Promise<void> {
@@ -373,10 +345,11 @@ export function useStaffUser(userId: string) {
   });
 }
 
-export function useUserPermissions(userId: string) {
+export function useUserPermissions(userId: string) {  
   return useQuery({
     queryKey: staffKeys.permissions(userId),
     queryFn: () => getUserPermissions(userId),
+    placeholderData: [],
     enabled: !!userId,
   });
 }

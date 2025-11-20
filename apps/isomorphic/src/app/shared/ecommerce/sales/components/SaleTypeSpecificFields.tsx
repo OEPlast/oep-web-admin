@@ -73,19 +73,7 @@ export default function SaleTypeSpecificFields({
           />
         </>
       )}
-      {/* {saleType === 'Limited' && (
-        <Input
-          label="Buyable Limit (Overall Sale)"
-          type="number"
-          {...register('limit', {
-            required: 'Overall sale limit is required for Limited type sales.',
-            valueAsNumber: true,
-            min: { value: 1, message: 'Limit must be at least 1' },
-          })}
-          error={errors.limit?.message}
-          helperText="Maximum number of times this entire sale can be used."
-        />
-      )} */}
+
     </>
   );
 }

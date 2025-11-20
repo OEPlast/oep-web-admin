@@ -69,7 +69,6 @@ export default function EditSales({ saleId }: EditSalesProps) {
   const updateSaleMutation = useUpdateSale();
 
   function defaultValues(saleData?: Sale): CreateSalesInput {
-    console.log(saleData);
 
   if (!saleData) {
     return {

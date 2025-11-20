@@ -7,6 +7,7 @@ import type { Shipment, ShipmentListResponse } from "@/types/shipment.types";
 
 export type DeliveryStatus =
   | "In-Warehouse"
+  | "In-Transit"
   | "Shipped"
   | "Dispatched"
   | "Delivered"
@@ -23,6 +24,7 @@ export type DeliveryStats = Record<DeliveryStatus | "total", number>;
 
 const EMPTY_STATS: DeliveryStats = {
   "In-Warehouse": 0,
+  "In-Transit": 0,
   Shipped: 0,
   Dispatched: 0,
   Delivered: 0,
@@ -63,7 +65,7 @@ export const useMyDeliveryStats = () => {
     queryKey: deliveryKeys.stats(),
     queryFn: async () => {
       const response = await apiClient.get<{ message: string; data: DeliveryStats }>(api.delivery.mineStats);
-      return (response.data?.data ?? EMPTY_STATS) as DeliveryStats;
+      return (response.data ?? EMPTY_STATS) as DeliveryStats;
     },
     placeholderData: EMPTY_STATS,
     staleTime: 60 * 1000,
@@ -82,5 +84,19 @@ export const useDeliveryById = (id: string) => {
     staleTime: 5 * 60 * 1000,
   });
 };
+
+export const useDeliveryByTrackingNumber = (trackingNumber: string) => {
+  return useQuery<Shipment>({
+    queryKey: deliveryKeys.detail(trackingNumber),
+    queryFn: async () => {
+      const response = await apiClient.get<Shipment>(api.delivery.byTracking(trackingNumber));
+      return response.data!;
+    },
+    enabled: !!trackingNumber,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+
 
 export default deliveryKeys;

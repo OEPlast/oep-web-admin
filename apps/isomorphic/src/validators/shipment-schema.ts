@@ -47,6 +47,7 @@ export const createShipmentSchema = z.object({
 // Update shipment schema
 export const updateShipmentSchema = z.object({
   courier: z.string().min(2).optional(),
+  courierUser: z.string().min(2).optional(),
   shippingAddress: shippingAddressSchema.partial().optional(),
   estimatedDelivery: z.string().optional(),
   actualDelivery: z.string().optional(),

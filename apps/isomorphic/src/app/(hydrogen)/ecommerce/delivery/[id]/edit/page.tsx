@@ -19,7 +19,7 @@ export default async function EditDeliveryPage({
     breadcrumb: [
       { href: routes.eCommerce.dashboard, name: 'E-Commerce' },
       { href: routes.eCommerce.delivery.list, name: 'Delivery' },
-      { href: routes.eCommerce.delivery.details(id), name: 'Details' },
+      { href: routes.eCommerce.delivery.details(id), name: id },
       { name: 'Edit' },
     ],
   };

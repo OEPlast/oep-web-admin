@@ -6,6 +6,7 @@ import type {
   OrderByIdResponse,
   OrderStatisticsResponse,
   OrdersQueryParams,
+  Order,
 } from '@/types/order.types';
 
 // Fetch orders list with filters
@@ -35,12 +36,12 @@ export function useOrders(
 // Fetch single order by ID
 export function useOrderById(
   orderId: string,
-  options?: Omit<UseQueryOptions<OrderByIdResponse>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<Order>, 'queryKey' | 'queryFn'>
 ) {
-  return useQuery<OrderByIdResponse>({
+  return useQuery<Order>({
     queryKey: ['order', orderId],
     queryFn: async () => {
-      const response = await apiClient.get<OrderByIdResponse>(
+      const response = await apiClient.get<Order>(
         api.orders.byId(orderId)
       );
       if (!response.data) {

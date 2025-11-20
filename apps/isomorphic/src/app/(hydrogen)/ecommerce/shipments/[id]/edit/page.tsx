@@ -9,12 +9,13 @@ export const metadata: Metadata = {
 };
 
 interface EditShipmentPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function EditShipmentPage({ params }: EditShipmentPageProps) {
+export default async function EditShipmentPage({ params }: EditShipmentPageProps) {
+  const resolvedParams = await params;
   const pageHeader = {
     title: 'Edit Shipment',
     breadcrumb: [
@@ -27,7 +28,7 @@ export default function EditShipmentPage({ params }: EditShipmentPageProps) {
         name: 'Shipments',
       },
       {
-  href: routes.eCommerce.shipment.shipmentDetails(params.id),
+  href: routes.eCommerce.shipment.shipmentDetails(resolvedParams.id),
         name: 'Details',
       },
       {
@@ -39,7 +40,7 @@ export default function EditShipmentPage({ params }: EditShipmentPageProps) {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-      <EditShipmentForm shipmentId={params.id} />
+      <EditShipmentForm shipmentId={resolvedParams.id} />
     </>
   );
 }

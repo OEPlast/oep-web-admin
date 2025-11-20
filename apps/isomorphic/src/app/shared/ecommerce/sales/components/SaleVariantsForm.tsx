@@ -122,7 +122,6 @@ export default function SaleVariantsForm({
         (acc, variant) => acc + (Number(variant.maxBuys) || 0),
         0
       );
-      setValue('limit', sumOfMaxBuys, { shouldValidate: true });
     }
   }, [variants, saleType, setValue]);
 
@@ -250,7 +249,7 @@ export default function SaleVariantsForm({
                   // Schema handles requirement for 'Limited' type
                 })}
                 error={errors.variants?.[index]?.maxBuys?.message}
-                helperText="Max times this specific variant can be bought by a single user."
+                helperText="Max times this specific variant can be bought."
               />
             )}
             <div className="pt-1 text-sm text-gray-600">

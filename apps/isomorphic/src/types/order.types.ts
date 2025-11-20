@@ -26,14 +26,20 @@ export interface OrderItem {
 
 // Shipping Address Interface
 export interface ShippingAddress {
-  fullName: string;
-  phone: string;
-  addressLine1: string;
-  addressLine2?: string;
+  fullName?: string; // Old format
+  firstName?: string; // New format
+  lastName?: string; // New format
+  phone?: string; // Old format
+  phoneNumber?: string; // New format
+  addressLine1?: string; // Old format
+  address1?: string; // New format
+  addressLine2?: string; // Old format
+  address2?: string; // New format
   city: string;
   state: string;
   zipCode: string;
   country: string;
+  lga?: string; // Local Government Area (Nigeria specific)
 }
 
 // Status History Interface
@@ -94,37 +100,94 @@ export interface Order {
     _id: string;
     firstName: string;
     lastName: string;
+    name?: string; // Full name concatenation
     email: string;
-    avatar?: string;
+    image?: string;
   };
-  items: OrderItem[];
+  items?: OrderItem[]; // Optional for backward compatibility
+  products?: Array<{ // New API format
+    _id: string;
+    name: string;
+    slug: string;
+    image?: string;
+    quantity: number;
+    price: number;
+    attributes: any[];
+    sale: any;
+    saleDiscount: number;
+  }>;
   totalQty?: number;
 
   // Pricing
-  subtotal: number;
-  shippingCost: number;
-  tax: number;
-  discount: number;
+  subtotal?: number;
+  shippingCost?: number;
+  tax?: number;
+  discount?: number;
   total: number;
+  totalBeforeDiscount?: number; // New API field
+  shippingPrice?: number; // New API field
+  taxPrice?: number; // New API field
+  couponDiscount?: number; // New API field
 
   // Payment
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
-  paymentDetails: PaymentDetails;
+  paymentMethod?: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  paymentDetails?: PaymentDetails;
+  isPaid?: boolean; // New API field
+  paidAt?: string; // New API field
+  
+  // Transaction details (new API format)
+  transaction?: {
+    _id: string;
+    reference: string;
+    amount: number;
+    paymentMethod: string;
+    paymentGateway: string;
+    status: string;
+    paidAt: string;
+    transactionDate: string;
+  };
 
   // Shipping
   shippingAddress: ShippingAddress;
-  shippingMethod: ShippingMethod;
+  billingAddress?: ShippingAddress; // New API field
+  shippingMethod?: ShippingMethod;
   trackingNumber?: string;
   carrier?: string;
+  deliveryType?: string; // New API field ('shipping' | 'pickup')
+  
+  // Contact info (new API format)
+  contact?: {
+    name: string | null;
+    phone: string;
+    email: string;
+  };
+  
+  // Shipment details (new API format)
+  shipment?: {
+    _id: string;
+    trackingNumber: string;
+    status: string;
+    courier: string;
+    estimatedDelivery: string;
+    deliveredOn?: string;
+    shippingAddress: any;
+    trackingHistory: Array<{
+      _id: string;
+      location: string;
+      timestamp: string;
+      description: string;
+    }>;
+    cost: number;
+  };
 
   // Status
   status: OrderStatus;
-  statusHistory: StatusHistory[];
+  statusHistory?: StatusHistory[];
 
   // Discounts
   coupon?: {
-    _id: string;
+    _id?: string;
     code: string;
     discount: number;
   };

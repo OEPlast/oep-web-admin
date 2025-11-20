@@ -1,20 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Alert, Button, Input, Select, Textarea } from 'rizzui';
+import { Alert, Button, Input, Select, Badge, Text } from 'rizzui';
 import { handleApiError } from '@/libs/axios';
-import { SHIPMENT_STATUSES } from '@/types/shipment.types';
-import { useDeliveryAddTracking, useDeliveryUpdateNotes, useDeliveryUpdateStatus } from '@/hooks/mutations/useDelivery';
+import { useDeliveryAddTracking, useDeliveryUpdateStatus } from '@/hooks/mutations/useDelivery';
 import { useDeliveryById } from '@/hooks/queries/useDeliveries';
 import { routes } from '@/config/routes';
+
+// Courier can only change to these statuses
+const COURIER_ALLOWED_STATUSES = ['Dispatched', 'In-Transit', 'Delivered', 'Returned', 'Failed'];
 
 export default function DeliveryEditClient({ id }: { id: string }) {
   const router = useRouter();
   const { data: delivery, isLoading, error, isError } = useDeliveryById(id);
 
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [trackingLocation, setTrackingLocation] = useState('');
+  const [trackingDescription, setTrackingDescription] = useState('');
+
   const updateStatus = useDeliveryUpdateStatus(id);
   const addTracking = useDeliveryAddTracking(id);
-  const updateNotes = useDeliveryUpdateNotes(id);
 
   if (isLoading) return <div className="p-6">Loading delivery...</div>;
   if (isError)
@@ -27,93 +33,121 @@ export default function DeliveryEditClient({ id }: { id: string }) {
 
   const isDelivered = delivery.status === 'Delivered';
 
+  const handleStatusUpdate = () => {
+    if (!selectedStatus) return;
+    updateStatus.mutate(
+      { status: selectedStatus as any },
+      {
+        onSuccess: () => {
+          setSelectedStatus('');
+        },
+      }
+    );
+  };
+
+  const handleAddTracking = () => {
+    if (!trackingLocation || !trackingDescription) return;
+    addTracking.mutate(
+      {
+        status: delivery.status,
+        location: trackingLocation,
+        description: trackingDescription,
+      },
+      {
+        onSuccess: () => {
+          setTrackingLocation('');
+          setTrackingDescription('');
+        },
+      }
+    );
+  };
+
   return (
     <div className="space-y-6">
-      {/* Status */}
+      {/* Current Status Display */}
+      <div className="rounded-lg border border-gray-200 p-6">
+        <h3 className="mb-4 text-lg font-semibold">Current Status</h3>
+        <Badge size="lg" className="text-base">
+          {delivery.status}
+        </Badge>
+      </div>
+
+      {/* Update Status */}
       <div className="rounded-lg border border-gray-200 p-6">
         <h3 className="mb-4 text-lg font-semibold">Update Status</h3>
         <div className="flex gap-3">
           <Select
             disabled={isDelivered || updateStatus.isPending}
-            value={delivery.status}
-            onChange={(value: any) =>
-              updateStatus.mutate({ status: value as any }, {
-                onSuccess: () => {},
-              })
-            }
-            options={SHIPMENT_STATUSES.map((s) => ({ label: s, value: s }))}
+            value={selectedStatus}
+            onChange={(value: any) => setSelectedStatus(value.value)}
+            options={COURIER_ALLOWED_STATUSES.map((s) => ({ label: s, value: s }))}
+            placeholder="Select new status"
           />
           <Button
-            disabled={isDelivered || updateStatus.isPending}
+            disabled={isDelivered || updateStatus.isPending || !selectedStatus}
             isLoading={updateStatus.isPending}
-            onClick={() => updateStatus.mutate({ status: delivery.status })}
+            onClick={handleStatusUpdate}
           >
-            Save Status
+            Save
           </Button>
         </div>
       </div>
 
-      {/* Add Tracking */}
+      {/* Add Tracking Update */}
       <div className="rounded-lg border border-gray-200 p-6">
         <h3 className="mb-4 text-lg font-semibold">Add Tracking Update</h3>
-        <div className="grid gap-3 @md:grid-cols-3">
-          <Select
-            placeholder="Status"
+        <div className="grid gap-3">
+          <Input
+            label="Location"
+            placeholder="Enter location (e.g., Distribution Center, City)"
             disabled={isDelivered || addTracking.isPending}
-            options={SHIPMENT_STATUSES.map((s) => ({ label: s, value: s }))}
-            onChange={(value: any) => (window as any).__deliveryTrackingStatus = value}
+            value={trackingLocation}
+            onChange={(e) => setTrackingLocation(e.target.value)}
           />
           <Input
-            placeholder="Location"
+            label="Description"
+            placeholder="Enter tracking description"
             disabled={isDelivered || addTracking.isPending}
-            onChange={(e) => (window as any).__deliveryTrackingLocation = e.target.value}
+            value={trackingDescription}
+            onChange={(e) => setTrackingDescription(e.target.value)}
           />
-          <Input
-            placeholder="Description"
-            disabled={isDelivered || addTracking.isPending}
-            onChange={(e) => (window as any).__deliveryTrackingDescription = e.target.value}
-          />
-          <div className="@md:col-span-3">
-            <Button
-              disabled={isDelivered || addTracking.isPending}
-              isLoading={addTracking.isPending}
-              onClick={() => {
-                const status = (window as any).__deliveryTrackingStatus;
-                const location = (window as any).__deliveryTrackingLocation;
-                const description = (window as any).__deliveryTrackingDescription;
-                if (!status || !location || !description) return;
-                addTracking.mutate({ status, location, description });
-              }}
-            >
-              Add Tracking
-            </Button>
-          </div>
+          <Button
+            disabled={isDelivered || addTracking.isPending || !trackingLocation || !trackingDescription}
+            isLoading={addTracking.isPending}
+            onClick={handleAddTracking}
+          >
+            Add Tracking
+          </Button>
         </div>
       </div>
 
-      {/* Notes */}
+      {/* Tracking History */}
       <div className="rounded-lg border border-gray-200 p-6">
-        <h3 className="mb-4 text-lg font-semibold">Notes</h3>
-        <Textarea
-          defaultValue={delivery.notes || ''}
-          disabled={isDelivered || updateNotes.isPending}
-          onChange={(e) => ((window as any).__deliveryNotes = e.target.value)}
-        />
-        <div className="mt-3 flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push(routes.eCommerce.delivery.details(id))}
-          >
-            Cancel
-          </Button>
-          <Button
-            disabled={isDelivered || updateNotes.isPending}
-            isLoading={updateNotes.isPending}
-            onClick={() => updateNotes.mutate({ notes: (window as any).__deliveryNotes || '' })}
-          >
-            Save Notes
-          </Button>
-        </div>
+        <h3 className="mb-4 text-lg font-semibold">Tracking History</h3>
+        {delivery.trackingHistory && delivery.trackingHistory.length > 0 ? (
+          <div className="space-y-4">
+            {delivery.trackingHistory.map((entry: any, index: number) => (
+              <div key={index} className="border-l-4 border-gray-300 pl-4">
+                <div className="flex justify-between">
+                  <Text className="font-semibold text-gray-900">{entry.location}</Text>
+                  <Text className="text-sm text-gray-500">
+                    {new Date(entry.timestamp).toLocaleString()}
+                  </Text>
+                </div>
+                <Text className="text-gray-700">{entry.description}</Text>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Text className="text-gray-500">No tracking history available</Text>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3">
+        <Button variant="outline" onClick={() => router.push(routes.eCommerce.delivery.details(id))}>
+          Back to Details
+        </Button>
       </div>
     </div>
   );

@@ -48,6 +48,7 @@ export default function UserDetailClient({ userId }: UserDetailClientProps) {
   } = useUserPermissions(userId);
 
   const { data: allRoles } = useRoles();
+console.log({allRoles});
 
   const isLoading = userLoading || permissionsLoading;
   const error = userError || permissionsError;
@@ -86,7 +87,7 @@ export default function UserDetailClient({ userId }: UserDetailClientProps) {
   }
 
   const userRoles = userData.roles || [];
-  const permissions = permissionsData?.permissions || [];
+  const permissions = permissionsData || [];
 
   const handleRevokeAccess = async () => {
     if (!window.confirm('Are you sure you want to revoke admin access for this user? They will be demoted to a regular user.')) {
@@ -246,7 +247,7 @@ export default function UserDetailClient({ userId }: UserDetailClientProps) {
                                 size="sm"
                                 className="capitalize"
                               >
-                                {action}
+                                {action === '*' ? 'All': action }
                               </Badge>
                             ))}
                           </div>

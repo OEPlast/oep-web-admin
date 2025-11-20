@@ -10,6 +10,8 @@ import { ActionIcon, Text } from 'rizzui';
 import { PiEyeBold } from 'react-icons/pi';
 import { formatPrice } from '@core/hooks/use-price';
 import { getCdnUrl } from '@core/utils/cdn-url';
+import Link from 'next/link';
+import { routes } from '@/config/routes';
 
 const columnHelper = createColumnHelper<Order>();
 
@@ -27,11 +29,11 @@ export const ordersColumns = (onViewOrder: (order: Order) => void) => [
     id: 'customer',
     size: 250,
     header: 'Customer',
-    cell: ({ row }) => {
+    cell: ({ row }) => { 
       const user = row.original.user;
       return (
         <TableAvatar
-          src={getCdnUrl(user.avatar) || ''}
+          src={getCdnUrl(user.image) || ''}
           name={`${user.firstName} ${user.lastName}`}
           description={user.email}
         />
@@ -90,13 +92,14 @@ export const ordersColumns = (onViewOrder: (order: Order) => void) => [
     size: 80,
     header: 'Actions',
     cell: ({ row }) => (
+      <Link href={routes.eCommerce.orderDetails(row.original._id)}>
       <ActionIcon
         size="sm"
         variant="outline"
-        onClick={() => onViewOrder(row.original)}
       >
         <PiEyeBold className="h-4 w-4" />
       </ActionIcon>
+      </Link>
     ),
   }),
 ];

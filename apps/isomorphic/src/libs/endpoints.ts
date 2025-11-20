@@ -446,6 +446,7 @@ export const api = {
     mine: '/admin/delivery/mine',
     mineStats: '/admin/delivery/mine/stats',
     byId: (id: string) => `/admin/delivery/${id}`,
+    byTracking: (tracking: string) => `/admin/delivery/t/${tracking}`,
     updateStatus: (id: string) => `/admin/delivery/${id}/status`,
     addTracking: (id: string) => `/admin/delivery/${id}/tracking`,
     updateNotes: (id: string) => `/admin/delivery/${id}/notes`,

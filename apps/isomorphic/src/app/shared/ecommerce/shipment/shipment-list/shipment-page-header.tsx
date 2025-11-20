@@ -6,6 +6,7 @@ import { PiPlusBold, PiReceiptDuotone, PiCheckCircleDuotone, PiXCircleDuotone, P
 import { Button, Loader, Text } from 'rizzui';
 import Link from 'next/link';
 import { useShipmentStats } from '@/hooks/queries/useShipmentStats';
+import { BiBus } from 'react-icons/bi';
 
 type Variant = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary';
 
@@ -67,10 +68,11 @@ export default function ShipmentPageHeader() {
           <Text className="text-red-600">Failed to load shipment statistics. Please try again.</Text>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 @xl:grid-cols-3 @4xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 @xl:grid-cols-3 @4xl:grid-cols-4">
           <StatCard title="In Warehouse" value={stats['In-Warehouse'] ?? 0} icon={<PiReceiptDuotone className="h-5 w-5" />} variant="secondary" />
           <StatCard title="Shipped" value={stats.Shipped ?? 0} icon={<PiClockDuotone className="h-5 w-5" />} variant="info" />
           <StatCard title="Dispatched" value={stats.Dispatched ?? 0} icon={<PiClockDuotone className="h-5 w-5" />} variant="warning" />
+          <StatCard title="In-Transit" value={stats['In-Transit'] ?? 0} icon={<BiBus className="h-5 w-5" />} variant="warning" />
           <StatCard title="Delivered" value={stats.Delivered ?? 0} icon={<PiCheckCircleDuotone className="h-5 w-5" />} variant="success" />
           <StatCard title="Returned" value={stats.Returned ?? 0} icon={<PiArrowCounterClockwiseDuotone className="h-5 w-5" />} variant="info" />
           <StatCard title="Failed" value={stats.Failed ?? 0} icon={<PiXCircleDuotone className="h-5 w-5" />} variant="danger" />

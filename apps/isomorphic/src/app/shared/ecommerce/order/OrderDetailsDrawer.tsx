@@ -64,11 +64,11 @@ export default function OrderDetailsDrawer({
             <Text className="capitalize">
               {order.paymentMethod.replace('_', ' ')}
             </Text>
-            {order.paymentDetails.transactionId && (
+            {/* {order.paymentDetails.transactionId && (
               <Text className="text-sm text-gray-600">
                 ID: {order.paymentDetails.transactionId}
               </Text>
-            )}
+            )} */}
           </div>
           <div className="rounded-lg border p-4">
             <Text className="mb-2 font-semibold">Shipping Method</Text>

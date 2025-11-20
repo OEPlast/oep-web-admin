@@ -4,7 +4,7 @@
  */
 
 // Sale type enum
-export type SaleType = 'Flash' | 'Normal';
+export type SaleType = 'Flash' | 'Normal' | 'Limited';
 
 // Sale variant interface
 export interface SaleVariant {

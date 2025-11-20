@@ -4,6 +4,7 @@
 export type ShipmentStatus =
   | 'In-Warehouse'
   | 'Shipped'
+  | 'In-Transit'
   | 'Dispatched'
   | 'Delivered'
   | 'Returned'
@@ -55,6 +56,7 @@ export interface Shipment {
   orderId: string | OrderRef;
   trackingNumber: string;
   courier: string;
+  courierUser: string;
   status: ShipmentStatus;
   estimatedDelivery?: Date | string;
   actualDelivery?: Date | string;
@@ -145,6 +147,7 @@ export interface StatusBadgeConfig {
 // Status options for dropdowns
 export const SHIPMENT_STATUSES: ShipmentStatus[] = [
   'In-Warehouse',
+  'In-Transit',
   'Shipped',
   'Dispatched',
   'Delivered',
@@ -155,6 +158,7 @@ export const SHIPMENT_STATUSES: ShipmentStatus[] = [
 // Status badge mapping
 export const STATUS_BADGE_CONFIG: Record<ShipmentStatus, StatusBadgeConfig> = {
   'In-Warehouse': { label: 'In Warehouse', color: 'warning', variant: 'flat' },
+  'In-Transit': { label: 'In Transit', color: 'primary', variant: 'flat' },
   Shipped: { label: 'Shipped', color: 'info', variant: 'flat' },
   Dispatched: { label: 'Dispatched', color: 'secondary', variant: 'flat' },
   Delivered: { label: 'Delivered', color: 'success', variant: 'flat' },

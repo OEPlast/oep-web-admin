@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,14 @@ interface EditShipmentFormProps {
   shipmentId: string;
 }
 
+interface CourierOption {
+  label: string;
+  value: string;
+  name: string;
+  email: string;
+  _id: string;
+}
+
 export default function EditShipmentForm({
   shipmentId,
 }: EditShipmentFormProps) {
@@ -31,14 +39,40 @@ export default function EditShipmentForm({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<UpdateShipmentFormData>({
     resolver: zodResolver(updateShipmentSchema),
   });
 
+  const courierValue = watch('courierUser');
+
+  const courierLabel = useMemo(() => {
+    const selectedCourier = (couriers || []).find((c) => c._id === courierValue);
+    return selectedCourier ? selectedCourier.name : '';
+  }, [couriers, courierValue]);
+
+  const courierLabelFull = useMemo(() => {
+    const selectedCourier = (couriers || []).find((c) => c._id === courierValue);
+    return selectedCourier
+      ? selectedCourier.name
+        ? `${selectedCourier.email} (${selectedCourier.name})`
+        : selectedCourier.email
+      : '';
+  }, [couriers, courierValue]);
+
+  // Set courier name when courierUser changes
+  useEffect(() => {    
+    if (courierLabel) {
+      setValue('courier', courierLabel);
+    }
+  }, [courierLabel, setValue]);
+  
   useEffect(() => {
     if (shipment) {
       reset({
         courier: shipment.courier,
+        courierUser: shipment.courierUser,
         cost: shipment.cost,
         status: shipment.status,
         estimatedDelivery: shipment.estimatedDelivery
@@ -85,25 +119,25 @@ export default function EditShipmentForm({
               Courier
             </label>
             <Select
-              value={shipment?.courier ?? ''}
-              onChange={(value) => {
-                // Populate the plain courier field with selected courier's name or email
-                const selected = (couriers || []).find((c) => c._id === value);
-                const label = selected ? (selected.name || selected.email) : String(value || '');
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                reset({
-                  ...((shipment as any) || {}),
-                  courier: label,
-                });
+              value={courierLabelFull}
+              onChange={(value: CourierOption) => {
+                // value is the entire option object with _id, name, email, etc.
+                setValue('courierUser', value._id || value.value);
               }}
-              options={(couriers || []).map((c) => ({ label: `${c.name} (${c.email})`, value: c._id }))}
+              options={(couriers || []).map((c) => ({ 
+                label: c.name ? `${c.email} (${c.name})` : c.email,
+                value: c._id,
+                name: c.name,
+                email: c.email,
+                _id: c._id
+              }))}
               placeholder="Select courier user"
             />
-            <p className="mt-1 text-xs text-gray-500">Selecting will set courier name to the chosen user</p>
-            {/* Keep raw input for manual override */}
+            <p className="mt-1 text-xs text-gray-500">Selecting will set courier ID</p>
+            {/* Display courier name based on ID - editable */}
             <Input
               className="mt-2"
-              placeholder="Or type courier name (e.g., DHL, UPS)"
+              placeholder="Courier name (editable)"
               {...register('courier')}
               error={errors.courier?.message}
             />
