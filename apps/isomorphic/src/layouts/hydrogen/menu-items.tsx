@@ -217,12 +217,12 @@ export const menuItems = [
     icon: <PiCurrencyDollarDuotone />,
     permission: { resource: ['invoices'], action: 'read' },
   },
-  {
-    name: 'Account Settings',
-    href: routes.forms.profileSettings,
-    icon: <PiUserGearDuotone />,
-    permission: { resource: ['*'], action: '*' },
-  },
+  // {
+  //   name: 'Account Settings',
+  //   href: routes.forms.profileSettings,
+  //   icon: <PiUserGearDuotone />,
+  //   permission: { resource: ['*'], action: '*' },
+  // },
   {
     name: 'Roles & Permissions',
     href: routes.rolesPermissions,
