@@ -34,12 +34,11 @@ export const metaObject = (
         process.env.NEXT_PUBLIC_SITE_URL ||
         'https://isomorphic-furyroad.vercel.app',
       siteName: 'Rawura Admin', // https://developers.google.com/search/docs/appearance/site-names
-      images: [],
-      // images: {
-      //   url: 'https://s3.amazonaws.com/redqteam.com/isomorphic-furyroad/itemdep/isobanner.png',
-      //   width: 1200,
-      //   height: 630,
-      // },
+      images: {
+        url: '/opengraph-thumb.png',
+        width: 1200,
+        height: 630,
+      },
       locale: 'en_US',
       type: 'website',
     },
