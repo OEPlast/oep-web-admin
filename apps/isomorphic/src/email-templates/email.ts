@@ -19,7 +19,7 @@ export const sendEmail = async (data: EmailPayload) => {
 
   try {
     await transporter.sendMail({
-      from: `Isomorphic Furyroad<${env.SMTP_FROM_EMAIL}>`,
+      from: `Rawura Admin<${env.SMTP_FROM_EMAIL}>`,
       ...data,
     });
     return true;

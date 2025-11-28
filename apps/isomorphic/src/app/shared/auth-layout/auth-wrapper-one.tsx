@@ -62,7 +62,7 @@ export default function AuthWrapperOne({
                 <Image src={logoImg} alt="Isomorphic" />
                 <Image
                   src={logoImgText}
-                  alt="Isomorphic"
+                  alt="Rawura"
                   className="ps-2.5 dark:invert"
                 />
               </Link>

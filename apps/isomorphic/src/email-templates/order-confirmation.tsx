@@ -61,7 +61,7 @@ export default function OrderConfirmationEmail(
               <Column>
                 <Img
                   src="https://isomorphic-furyroad.vercel.app/logo.svg"
-                  alt="isomorphic furyroad logo"
+                  alt="rawura admin logo"
                   style={{
                     margin: '0',
                   }}
