@@ -7,6 +7,9 @@ const optionalNumber = (isInteger = false) => {
   return schema.optional();
 };
 
+// Helper for preprocessing optional number fields that may come as empty strings
+const preprocessedOptionalNumber = z.coerce.number().min(0).optional();
+
 // Pricing tier schema
 const pricingTierSchema = z
   .object({
@@ -94,16 +97,7 @@ const baseProductSchema = z.object({
         children: z.array(
           z.object({
             name: z.string().min(1, 'Child name is required'),
-            price: z.preprocess((val) => {
-              if (
-                val === '' ||
-                val === null ||
-                val === undefined ||
-                isNaN(Number(val))
-              )
-                return undefined;
-              return Number(val);
-            }, z.number().min(0).optional()),
+            price: preprocessedOptionalNumber,
             stock: z.number().int().min(0, 'Stock cannot be negative'),
             pricingTiers: z.array(pricingTierSchema).optional(),
           })
