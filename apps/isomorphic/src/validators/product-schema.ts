@@ -94,7 +94,16 @@ const baseProductSchema = z.object({
         children: z.array(
           z.object({
             name: z.string().min(1, 'Child name is required'),
-            price: z.number().min(0).optional(),
+            price: z.preprocess((val) => {
+              if (
+                val === '' ||
+                val === null ||
+                val === undefined ||
+                isNaN(Number(val))
+              )
+                return undefined;
+              return Number(val);
+            }, z.number().min(0).optional()),
             stock: z.number().int().min(0, 'Stock cannot be negative'),
             pricingTiers: z.array(pricingTierSchema).optional(),
           })
@@ -123,7 +132,7 @@ export const productSchema = baseProductSchema.refine(
   }
 );
 
-export type CreateProductInput = z.input<typeof productSchema>;
+export type CreateProductInput = z.infer<typeof productSchema>;
 
 export const updateProductSchema = baseProductSchema.partial().extend({
   sku: z.number().int().min(1, 'SKU is required').optional(),

@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import { useProducts, useProductSearch } from '@/hooks/queries/useProducts';
 import { useDebounce } from '@/hooks/use-debounce';
+import { getCdnUrl } from '@core/utils/cdn-url';
 
 const typeOptions = [
   { value: 'Normal', label: 'Normal' },
@@ -236,9 +237,11 @@ export default function SaleInfoForm({
                   >
                     <img
                       src={
-                        product.description_images.find(
-                          (img) => img.cover_image
-                        )?.url || '/placeholder.png'
+                        getCdnUrl(
+                          product.description_images.find(
+                            (img) => img.cover_image
+                          )?.url
+                        ) || '/placeholder.png'
                       }
                       alt={product.name}
                       className="h-12 w-12 flex-shrink-0 rounded-md border border-gray-200 object-cover"
@@ -281,7 +284,7 @@ export default function SaleInfoForm({
             </Button>
           </div>
           <img
-            src={selectedProduct.image}
+            src={getCdnUrl(selectedProduct.image)}
             alt={selectedProduct.name}
             className="h-8 w-8 rounded-md object-cover"
           />

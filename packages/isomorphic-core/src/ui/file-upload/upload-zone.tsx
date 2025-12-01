@@ -203,7 +203,7 @@ export default function UploadZone({
           if (!multiple || typeof initialValue === "string") {
             setValue(name, [...currentValue, uploadedFiles[0].path]);
           } else {
-            setValue(name, [...currentValue, uploadedFiles]);
+            setValue(name, [...currentValue, ...uploadedFiles]);
           }
 
           toast.success(

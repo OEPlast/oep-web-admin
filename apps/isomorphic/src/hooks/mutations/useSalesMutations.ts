@@ -4,11 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
 import toast from 'react-hot-toast';
-import {
-  Sale,
-  CreateSaleInput,
-  UpdateSaleInput,
-} from '@/types/sales';
+import { Sale, CreateSaleInput, UpdateSaleInput } from '@/types/sales';
 
 /**
  * Hook to create a new sale
@@ -154,7 +150,9 @@ export const useDecrementSaleLimit = () => {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['sale', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['sale', 'usage', variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['sale', 'usage', variables.id],
+      });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       // Don't show toast for this operation as it's automated
     },

@@ -39,11 +39,11 @@ export default function Filters<TData extends Record<string, any>>({
             placeholder="Sale Type"
             options={[
               { value: '', label: 'All Types' },
-              { value: 'Flash', label: 'Sale' },
-              { value: 'Limited', label: 'Limited Sale' },
-              { value: 'Normal', label: 'Normal Sale' },
+              { value: 'Flash', label: 'Flash' },
+              { value: 'Limited', label: 'Limited ' },
+              { value: 'Normal', label: 'Normal' },
             ]}
-            value={filters.type || ''}
+            value={filters.type === undefined ? 'All Types' : filters.type}
             onChange={(option: SelectOption) =>
               onFilterChange({ type: (option?.value as SaleType) || undefined })
             }
@@ -59,26 +59,21 @@ export default function Filters<TData extends Record<string, any>>({
             ]}
             value={
               filters.isActive === undefined
-                ? ''
+                ? 'All Status'
                 : filters.isActive
-                  ? 'true'
-                  : 'false'
+                  ? 'Active'
+                  : 'Inactive'
             }
             onChange={(option: SelectOption) => {
               const value = option?.value;
               onFilterChange({
-                isActive:
-                  value === '' ? undefined : value === 'true',
+                isActive: value === '' ? undefined : value === 'true',
               });
             }}
             className="w-40"
           />
 
-          <Button
-            variant="outline"
-            onClick={onRefresh}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onRefresh} className="gap-2">
             <PiArrowsClockwise className="size-4" />
             Refresh
           </Button>

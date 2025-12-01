@@ -9,6 +9,7 @@ import cn from '@core/utils/class-names';
 import { getCdnUrl } from '@core/utils/cdn-url';
 import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 import { CreateProductInput } from '@/validators/product-schema';
+import { UploadedFile } from '@core/utils/upload-history';
 
 interface ProductImage {
   url: string;
@@ -58,6 +59,27 @@ export default function ProductImageManager({
     onChange(updatedImages);
   };
 
+  const finalSetValue = (
+    name: string,
+    value: Array<ProductImage | UploadedFile>
+  ) => {
+    const newSetOfImages = value.map((imageData) => {
+      if ('cover_image' in imageData) {
+        return { ...imageData };
+      } else {
+        return {
+          url: imageData.path,
+          cover_image: false,
+        };
+      }
+    });
+    const isCoverImageSelected = newSetOfImages.findIndex(
+      (images) => images.cover_image
+    );
+    if (!isCoverImageSelected) newSetOfImages[0].cover_image = true;
+    setValue('description_images', newSetOfImages);
+  };
+
   return (
     <div className={cn('space-y-5', className)}>
       {displayImages.length > 0 && (
@@ -98,7 +120,7 @@ export default function ProductImageManager({
         <UploadZone
           name="description_images"
           getValues={getValues}
-          setValue={setValue}
+          setValue={finalSetValue}
           multiple={true}
           label={
             displayImages.length > 0

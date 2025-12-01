@@ -69,67 +69,70 @@ export default function EditSales({ saleId }: EditSalesProps) {
   const updateSaleMutation = useUpdateSale();
 
   function defaultValues(saleData?: Sale): CreateSalesInput {
+    if (!saleData) {
+      return {
+        title: 'l',
+        type: 'Normal',
+        product: '',
+        deleted: false,
+        startDate: new Date(),
+        endDate: new Date(),
+        variants: [],
+        isActive: true,
+        isHot: false,
+      };
+    }
 
-  if (!saleData) {
     return {
-      title: 'l',
-      type: 'Normal',
-      product: '',
-      deleted: false,
-      startDate: new Date(),
-      endDate: new Date(),
-      variants: [],
-      isActive: true,
-      isHot: false,
+      title: saleData.title,
+      type: saleData.type,
+      product: saleData.product._id,
+      deleted: saleData.deleted || false,
+      startDate: saleData.startDate ? new Date(saleData.startDate) : new Date(),
+      endDate: saleData.endDate ? new Date(saleData.endDate) : new Date(),
+      variants: saleData.variants.map((v) => ({
+        attributeName: v.attributeName || null,
+        attributeValue: v.attributeValue || null,
+        discount: v.discount || 0,
+        maxBuys: v.maxBuys || 0,
+        boughtCount: v.boughtCount || 0,
+      })),
+      isActive: saleData.isActive,
+      isHot: saleData.isHot || false,
     };
-  }  
-
-  return {
-    title: saleData.title,
-    type: saleData.type,
-    product: saleData.product._id,
-    deleted: saleData.deleted || false,
-    startDate: saleData.startDate ? new Date(saleData.startDate) : new Date(),
-    endDate: saleData.endDate ? new Date(saleData.endDate) : new Date(),
-    variants: saleData.variants.map((v) => ({
-      attributeName: v.attributeName || null,
-      attributeValue: v.attributeValue || null,
-      discount: v.discount || 0,
-      maxBuys: v.maxBuys || 0,
-      boughtCount: v.boughtCount || 0,
-    })),
-    isActive: saleData.isActive,
-    isHot: saleData.isHot || false,
-  };
-}
+  }
   // Form setup
   const methods = useForm<CreateSalesInput>({
     resolver: zodResolver(createSalesSchema),
     mode: 'onChange',
     defaultValues: defaultValues(saleData),
-
   });
 
   useEffect(() => {
-  if (saleData) {
-    methods.reset(defaultValues(saleData));
-    
-    // Set selected product
-    if (saleData.product) {
-      setSelectedProduct({
-        _id: saleData.product._id,
-        name: saleData.product.name,
-        image: saleData.product.image || '',
-        stock: saleData.product.stock || 0,
-        slug: saleData.product.slug || '',
-        category: saleData.product.category || { _id: '', name: '' },
-        subCategories: saleData.product.subCategories || { _id: '', name: '' },
-        attributes: saleData.product.attributes || [],
-        coverImage: saleData.product.coverImage,
-      });
+    if (saleData) {
+      methods.reset(defaultValues(saleData));
+
+      // Set selected product
+      if (saleData.product) {
+        setSelectedProduct({
+          _id: saleData.product._id,
+          name: saleData.product.name,
+          image:
+            saleData.product.description_images.find((img) => img.cover_image)
+              ?.url || '',
+          stock: saleData.product.stock || 0,
+          slug: saleData.product.slug || '',
+          category: saleData.product.category || { _id: '', name: '' },
+          subCategories: saleData.product.subCategories || {
+            _id: '',
+            name: '',
+          },
+          attributes: saleData.product.attributes || [],
+          coverImage: saleData.product.coverImage,
+        });
+      }
     }
-  }
-}, [saleData, methods]);
+  }, [saleData, methods]);
 
   const onSubmit: SubmitHandler<CreateSalesInput> = async (data) => {
     try {

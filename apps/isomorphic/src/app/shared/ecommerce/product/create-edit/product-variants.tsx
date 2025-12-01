@@ -354,7 +354,7 @@ function VariantChildRow({
             type="number"
             step="0.01"
             placeholder={`${productPrice}`}
-            prefix="$"
+            prefix="&#8358;"
             {...register(
               `attributes.${attributeIndex}.children.${childIndex}.price`,
               { valueAsNumber: true }
@@ -364,7 +364,9 @@ function VariantChildRow({
                 childIndex
               ]?.price?.message
             }
-            helperText={!childPrice ? `Uses parent: $${productPrice}` : ''}
+            helperText={
+              !childPrice ? `Uses parent: ${formatToNaira(productPrice)}` : ''
+            }
           />
         </div>
 

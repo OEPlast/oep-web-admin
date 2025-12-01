@@ -45,17 +45,19 @@ export default function SalesTable() {
     }
   }, [salesData, setData]);
 
-  const paginationState = useMemo(() => table.getState().pagination, [table]) ;
+  const paginationState = useMemo(
+    () => table.getState().pagination,
+    [table.getState().pagination]
+  );
   useEffect(() => {
     const newPage = paginationState.pageIndex + 1;
+    console.log(newPage);
     if (salesData?.pagination && newPage !== salesData.pagination.page) {
+      console.log(newPage);
+
       setFilters((prev) => ({ ...prev, page: newPage }));
     }
-  }, [
-    paginationState.pageIndex,
-    salesData?.pagination,
-    setFilters,
-  ]);
+  }, [paginationState.pageIndex, salesData?.pagination, setFilters]);
 
   // Handle filter changes
   const handleFilterChange = (newFilters: Partial<SalesFilters>) => {
