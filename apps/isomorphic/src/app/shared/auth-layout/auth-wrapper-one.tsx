@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import logoImg from '@public/logo-primary.svg';
-import logoImgText from '@public/logo-primary-text.svg';
 import Image from 'next/image';
 import { Button, Title, Text } from 'rizzui';
+import Logo from '@core/components/logo';
 import { PiArrowLeftBold } from 'react-icons/pi';
 import { FcGoogle } from 'react-icons/fc';
 import OrSeparation from '@/app/shared/auth-layout/or-separation';
@@ -59,12 +58,7 @@ export default function AuthWrapperOne({
                 href={'/'}
                 className="mb-6 inline-flex max-w-[168px] xl:mb-8"
               >
-                <Image src={logoImg} alt="Isomorphic" />
-                <Image
-                  src={logoImgText}
-                  alt="Rawura"
-                  className="ps-2.5 dark:invert"
-                />
+                <Logo alwaysFull className="dark:invert" />
               </Link>
               <Title
                 as="h2"

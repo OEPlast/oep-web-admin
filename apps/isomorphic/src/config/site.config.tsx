@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-import logoImg from '@public/logo.svg';
 import { LAYOUT_OPTIONS } from '@/config/enums';
-import logoIconImg from '@public/logo-short.svg';
 import { OpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
 
 enum MODE {
@@ -12,8 +10,8 @@ enum MODE {
 export const siteConfig = {
   title: 'Rawura Admin - Manage the best store in the world',
   description: `Rawura admin.`,
-  logo: logoImg,
-  icon: logoIconImg,
+  logo: '/images/brand/logoTransparent.png',
+  icon: '/images/brand/logoMiniLight.png',
   mode: MODE.LIGHT,
   layout: LAYOUT_OPTIONS.HYDROGEN,
   // TODO: favicon
