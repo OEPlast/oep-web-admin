@@ -200,6 +200,12 @@ export const menuItems = [
     permission: { resource: ['logistics'], action: 'read' },
   },
   {
+    name: 'GIG Config',
+    href: routes.eCommerce.gigConfig,
+    icon: <PiTruckDuotone />,
+    permission: { resource: ['logistics'], action: 'read' },
+  },
+  {
     name: 'Shipment',
     href: routes.eCommerce.shipment.dashboard,
     icon: <PiAirplaneTiltDuotone />,

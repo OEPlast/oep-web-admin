@@ -22,6 +22,7 @@ import UploadZone from '@core/ui/file-upload/upload-zone';
 import { getCdnUrl } from '@core/utils/cdn-url';
 import Image from 'next/image';
 import { PiXBold } from 'react-icons/pi';
+import CheckoutDeliverySettingsCard from './checkout-delivery-settings-card';
 
 export default function SettingsForm() {
   const { data: settings, isLoading } = useStoreSettings();
@@ -258,6 +259,8 @@ export default function SettingsForm() {
                 />
               </div>
             </div>
+
+            <CheckoutDeliverySettingsCard />
 
             {/* Submit Button */}
             <div className="flex gap-3 border-t pt-6">

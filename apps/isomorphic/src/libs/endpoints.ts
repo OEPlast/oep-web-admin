@@ -273,8 +273,7 @@ export const api = {
     list: '/admin/reviews',
     byId: (id: string) => `/admin/reviews/${id}`,
     byUser: (userId: string) => `/admin/reviews/user/${userId}`,
-    byProduct: (productId: string) =>
-      `/admin/reviews/product/${productId}`,
+    byProduct: (productId: string) => `/admin/reviews/product/${productId}`,
     approve: (reviewId: string) => `/admin/reviews/${reviewId}/approve`,
     delete: (reviewId: string) => `/admin/reviews/${reviewId}`,
     moodAnalytics: '/admin/reviews/analytics/mood',
@@ -448,6 +447,14 @@ export const api = {
     updateStatus: (id: string) => `/admin/delivery/${id}/status`,
     addTracking: (id: string) => `/admin/delivery/${id}/tracking`,
     updateNotes: (id: string) => `/admin/delivery/${id}/notes`,
+  },
+
+  // GIG Logistics endpoints
+  gig: {
+    config: '/admin/gig/config',
+    updateConfig: '/admin/gig/config',
+    stations: '/admin/gig/stations',
+    track: (waybill: string) => `/admin/gig/track/${waybill}`,
   },
 } as const;
 

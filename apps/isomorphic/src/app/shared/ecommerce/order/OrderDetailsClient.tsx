@@ -51,18 +51,18 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
   // Helper to get order status badge
   const getOrderStatusBadge = (status: string) => {
     const statusMap: Record<string, { color: any; label: string }> = {
-      'Pending': { color: 'warning', label: 'Pending' },
-      'Processing': { color: 'info', label: 'Processing' },
-      'Shipped': { color: 'secondary', label: 'Shipped' },
-      'Delivered': { color: 'success', label: 'Delivered' },
-      'Cancelled': { color: 'danger', label: 'Cancelled' },
+      Pending: { color: 'warning', label: 'Pending' },
+      Processing: { color: 'info', label: 'Processing' },
+      Shipped: { color: 'secondary', label: 'Shipped' },
+      Delivered: { color: 'success', label: 'Delivered' },
+      Cancelled: { color: 'danger', label: 'Cancelled' },
     };
     const statusInfo = statusMap[status] || { color: 'default', label: status };
     return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <div>
@@ -79,7 +79,7 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
 
       {/* Customer Info */}
       <div className="rounded-lg border p-4">
-        <Text className="mb-3 font-semibold text-lg">Customer Information</Text>
+        <Text className="mb-3 text-lg font-semibold">Customer Information</Text>
         <div className="space-y-2">
           {order.user.name && (
             <div>
@@ -102,132 +102,172 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
 
       {/* Order Items */}
       <div className="rounded-lg border p-4">
-        <Text className="mb-3 font-semibold text-lg">Order Items</Text>
+        <Text className="mb-3 text-lg font-semibold">Order Items</Text>
         <div className="space-y-3">
-          {order.products && order.products.map((product: ProductItem) => (
-            <div key={product._id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
-              {product.image && (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL || ''}/${product.image}`}
-                  alt={product.name}
-                  className="h-16 w-16 rounded object-cover"
-                />
-              )}
-              <div className="flex-1">
-                <Text className="font-medium">{product.name}</Text>
-                <Text className="text-sm text-gray-600">Quantity: {product.quantity}</Text>
-                {product.attributes && product.attributes.length > 0 && (
+          {order.products &&
+            order.products.map((product: ProductItem) => (
+              <div
+                key={product._id}
+                className="flex items-center gap-4 border-b pb-3 last:border-b-0"
+              >
+                {product.image && (
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_API_URL || ''}/${product.image}`}
+                    alt={product.name}
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                )}
+                <div className="flex-1">
+                  <Text className="font-medium">{product.name}</Text>
                   <Text className="text-sm text-gray-600">
-                    {product.attributes.map((attr: any) => `${attr.key}: ${attr.value}`).join(', ')}
+                    Quantity: {product.quantity}
                   </Text>
-                )}
+                  {product.attributes && product.attributes.length > 0 && (
+                    <Text className="text-sm text-gray-600">
+                      {product.attributes
+                        .map((attr: any) => `${attr.key}: ${attr.value}`)
+                        .join(', ')}
+                    </Text>
+                  )}
+                </div>
+                <div className="text-right">
+                  <Text className="font-medium">
+                    ₦{product.price.toLocaleString()}
+                  </Text>
+                  {product.saleDiscount > 0 && (
+                    <Text className="text-sm text-green-600">
+                      -₦{product.saleDiscount.toLocaleString()}
+                    </Text>
+                  )}
+                </div>
               </div>
-              <div className="text-right">
-                <Text className="font-medium">₦{product.price.toLocaleString()}</Text>
-                {product.saleDiscount > 0 && (
-                  <Text className="text-sm text-green-600">-₦{product.saleDiscount.toLocaleString()}</Text>
-                )}
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
-{/* Pricing Breakdown */}
-<div className="rounded-lg border p-4">
-  <Text className="mb-3 font-semibold text-lg">Pricing Summary</Text>
-  <div className="space-y-2">
-    {/* Check !== undefined instead of truthy */}
-    {order.totalBeforeDiscount !== undefined && (
-      <div className="flex justify-between">
-        <Text className="text-gray-600">Subtotal:</Text>
-        <Text className="font-medium">₦{order.totalBeforeDiscount.toLocaleString()}</Text>
+      {/* Pricing Breakdown */}
+      <div className="rounded-lg border p-4">
+        <Text className="mb-3 text-lg font-semibold">Pricing Summary</Text>
+        <div className="space-y-2">
+          {/* Check !== undefined instead of truthy */}
+          {order.totalBeforeDiscount !== undefined && (
+            <div className="flex justify-between">
+              <Text className="text-gray-600">Subtotal:</Text>
+              <Text className="font-medium">
+                ₦{order.totalBeforeDiscount.toLocaleString()}
+              </Text>
+            </div>
+          )}
+
+          {/* Only show coupon if discount > 0 AND code exists */}
+          {order.coupon?.code && order.couponDiscount! > 0 && (
+            <div className="flex justify-between text-green-600">
+              <Text>Coupon ({order.coupon.code}):</Text>
+              <Text className="font-medium">
+                -₦{order.couponDiscount!.toLocaleString()}
+              </Text>
+            </div>
+          )}
+
+          {/* Check !== undefined instead of truthy */}
+          {order.shippingPrice !== undefined && (
+            <div className="flex justify-between">
+              <Text className="text-gray-600">Shipping:</Text>
+              <Text className="font-medium">
+                ₦{order.shippingPrice.toLocaleString()}
+              </Text>
+            </div>
+          )}
+
+          {/* Tax only shows if > 0 (this condition is correct) */}
+          {order.taxPrice !== undefined && order.taxPrice > 0 && (
+            <div className="flex justify-between">
+              <Text className="text-gray-600">Tax:</Text>
+              <Text className="font-medium">
+                ₦{order.taxPrice.toLocaleString()}
+              </Text>
+            </div>
+          )}
+
+          {/* Check !== undefined instead of truthy */}
+          {order.total !== undefined && (
+            <div className="flex justify-between border-t pt-2 font-bold">
+              <Text>Total:</Text>
+              <Text>₦{order.total.toLocaleString()}</Text>
+            </div>
+          )}
+        </div>
       </div>
-    )}
-    
-    {/* Only show coupon if discount > 0 AND code exists */}
-    {order.coupon?.code && order.couponDiscount! > 0 && (
-      <div className="flex justify-between text-green-600">
-        <Text>Coupon ({order.coupon.code}):</Text>
-        <Text className="font-medium">-₦{order.couponDiscount!.toLocaleString()}</Text>
-      </div>
-    )}
-    
-    {/* Check !== undefined instead of truthy */}
-    {order.shippingPrice !== undefined && (
-      <div className="flex justify-between">
-        <Text className="text-gray-600">Shipping:</Text>
-        <Text className="font-medium">₦{order.shippingPrice.toLocaleString()}</Text>
-      </div>
-    )}
-    
-    {/* Tax only shows if > 0 (this condition is correct) */}
-    {order.taxPrice !== undefined && order.taxPrice > 0 && (
-      <div className="flex justify-between">
-        <Text className="text-gray-600">Tax:</Text>
-        <Text className="font-medium">₦{order.taxPrice.toLocaleString()}</Text>
-      </div>
-    )}
-    
-    {/* Check !== undefined instead of truthy */}
-    {order.total !== undefined && (
-      <div className="flex justify-between border-t pt-2 font-bold">
-        <Text>Total:</Text>
-        <Text>₦{order.total.toLocaleString()}</Text>
-      </div>
-    )}
-  </div>
-</div>
 
       {/* Shipping & Billing Addresses */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Shipping Address */}
         <div className="rounded-lg border p-4">
-          <Text className="mb-3 font-semibold text-lg">Shipping Address</Text>
-          {order.shippingAddress ?(
-            
+          <Text className="mb-3 text-lg font-semibold">Shipping Address</Text>
+          {order.shippingAddress ? (
             <div className="space-y-1">
-            <Text className="font-medium">
-              {order.shippingAddress.firstName} {order.shippingAddress.lastName}
-            </Text>
-            <Text className="text-sm text-gray-600">{order.shippingAddress.phoneNumber}</Text>
-            <Text className="text-sm text-gray-600">{order.shippingAddress.address1}</Text>
-            {order.shippingAddress.address2 && (
-              <Text className="text-sm text-gray-600">{order.shippingAddress.address2}</Text>
-            )}
-            <Text className="text-sm text-gray-600">
-              {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
-            </Text>
-            <Text className="text-sm text-gray-600">{order.shippingAddress.country}</Text>
-            {order.shippingAddress.lga && (
-              <Text className="text-sm text-gray-600">LGA: {order.shippingAddress.lga}</Text>
-            )}
-          </div>) : (
-
-      <Text className="font-medium">
-              PICKUP
-            </Text>
+              <Text className="font-medium">
+                {order.shippingAddress.firstName}{' '}
+                {order.shippingAddress.lastName}
+              </Text>
+              <Text className="text-sm text-gray-600">
+                {order.shippingAddress.phoneNumber}
+              </Text>
+              <Text className="text-sm text-gray-600">
+                {order.shippingAddress.address1}
+              </Text>
+              {order.shippingAddress.address2 && (
+                <Text className="text-sm text-gray-600">
+                  {order.shippingAddress.address2}
+                </Text>
+              )}
+              <Text className="text-sm text-gray-600">
+                {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
+                {order.shippingAddress.zipCode}
+              </Text>
+              <Text className="text-sm text-gray-600">
+                {order.shippingAddress.country}
+              </Text>
+              {order.shippingAddress.lga && (
+                <Text className="text-sm text-gray-600">
+                  LGA: {order.shippingAddress.lga}
+                </Text>
+              )}
+            </div>
+          ) : (
+            <Text className="font-medium">PICKUP</Text>
           )}
         </div>
 
         {/* Billing Address */}
         {order.billingAddress && (
           <div className="rounded-lg border p-4">
-            <Text className="mb-3 font-semibold text-lg">Billing Address</Text>
+            <Text className="mb-3 text-lg font-semibold">Billing Address</Text>
             <div className="space-y-1">
               <Text className="font-medium">
                 {order.billingAddress.firstName} {order.billingAddress.lastName}
               </Text>
-              <Text className="text-sm text-gray-600">{order.billingAddress.phoneNumber}</Text>
-              <Text className="text-sm text-gray-600">{order.billingAddress.address1}</Text>
+              <Text className="text-sm text-gray-600">
+                {order.billingAddress.phoneNumber}
+              </Text>
+              <Text className="text-sm text-gray-600">
+                {order.billingAddress.address1}
+              </Text>
               {order.billingAddress.address2 && (
-                <Text className="text-sm text-gray-600">{order.billingAddress.address2}</Text>
+                <Text className="text-sm text-gray-600">
+                  {order.billingAddress.address2}
+                </Text>
               )}
               <Text className="text-sm text-gray-600">
-                {order.billingAddress.city}, {order.billingAddress.state} {order.billingAddress.zipCode}
+                {order.billingAddress.city}, {order.billingAddress.state}{' '}
+                {order.billingAddress.zipCode}
               </Text>
-              <Text className="text-sm text-gray-600">{order.billingAddress.country}</Text>
+              <Text className="text-sm text-gray-600">
+                {order.billingAddress.country}
+              </Text>
               {order.billingAddress.lga && (
-                <Text className="text-sm text-gray-600">LGA: {order.billingAddress.lga}</Text>
+                <Text className="text-sm text-gray-600">
+                  LGA: {order.billingAddress.lga}
+                </Text>
               )}
             </div>
           </div>
@@ -237,15 +277,21 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
       {/* Payment & Transaction Info */}
       {order.transaction && (
         <div className="rounded-lg border p-4">
-          <Text className="mb-3 font-semibold text-lg">Payment Information</Text>
+          <Text className="mb-3 text-lg font-semibold">
+            Payment Information
+          </Text>
           <div className="space-y-2">
             <div className="flex justify-between">
               <Text className="text-gray-600">Payment Method:</Text>
-              <Text className="font-medium capitalize">{order.transaction.paymentMethod}</Text>
+              <Text className="font-medium capitalize">
+                {order.transaction.paymentMethod}
+              </Text>
             </div>
             <div className="flex justify-between">
               <Text className="text-gray-600">Gateway:</Text>
-              <Text className="font-medium capitalize">{order.transaction.paymentGateway}</Text>
+              <Text className="font-medium capitalize">
+                {order.transaction.paymentGateway}
+              </Text>
             </div>
             <div className="flex justify-between">
               <Text className="text-gray-600">Reference:</Text>
@@ -253,18 +299,28 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
             </div>
             <div className="flex justify-between">
               <Text className="text-gray-600">Amount:</Text>
-              <Text className="font-medium">₦{order.transaction.amount.toLocaleString()}</Text>
+              <Text className="font-medium">
+                ₦{order.transaction.amount.toLocaleString()}
+              </Text>
             </div>
             <div className="flex justify-between">
               <Text className="text-gray-600">Status:</Text>
-              <Badge color={order.transaction.status === 'completed' ? 'success' : 'warning'}>
+              <Badge
+                color={
+                  order.transaction.status === 'completed'
+                    ? 'success'
+                    : 'warning'
+                }
+              >
                 {order.transaction.status}
               </Badge>
             </div>
             {order.transaction.paidAt && (
               <div className="flex justify-between">
                 <Text className="text-gray-600">Paid At:</Text>
-                <Text className="font-medium">{new Date(order.transaction.paidAt).toLocaleString()}</Text>
+                <Text className="font-medium">
+                  {new Date(order.transaction.paidAt).toLocaleString()}
+                </Text>
               </div>
             )}
           </div>
@@ -276,6 +332,19 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
         <Text className="mb-2 font-semibold">Delivery Type</Text>
         <Badge className="capitalize">{order.deliveryType}</Badge>
       </div>
+
+      {/* GIG Logistics Tracking */}
+      {order.deliveryType === 'gig' && order.gigWaybill && (
+        <div className="rounded-lg border p-4">
+          <Text className="mb-3 text-lg font-semibold">GIG Logistics</Text>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Text className="text-gray-600">Waybill Number:</Text>
+              <Text className="font-mono font-medium">{order.gigWaybill}</Text>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

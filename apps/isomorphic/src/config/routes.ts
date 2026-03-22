@@ -55,6 +55,7 @@ export const routes = {
       configDetails: (id: string) => `/ecommerce/logistics/${id}`,
       editConfig: (id: string) => `/ecommerce/logistics/${id}/edit`,
     },
+    gigConfig: '/ecommerce/gig-config',
     delivery: {
       list: '/ecommerce/delivery',
       details: (id: string) => `/ecommerce/delivery/${id}`,

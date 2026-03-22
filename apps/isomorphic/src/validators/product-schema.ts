@@ -90,6 +90,13 @@ const baseProductSchema = z.object({
     })
     .optional(),
 
+  // GIG shipping fields
+  weight: z.number().min(0, 'Weight must be non-negative'),
+  height: z.number().min(0, 'Height must be non-negative'),
+  width: z.number().min(0, 'Width must be non-negative'),
+  length: z.number().min(0, 'Length must be non-negative'),
+  isVolumetric: z.boolean(),
+
   attributes: z
     .array(
       z.object({

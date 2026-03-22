@@ -41,6 +41,12 @@ export interface Product {
     increaseCostBy: number;
     addedDays: number;
   };
+  // GIG shipping fields
+  weight: number;
+  height: number;
+  width: number;
+  length: number;
+  isVolumetric: boolean;
   attributes?: {
     name: string;
     children: {
@@ -111,28 +117,33 @@ export const useProductsEnhanced = (filters?: ProductsFilters) => {
       if (filters?.page) params.append('page', filters.page.toString());
       if (filters?.limit) params.append('limit', filters.limit.toString());
       if (filters?.category) params.append('category', filters.category);
-      if (filters?.subcategory) params.append('subcategory', filters.subcategory);
+      if (filters?.subcategory)
+        params.append('subcategory', filters.subcategory);
       if (filters?.search) params.append('search', filters.search);
-      if (filters?.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
-      if (filters?.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
+      if (filters?.minPrice !== undefined)
+        params.append('minPrice', filters.minPrice.toString());
+      if (filters?.maxPrice !== undefined)
+        params.append('maxPrice', filters.maxPrice.toString());
       if (filters?.sortBy) params.append('sortBy', filters.sortBy);
       if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
-      if (filters?.availability) params.append('availability', filters.availability);
+      if (filters?.availability)
+        params.append('availability', filters.availability);
       if (filters?.brand) params.append('brand', filters.brand);
       if (filters?.specKey) params.append('specKey', filters.specKey);
       if (filters?.specValue) params.append('specValue', filters.specValue);
 
-      const response = await apiClient.getWithMeta<Product[], { total: number; page: number; limit: number; pages: number }>(
-        `${api.products.listEnhanced}?${params.toString()}`
-      );
-      
+      const response = await apiClient.getWithMeta<
+        Product[],
+        { total: number; page: number; limit: number; pages: number }
+      >(`${api.products.listEnhanced}?${params.toString()}`);
+
       if (!response.data) {
         throw new Error('No data returned');
       }
-      
+
       return {
         data: response.data,
-        meta: response.meta || { total: 0, page: 1, limit: 20, pages: 0 }
+        meta: response.meta || { total: 0, page: 1, limit: 20, pages: 0 },
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -144,12 +155,18 @@ export const useProductsEnhanced = (filters?: ProductsFilters) => {
  * Hook to check if SKU exists
  */
 export const useCheckSku = (sku: string, enabled: boolean = false) => {
-  return useQuery<{ exists: boolean; productId?: string; productName?: string }>({
+  return useQuery<{
+    exists: boolean;
+    productId?: string;
+    productName?: string;
+  }>({
     queryKey: ['product', 'check-sku', sku],
     queryFn: async () => {
-      const response = await apiClient.get<{ exists: boolean; productId?: string; productName?: string }>(
-        api.products.checkSku(sku)
-      );
+      const response = await apiClient.get<{
+        exists: boolean;
+        productId?: string;
+        productName?: string;
+      }>(api.products.checkSku(sku));
       return response.data || { exists: false };
     },
     enabled: enabled && !!sku,
@@ -169,28 +186,33 @@ export const useProducts = (filters?: ProductsFilters) => {
       if (filters?.page) params.append('page', filters.page.toString());
       if (filters?.limit) params.append('limit', filters.limit.toString());
       if (filters?.category) params.append('category', filters.category);
-      if (filters?.subcategory) params.append('subcategory', filters.subcategory);
+      if (filters?.subcategory)
+        params.append('subcategory', filters.subcategory);
       if (filters?.search) params.append('search', filters.search);
-      if (filters?.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
-      if (filters?.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
+      if (filters?.minPrice !== undefined)
+        params.append('minPrice', filters.minPrice.toString());
+      if (filters?.maxPrice !== undefined)
+        params.append('maxPrice', filters.maxPrice.toString());
       if (filters?.sortBy) params.append('sortBy', filters.sortBy);
       if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
-      if (filters?.availability) params.append('availability', filters.availability);
+      if (filters?.availability)
+        params.append('availability', filters.availability);
       if (filters?.brand) params.append('brand', filters.brand);
       if (filters?.specKey) params.append('specKey', filters.specKey);
       if (filters?.specValue) params.append('specValue', filters.specValue);
 
-      const response = await apiClient.getWithMeta<Product[], { total: number; page: number; limit: number; pages: number }>(
-        `${api.products.list}?${params.toString()}`
-      );
-      
+      const response = await apiClient.getWithMeta<
+        Product[],
+        { total: number; page: number; limit: number; pages: number }
+      >(`${api.products.list}?${params.toString()}`);
+
       if (!response.data) {
         throw new Error('No data returned');
       }
-      
+
       return {
         data: response.data,
-        meta: response.meta || { total: 0, page: 1, limit: 20, pages: 0 }
+        meta: response.meta || { total: 0, page: 1, limit: 20, pages: 0 },
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -202,7 +224,10 @@ export const useProducts = (filters?: ProductsFilters) => {
  * Hook to search products by name, SKU, or ID
  * This is a convenience hook that uses the same endpoint with search parameter
  */
-export const useProductSearch = (searchQuery: string, enabled: boolean = true) => {
+export const useProductSearch = (
+  searchQuery: string,
+  enabled: boolean = true
+) => {
   return useQuery<Product[]>({
     queryKey: ['products', 'search', searchQuery],
     queryFn: async () => {
@@ -210,14 +235,17 @@ export const useProductSearch = (searchQuery: string, enabled: boolean = true) =
         return [];
       }
 
-      const response = await apiClient.getWithMeta<Product[], { total: number; page: number; limit: number; pages: number }>(
+      const response = await apiClient.getWithMeta<
+        Product[],
+        { total: number; page: number; limit: number; pages: number }
+      >(
         `${api.products.search}?search=${encodeURIComponent(searchQuery)}&limit=20`
       );
-      
+
       if (!response.data) {
         throw new Error('No data returned');
       }
-      
+
       return response.data;
     },
     placeholderData: [],

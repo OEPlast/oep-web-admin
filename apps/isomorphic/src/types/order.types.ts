@@ -155,7 +155,8 @@ export interface Order {
   shippingMethod?: ShippingMethod;
   trackingNumber?: string;
   carrier?: string;
-  deliveryType?: string; // New API field ('shipping' | 'pickup')
+  deliveryType?: string; // New API field ('shipping' | 'pickup' | 'gig')
+  gigWaybill?: string | null; // GIG Logistics waybill number
 
   // Contact info (new API format)
   contact?: {
