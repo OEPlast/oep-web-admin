@@ -26,7 +26,9 @@ import CheckoutDeliverySettingsCard from './checkout-delivery-settings-card';
 
 export default function SettingsForm() {
   const { data: settings, isLoading } = useStoreSettings();
-  const [apiErrors, setApiErrors] = useState<BackendValidationError[] | null>(null);
+  const [apiErrors, setApiErrors] = useState<BackendValidationError[] | null>(
+    null
+  );
 
   const updateMutation = useUpdateStoreSettings({
     onSuccess: () => {
@@ -88,12 +90,20 @@ export default function SettingsForm() {
       }}
       className="isomorphic-form flex max-w-[900px] flex-col gap-6"
     >
-      {({ register, control, watch, formState: { errors }, setValue, setError, getValues }) => {
+      {({
+        register,
+        control,
+        watch,
+        formState: { errors },
+        setValue,
+        setError,
+        getValues,
+      }) => {
         // Set backend errors when apiErrors changes
-          if (apiErrors) {
-            setBackendFormErrors(apiErrors, setError);
-            setApiErrors(null);
-          } 
+        if (apiErrors) {
+          setBackendFormErrors(apiErrors, setError);
+          setApiErrors(null);
+        }
 
         const logoValue = watch('logoUrl');
 
@@ -102,7 +112,7 @@ export default function SettingsForm() {
             {/* Logo Upload Section */}
             <div className={cn('rounded-lg border border-muted p-6')}>
               <h3 className="mb-4 text-lg font-semibold">Store Logo</h3>
-              
+
               {!logoValue ? (
                 <Controller
                   name="logoUrl"
@@ -174,7 +184,9 @@ export default function SettingsForm() {
 
             {/* Contact Information */}
             <div className={cn('rounded-lg border border-muted p-6')}>
-              <h3 className="mb-4 text-lg font-semibold">Contact Information</h3>
+              <h3 className="mb-4 text-lg font-semibold">
+                Contact Information
+              </h3>
               <div className="grid gap-4 @md:grid-cols-2">
                 <Input
                   label="Support Email"
