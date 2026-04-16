@@ -103,8 +103,9 @@ export default function InvoicePreview({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @media print {
           /* Hide everything except the invoice */
           body * {
@@ -143,7 +144,9 @@ export default function InvoicePreview({
             page-break-inside: avoid;
           }
         }
-      `}} />
+      `,
+        }}
+      />
 
       <div
         id="invoice-print-area"
@@ -151,12 +154,13 @@ export default function InvoicePreview({
         className="w-full rounded-xl border border-muted p-5 text-sm sm:p-6 lg:p-8 2xl:p-10"
       >
         <div className="mb-12 flex flex-col-reverse items-start justify-between md:mb-16 md:flex-row">
-          <Image
+          {/* <Image
             src={siteConfig.logo}
             alt={siteConfig.title}
-            className="dark:invert"
+            className="h-auto w-[100px] dark:invert"
             priority
-          />
+          /> */}
+          <h1 className="font-bold">Olu Executive Plastics 'n Essentials</h1>
           <div className="mb-4 md:mb-0">
             <Badge
               variant="flat"
