@@ -90,6 +90,8 @@ export default function InvoicePreview({
     (formData.taxes || 0) -
     (formData.discount || 0);
 
+  console.log(total);
+
   // Prepare items for table with id
   const tableItems = formData.items.map((item, index) => ({
     ...item,
