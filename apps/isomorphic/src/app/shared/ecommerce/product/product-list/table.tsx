@@ -16,12 +16,13 @@ import cn from '@core/utils/class-names';
 import { exportToCSV } from '@core/utils/export-to-csv';
 import { Alert } from 'rizzui';
 import { handleApiError } from '@/libs/axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import TableSkeleton from './table-skeleton';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/config/routes';
 import { PaginationState } from '@tanstack/react-table';
+import { useAdminProductSocket } from '@/hooks/useAdminProductSocket';
 
 export default function ProductsTable({
   pageSize = 20,
@@ -69,6 +70,8 @@ export default function ProductsTable({
   const router = useRouter();
 
   const products = productsData?.data || [];
+  const visibleProductIds = useMemo(() => products.map((p) => p._id), [products]);
+  useAdminProductSocket({ productIds: visibleProductIds, enabled: !isLoading });
 
   const { table, setData } = useTanStackTable<Product>({
     tableData: products,

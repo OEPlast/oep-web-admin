@@ -55,7 +55,8 @@ export default function BannerForm({
     ...defaultValues,
   };
 
-  const validationSchema = mode === 'create' ? createBannerFormSchema : updateBannerFormSchema;
+  const validationSchema =
+    mode === 'create' ? createBannerFormSchema : updateBannerFormSchema;
 
   return (
     <Form<BannerFormInput>
@@ -76,7 +77,8 @@ export default function BannerForm({
         watch,
       }) => {
         const imageUrl = watch('imageUrl');
-        
+        const category = watch('category');
+
         return (
           <>
             <div className="flex-grow pb-1">
@@ -155,7 +157,9 @@ export default function BannerForm({
                           }}
                         />
                         <span className="text-sm text-gray-500">
-                          {field.value ?? true ? 'Image fills entire banner area' : 'Image maintains aspect ratio'}
+                          {(field.value ?? true)
+                            ? 'Image fills entire banner area'
+                            : 'Image maintains aspect ratio'}
                         </span>
                       </div>
                     )}
@@ -183,6 +187,7 @@ export default function BannerForm({
                 <BannerImageBlock
                   error={errors?.imageUrl?.message}
                   imageUrl={imageUrl}
+                  category={category}
                   setValue={setValue}
                   getValues={getValues}
                 />
