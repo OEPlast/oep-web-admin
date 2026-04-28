@@ -53,9 +53,14 @@ const baseProductSchema = z.object({
       z.object({
         url: z.string(),
         cover_image: z.boolean(),
+        mediaType: z.enum(['image', 'video']).default('image'),
+        miniUrl: z.string().optional(),
       })
     )
-    .min(1, 'At least one product image is required'),
+    .refine(
+      (items) => items.some((i) => (i.mediaType ?? 'image') === 'image'),
+      'At least one product image is required'
+    ),
 
   specifications: z
     .array(
@@ -126,7 +131,10 @@ const baseProductSchema = z.object({
 
 // Product schema with refinement for create/update
 export const productSchema = baseProductSchema.refine(
-  (data) => data.description_images.some((img) => img.cover_image),
+  (data) =>
+    data.description_images.some(
+      (img) => img.cover_image && (img.mediaType ?? 'image') === 'image'
+    ),
   {
     message: 'At least one image must be marked as cover image',
     path: ['description_images'],

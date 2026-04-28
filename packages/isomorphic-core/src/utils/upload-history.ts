@@ -10,6 +10,8 @@ export interface UploadedFile {
   mimetype: string;
   originalName: string;
   uploadedAt: string; // ISO timestamp
+  mediaType?: 'image' | 'video';
+  thumbnailPath?: string; // video-only: path of the extracted WebP thumbnail
 }
 
 const STORAGE_KEY = "upload_history";

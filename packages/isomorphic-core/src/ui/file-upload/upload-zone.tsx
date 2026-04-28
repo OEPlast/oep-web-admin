@@ -191,6 +191,8 @@ export default function UploadZone({
             mimetype: file.mimetype,
             originalName: file.originalName,
             uploadedAt: new Date().toISOString(),
+            mediaType: file.mediaType ?? 'image',
+            thumbnailPath: file.thumbnailPath,
           }));
 
           // Add to history
@@ -234,6 +236,8 @@ export default function UploadZone({
             mimetype: response.data.data.mimetype,
             originalName: response.data.data.originalName,
             uploadedAt: new Date().toISOString(),
+            mediaType: response.data.data.mediaType ?? 'image',
+            thumbnailPath: response.data.data.thumbnailPath,
           };
 
           // Add to history
@@ -278,6 +282,13 @@ export default function UploadZone({
 
     if (accept === "video/*") {
       return { "video/*": [".mp4", ".webm", ".ogg", ".mov", ".avi"] };
+    }
+
+    if (accept === "image/*,video/*") {
+      return {
+        "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".ico"],
+        "video/*": [".mp4", ".webm", ".ogg", ".mov", ".avi"],
+      };
     }
 
     if (accept === "audio/*") {
@@ -409,11 +420,21 @@ function UploadButtons({
 }
 
 function MediaPreview({ name, url }: { name: string; url: string }) {
-  // Use blob URLs as-is (for local previews), otherwise construct CDN URL
   const isBlob = url.startsWith("blob:");
   const fullUrl = isBlob ? url : getCdnUrl(url);
+  const isVideo = name.match(/\.(mp4|webm|ogg|mov|avi)$/i);
 
-  // Use regular img for blob URLs, Next Image for CDN URLs
+  if (isVideo) {
+    return (
+      <video
+        src={fullUrl}
+        className="h-full w-full transform rounded-md object-contain"
+        muted
+        preload="metadata"
+      />
+    );
+  }
+
   return isBlob ? (
     <img src={fullUrl} alt={name} className="h-full w-full transform rounded-md object-contain" />
   ) : (
