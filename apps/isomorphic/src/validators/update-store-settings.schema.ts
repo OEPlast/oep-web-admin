@@ -30,6 +30,15 @@ export const updateStoreSettingsSchema = z.object({
     .length(3, 'Currency must be a 3-letter code (e.g., USD)')
     .optional()
     .or(z.literal('')),
+  socialLinks: z
+    .object({
+      instagram: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+      facebook: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+      whatsapp: z.string().optional(),
+      x: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+      threads: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+    })
+    .optional(),
 });
 
 export type UpdateStoreSettingsInput = z.infer<typeof updateStoreSettingsSchema>;

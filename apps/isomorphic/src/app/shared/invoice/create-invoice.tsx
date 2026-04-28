@@ -22,9 +22,7 @@ import {
 import { useOrderById } from '@/hooks/queries/useOrders';
 import InvoicePreview from '@/app/shared/invoice/invoice-preview';
 
-const invoiceItems = [
-  { item: '', description: '', quantity: 1, price: 0 },
-];
+const invoiceItems = [{ item: '', description: '', quantity: 1, price: 0 }];
 
 export default function CreateInvoice({
   id,
@@ -56,7 +54,9 @@ export default function CreateInvoice({
   // Update delivery type when order data changes
   useEffect(() => {
     if (orderData) {
-      const deliveryTypeValue = (orderData.deliveryType as "shipping" | "pickup" | undefined) || 'shipping';
+      const deliveryTypeValue =
+        (orderData.deliveryType as 'shipping' | 'pickup' | undefined) ||
+        'shipping';
       setDeliveryType(deliveryTypeValue);
     }
   }, [orderData]);
@@ -217,7 +217,7 @@ export default function CreateInvoice({
                 <div className="grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12">
                   <FormBlockWrapper
                     title={'From:'}
-                    description={'From he who sending this invoice'}
+                    description={'From who is sending this invoice'}
                   >
                     <Input
                       label="Name"
@@ -231,7 +231,7 @@ export default function CreateInvoice({
                       render={({ field: { value, onChange } }) => (
                         <PhoneNumber
                           label="Phone Number"
-                          country="us"
+                          country="ng"
                           value={value}
                           onChange={onChange}
                         />
@@ -249,7 +249,7 @@ export default function CreateInvoice({
 
                   <FormBlockWrapper
                     title={'To:'}
-                    description={'To he who will receive this invoice'}
+                    description={'To who will receive this invoice'}
                     className="pt-7 @2xl:pt-9 @3xl:pt-11"
                   >
                     <Input
@@ -264,7 +264,7 @@ export default function CreateInvoice({
                       render={({ field: { value, onChange } }) => (
                         <PhoneNumber
                           label="Phone Number"
-                          country="us"
+                          country="ng"
                           value={value}
                           onChange={onChange}
                         />

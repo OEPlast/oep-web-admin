@@ -7,6 +7,7 @@ import { Badge, Title, Text } from 'rizzui';
 import Table from '@core/components/legacy-table';
 import { siteConfig } from '@/config/site.config';
 import { InvoiceFormInput } from '@/validators/create-invoice.schema';
+import { calculateTotalPrice } from '@core/utils/calculate-total-price';
 
 interface InvoicePreviewProps {
   formData: InvoiceFormInput;
@@ -83,14 +84,13 @@ export default function InvoicePreview({
     0
   );
 
-  // Calculate total
-  const total =
-    subtotal +
-    (formData.shipping || 0) +
-    (formData.taxes || 0) -
-    (formData.discount || 0);
-
-  console.log(total);
+  const totalPrice =
+    calculateTotalPrice(
+      subtotal,
+      formData.shipping || 0,
+      formData.discount || 0,
+      formData.taxes || 0
+    ) ?? '--';
 
   // Prepare items for table with id
   const tableItems = formData.items.map((item, index) => ({
@@ -156,13 +156,15 @@ export default function InvoicePreview({
         className="w-full rounded-xl border border-muted p-5 text-sm sm:p-6 lg:p-8 2xl:p-10"
       >
         <div className="mb-12 flex flex-col-reverse items-start justify-between md:mb-16 md:flex-row">
-          {/* <Image
+          <Image
             src={siteConfig.logo}
             alt={siteConfig.title}
             className="h-auto w-[100px] dark:invert"
             priority
-          /> */}
-          <h1 className="text-xl font-extrabold tracking-wide">{`Olu Executive Plastics 'n Essentials`}</h1>
+            width={100}
+            height={100}
+          />
+          {/* <h1 className="text-xl font-extrabold tracking-wide">{`Olu Executive Plastics 'n Essentials`}</h1> */}
           <div className="mb-4 md:mb-0">
             <Badge
               variant="flat"
@@ -285,7 +287,7 @@ export default function InvoicePreview({
               </Text>
             </Text>
             <Text className="flex items-center justify-between pt-4 text-base font-semibold text-gray-900 lg:pt-5">
-              Total: <Text as="span">₦{total.toLocaleString()}</Text>
+              Total: <Text as="span">₦{totalPrice.toLocaleString()}</Text>
             </Text>
           </div>
         </div>

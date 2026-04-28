@@ -23,6 +23,13 @@ export interface StoreSettings {
   taxId: string;
   taxRate: number;
   currency: string;
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    whatsapp?: string;
+    x?: string;
+    threads?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

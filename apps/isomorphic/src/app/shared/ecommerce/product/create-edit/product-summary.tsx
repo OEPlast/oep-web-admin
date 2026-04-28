@@ -21,7 +21,11 @@ interface ProductSummaryProps {
   existingSlug?: string;
 }
 
-export default function ProductSummary({ className, mode = 'create', existingSlug }: ProductSummaryProps) {
+export default function ProductSummary({
+  className,
+  mode = 'create',
+  existingSlug,
+}: ProductSummaryProps) {
   const {
     register,
     control,
@@ -30,7 +34,8 @@ export default function ProductSummary({ className, mode = 'create', existingSlu
     formState: { errors },
   } = useFormContext();
 
-  const { data: categoryOptions = [], isLoading: categoriesLoading } = useParentCategoryOptions();
+  const { data: categoryOptions = [], isLoading: categoriesLoading } =
+    useParentCategoryOptions();
   const [slugTouched, setSlugTouched] = useState(false);
   const productName = watch('name');
 
@@ -95,7 +100,10 @@ export default function ProductSummary({ className, mode = 'create', existingSlu
           <Select
             label="Category"
             options={categoryOptions}
-            value={field.value}
+            value={
+              categoryOptions.find((option) => option.value === field.value) ||
+              null
+            }
             onChange={field.onChange}
             searchable
             disabled={categoriesLoading}

@@ -98,6 +98,7 @@ export function AddInvoiceItems({ watch, register, control, errors }: any) {
       const itemQuantity = watch(`items.${index}.quantity`) as number;
       subTotal += itemPrice * itemQuantity;
     });
+
     return subTotal as number;
   }
 
@@ -160,7 +161,7 @@ export function AddInvoiceItems({ watch, register, control, errors }: any) {
                   <div className="ms-3 mt-9 flex items-start text-sm">
                     <Text className="me-1 text-gray-500">Total:</Text>
                     <Text as="b" className="font-medium">
-                      ${priceValue * quantityValue}
+                      ₦{priceValue * quantityValue}
                     </Text>
                   </div>
                 </div>
@@ -229,12 +230,12 @@ export function AddInvoiceItems({ watch, register, control, errors }: any) {
               <Text className="flex items-center justify-between">
                 Subtotal:{' '}
                 <Text as="span" className="font-medium text-gray-700">
-                  ${calculateSubTotal()}
+                  ₦{calculateSubTotal()}
                 </Text>
               </Text>
               <Text className="flex items-center justify-between">
                 Shipping:{' '}
-                <Text as="span" className="font-medium text-red">
+                <Text as="span" className="font-medium">
                   {shippingCost ? `$${shippingCost}` : '--'}
                 </Text>
               </Text>
@@ -253,7 +254,7 @@ export function AddInvoiceItems({ watch, register, control, errors }: any) {
               <Text className="flex items-center justify-between text-base font-semibold text-gray-900">
                 Total:{' '}
                 <Text as="span">
-                  $
+                  ₦
                   {calculateTotalPrice(
                     calculateSubTotal(),
                     shippingCost,

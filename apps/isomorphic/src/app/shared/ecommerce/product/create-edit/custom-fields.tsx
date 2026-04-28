@@ -84,9 +84,30 @@ export default function CustomFields() {
 
       <VerticalFormBlockWrapper
         title="Dimensions"
-        description="Add product dimensions (weight, length, height, width)"
+        description="Add product dimensions (length, height, width)"
         className="col-span-full"
       >
+        {/* Fixed required weight field */}
+        <div className="flex gap-4 xl:gap-7">
+          <Input
+            label="Dimension Type"
+            className="flex-grow"
+            value="Weight"
+            readOnly
+            disabled
+          />
+          <Input
+            label="Value"
+            placeholder="e.g. 5 kg"
+            className="flex-grow"
+            {...register('weight', { valueAsNumber: true })}
+            error={errors.weight?.message as string}
+            suffix="kg"
+          />
+          {/* spacer to align with removable rows */}
+          <div className="mt-7 h-9 w-9 shrink-0" />
+        </div>
+
         {dimFields.map((item, index) => (
           <div key={item.id} className="flex gap-4 xl:gap-7">
             <Controller
@@ -97,7 +118,6 @@ export default function CustomFields() {
                   label="Dimension Type"
                   className="flex-grow"
                   options={[
-                    { value: 'weight', label: 'Weight' },
                     { value: 'length', label: 'Length' },
                     { value: 'height', label: 'Height' },
                     { value: 'width', label: 'Width' },
@@ -110,7 +130,7 @@ export default function CustomFields() {
             />
             <Input
               label="Value"
-              placeholder="e.g. 5 kg, 30 cm"
+              placeholder="e.g. 30 cm"
               className="flex-grow"
               {...register(`dimensions.${index}.value`)}
               error={(errors.dimensions as any)?.[index]?.value?.message}
@@ -124,14 +144,16 @@ export default function CustomFields() {
             </ActionIcon>
           </div>
         ))}
-        <Button
-          type="button"
-          onClick={() => appendDim({ key: 'weight', value: '' })}
-          variant="outline"
-          className="ml-auto w-auto"
-        >
-          <PiPlusBold className="me-2 h-4 w-4" strokeWidth={2} /> Add Dimension
-        </Button>
+        {dimFields.length < 3 && (
+          <Button
+            type="button"
+            onClick={() => appendDim({ key: 'length', value: '' })}
+            variant="outline"
+            className="ml-auto w-auto"
+          >
+            <PiPlusBold className="me-2 h-4 w-4" strokeWidth={2} /> Add Dimension
+          </Button>
+        )}
       </VerticalFormBlockWrapper>
     </>
   );
