@@ -455,6 +455,8 @@ export const api = {
     updateConfig: '/admin/gig/config',
     stations: '/admin/gig/stations',
     track: (waybill: string) => `/admin/gig/track/${waybill}`,
+    shipments: '/admin/gig/shipments',
+    shipmentInfo: (waybill: string) => `/admin/gig/shipments/${waybill}`,
   },
 } as const;
 

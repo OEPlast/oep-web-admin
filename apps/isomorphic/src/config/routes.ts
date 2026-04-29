@@ -56,6 +56,11 @@ export const routes = {
       editConfig: (id: string) => `/ecommerce/logistics/${id}/edit`,
     },
     gigConfig: '/ecommerce/gig-config',
+    gigLogistics: {
+      config: '/ecommerce/gig-logistics/config',
+      deliveryTracking: '/ecommerce/gig-logistics/delivery-tracking',
+      deliveryInfo: (waybill: string) => `/ecommerce/gig-logistics/delivery-info/${waybill}`,
+    },
     delivery: {
       list: '/ecommerce/delivery',
       details: (id: string) => `/ecommerce/delivery/${id}`,

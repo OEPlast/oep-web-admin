@@ -200,10 +200,24 @@ export const menuItems = [
     permission: { resource: ['logistics'], action: 'read' },
   },
   {
-    name: 'GIG Config',
-    href: routes.eCommerce.gigConfig,
+    name: 'GIG Logistics',
+    href: '#',
     icon: <PiTruckDuotone />,
     permission: { resource: ['logistics'], action: 'read' },
+    dropdownItems: [
+      {
+        name: 'GIG Config',
+        href: routes.eCommerce.gigLogistics.config,
+      },
+      {
+        name: 'Delivery Tracking',
+        href: routes.eCommerce.gigLogistics.deliveryTracking,
+      },
+      {
+        name: 'Delivery Info',
+        href: routes.eCommerce.gigLogistics.deliveryInfo(''),
+      },
+    ],
   },
   {
     name: 'Shipment',

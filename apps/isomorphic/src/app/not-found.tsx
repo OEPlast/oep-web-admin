@@ -17,6 +17,8 @@ export default function NotFound() {
             alt={siteConfig.title}
             className="dark:invert"
             priority
+            width={300}
+            height={300}
           />
         </Link>
       </div>

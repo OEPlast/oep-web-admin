@@ -71,3 +71,78 @@ export const useGIGStations = (enabled = true) => {
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
+
+export interface GIGShipmentSummary {
+  orderId: string;
+  gigWaybill: string;
+  receiverName: string;
+  receiverAddress: string;
+  internalStatus: string | null;
+  createdAt: string;
+}
+
+export interface GIGShipmentsPaginatedResponse {
+  data: GIGShipmentSummary[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+}
+
+export const useGIGShipments = (page = 1, limit = 20) => {
+  return useQuery<GIGShipmentsPaginatedResponse>({
+    queryKey: ['gigShipments', page, limit],
+    queryFn: async () => {
+      const response = await apiClient.get<GIGShipmentsPaginatedResponse>(
+        `${api.gig.shipments}?page=${page}&limit=${limit}`
+      );
+      if (!response.data) throw new Error('No data returned');
+      return response.data;
+    },
+    staleTime: 60 * 1000,
+  });
+};
+
+export interface GIGPreshipmentDetail {
+  PreShipmentMobileId: number;
+  Waybill: string;
+  SenderName: string;
+  SenderPhoneNumber: string;
+  ReceiverName: string;
+  ReceiverPhoneNumber: string;
+  ReceiverAddress: string;
+  SenderAddress: string;
+  IsHomeDelivery: boolean;
+  GrandTotal: number;
+  DeliveryPrice: number;
+  VehicleType: string;
+  shipmentstatus: string;
+  IsCancelled: boolean;
+  IsDelivered: boolean;
+  DateCreated: string;
+  DateModified: string;
+  WaybillImageUrl?: string;
+}
+
+export interface GIGShipmentInfoResponse {
+  gigTracking: GIGPreshipmentDetail[] | null;
+  order: Record<string, unknown> | null;
+  shipment: {
+    status: string;
+    trackingHistory: Array<{ location: string; timestamp: string; description: string }>;
+    estimatedDelivery?: string;
+    deliveredOn?: string;
+  } | null;
+}
+
+export const useGIGShipmentInfo = (waybill: string) => {
+  return useQuery<GIGShipmentInfoResponse>({
+    queryKey: ['gigShipmentInfo', waybill],
+    queryFn: async () => {
+      const response = await apiClient.get<GIGShipmentInfoResponse>(
+        api.gig.shipmentInfo(waybill)
+      );
+      if (!response.data) throw new Error('No data returned');
+      return response.data;
+    },
+    enabled: !!waybill,
+    staleTime: 30 * 1000,
+  });
+};
