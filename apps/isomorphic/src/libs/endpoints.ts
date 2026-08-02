@@ -378,6 +378,20 @@ export const api = {
       }`,
   },
 
+  // Intent shops (programmatic SEO landing pages at storefront /shop/<slug>)
+  intents: {
+    all: '/admin/intents/all', // List intents (optional ?status=)
+    byId: (id: string) => `/admin/intents/${id}`,
+    create: '/admin/intents/create',
+    update: (id: string) => `/admin/intents/${id}`,
+    delete: (id: string) => `/admin/intents/${id}`,
+    toggleStatus: (id: string) => `/admin/intents/${id}/status`,
+    checkSlug: (slug: string, excludeId?: string) =>
+      `/admin/intents/check-slug?slug=${encodeURIComponent(slug)}${
+        excludeId ? `&excludeId=${encodeURIComponent(excludeId)}` : ''
+      }`,
+  },
+
   // Transaction endpoints
   transactions: {
     list: '/admin/transactions',

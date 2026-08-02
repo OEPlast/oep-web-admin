@@ -32,6 +32,10 @@ export const routes = {
     createCampaign: '/ecommerce/campaigns/create',
     CampaignDetails: (id: string) => `/ecommerce/campaigns/${id}`,
     editCampaign: (id: string) => `/ecommerce/campaigns/${id}/edit`,
+    // Intent shops — storefront /shop/<slug> programmatic SEO landing pages
+    intents: '/marketing/intent-shops',
+    createIntent: '/marketing/intent-shops/create',
+    editIntent: (id: string) => `/marketing/intent-shops/${id}/edit`,
     reviews: '/ecommerce/reviews',
     reviewsByProduct: '/ecommerce/reviews/by-product',
     reviewsByUser: '/ecommerce/reviews/by-user',

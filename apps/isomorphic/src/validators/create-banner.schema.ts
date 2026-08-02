@@ -18,10 +18,19 @@ export const updateBannerFormSchema = z.object({
     .string()
     .min(1, { message: 'Main text is required' })
     .max(500, { message: 'Main text must be 500 characters or less' }),
+  supportingText: z
+    .string()
+    .max(500, { message: 'Supporting text must be 500 characters or less' })
+    .optional()
+    .nullable(),
   CTA: z
     .string()
     .min(1, { message: 'CTA is required' })
     .max(100, { message: 'CTA must be 100 characters or less' }).optional(),
+  ctaColor: z
+    .string()
+    .regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, { message: 'Must be a valid hex color' })
+    .optional(),
   fullImage: z.boolean(),
   active: z.boolean(),
   category: z.enum(['A', 'B', 'C', 'D', 'E'], {
@@ -50,10 +59,19 @@ export const createBannerFormSchema = z.object({
     .string()
     .min(1, { message: 'Main text is required' })
     .max(500, { message: 'Main text must be 500 characters or less' }).optional(),
+  supportingText: z
+    .string()
+    .max(500, { message: 'Supporting text must be 500 characters or less' })
+    .optional()
+    .nullable(),
   CTA: z
     .string()
     .min(1, { message: 'CTA is required' })
     .max(100, { message: 'CTA must be 100 characters or less' }).optional(),
+  ctaColor: z
+    .string()
+    .regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, { message: 'Must be a valid hex color' })
+    .optional(),
   fullImage: z.boolean(),
   active: z.boolean().optional(),
   category: z.enum(['A', 'B', 'C', 'D', 'E'], {

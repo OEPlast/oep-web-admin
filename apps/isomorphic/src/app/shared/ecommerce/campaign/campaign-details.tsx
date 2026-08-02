@@ -119,15 +119,12 @@ export default function CampaignDetails({ id }: CampaignDetailsProps) {
             <Text className="text-2xl font-semibold">{campaign.title}</Text>
             <Badge
               variant="flat"
-              color={getStatusBadgeColor(campaign.status)}
+              color={getStatusBadgeColor(campaign.status.toLowerCase())}
               className="capitalize"
             >
               {campaign.status}
             </Badge>
           </div>
-          {campaign.description && (
-            <Text className="text-gray-600">{campaign.description}</Text>
-          )}
         </div>
         <div className="flex items-center gap-3">
           <Button

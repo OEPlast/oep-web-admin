@@ -139,8 +139,10 @@ export default function ReviewDetailDrawer({
     );
   }
 
-  const statusColor = review.isApproved ? 'success' : 'warning';
-  const statusText = review.isApproved ? 'Approved' : 'Pending';
+  // Reviews go live on submit; `isApproved: false` means an admin took it down.
+  // Labelling that "Pending" read as though it were awaiting approval.
+  const statusColor = review.isApproved ? 'success' : 'danger';
+  const statusText = review.isApproved ? 'Live' : 'Removed';
 
   return (
     <div className="flex h-full flex-col">
@@ -356,48 +358,51 @@ export default function ReviewDetailDrawer({
           </div>
         )}
 
-        {/* Moderation Section */}
-        {!review.isApproved && (
-          <div>
-            <Button
-              variant="outline"
-              onClick={() => setShowModeration(!showModeration)}
-              className="w-full"
-            >
-              {showModeration ? 'Hide Moderation' : 'Moderate Review'}
-            </Button>
-            {showModeration && (
-              <div className="mt-4 space-y-3 rounded-lg border border-muted p-4">
-                <Textarea
-                  label="Moderation Note (optional)"
-                  placeholder="Add a note about this moderation decision..."
-                  value={moderationNote}
-                  onChange={(e) => setModerationNote(e.target.value)}
-                  rows={3}
-                />
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleApprove}
-                    isLoading={moderateMutation.isPending}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <PiCheckCircle className="mr-2 h-4 w-4" />
-                    Approve
-                  </Button>
-                  <Button
-                    onClick={handleReject}
-                    isLoading={moderateMutation.isPending}
-                    color="danger"
-                    className="flex-1"
-                  >
-                    <PiXCircle className="mr-2 h-4 w-4" />
-                    Reject
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Moderation Section.
+            Reviews publish immediately (post-moderation) — moderation is how an
+            admin takes a live review DOWN, so this must be reachable for live
+            reviews. Gating it on `!review.isApproved` made it reachable only for
+            reviews that were already removed, i.e. never. */}
+        <div>
+          <Button
+            variant="outline"
+            onClick={() => setShowModeration(!showModeration)}
+            className="w-full"
+          >
+            {showModeration ? 'Hide Moderation' : 'Moderate Review'}
+          </Button>
+          {showModeration && (
+            <div className="mt-4 space-y-3 rounded-lg border border-muted p-4">
+              <Textarea
+                label="Moderation Note (optional)"
+                placeholder="Add a note about this moderation decision..."
+                value={moderationNote}
+                onChange={(e) => setModerationNote(e.target.value)}
+                rows={3}
+              />
+              {review.isApproved ? (
+                <Button
+                  onClick={handleReject}
+                  isLoading={moderateMutation.isPending}
+                  color="danger"
+                  className="w-full"
+                >
+                  <PiXCircle className="mr-2 h-4 w-4" />
+                  Remove from storefront
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleApprove}
+                  isLoading={moderateMutation.isPending}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  <PiCheckCircle className="mr-2 h-4 w-4" />
+                  Restore to storefront
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Timeline */}
         <div className="border-line rounded-lg border bg-gray-50 p-4">

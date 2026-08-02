@@ -48,7 +48,9 @@ export default function BannerForm({
     pageLink: '',
     headerText: '',
     mainText: '',
+    supportingText: null,
     CTA: '#',
+    ctaColor: '#000000',
     fullImage: true,
     active: false,
     category: 'A',
@@ -121,11 +123,30 @@ export default function BannerForm({
                     error={errors.mainText?.message}
                   />
                   <Input
+                    label="Supporting Text"
+                    placeholder="Sale! Up To 50% Off!"
+                    {...register('supportingText')}
+                    error={errors.supportingText?.message}
+                  />
+                  <Input
                     label="CTA (Call to Action)"
                     placeholder="Shop Now"
                     {...register('CTA')}
                     error={errors.CTA?.message}
                   />
+                  <div className="flex flex-1 items-center gap-3">
+                    <label className="block font-medium">CTA Color</label>
+                    <input
+                      type="color"
+                      {...register('ctaColor')}
+                      className="h-10 w-16 cursor-pointer rounded border border-gray-300"
+                    />
+                    {errors.ctaColor?.message && (
+                      <span className="text-sm text-red-500">
+                        {errors.ctaColor.message as string}
+                      </span>
+                    )}
+                  </div>
                   <Controller
                     name="category"
                     control={control}

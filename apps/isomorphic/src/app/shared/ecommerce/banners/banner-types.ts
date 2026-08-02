@@ -7,4 +7,6 @@ export type BannerType = {
   active: boolean;
   category: 'A' | 'B' | 'C' | 'D' | 'E';
   createdAt: Date;
+  supportingText?: string | null;
+  ctaColor?: string;
 };

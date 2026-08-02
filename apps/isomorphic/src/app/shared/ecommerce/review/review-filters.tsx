@@ -46,8 +46,8 @@ const SORT_OPTIONS = [
 
 const APPROVAL_OPTIONS = [
   { label: 'All Status', value: 'all' },
-  { label: 'Approved', value: 'true' },
-  { label: 'Pending', value: 'false' },
+  { label: 'Live', value: 'true' },
+  { label: 'Removed', value: 'false' },
 ];
 
 export default function ReviewFilters({
@@ -253,7 +253,7 @@ export default function ReviewFilters({
                 )}
                 {filters.isApproved !== 'all' && filters.isApproved !== undefined && (
                   <Badge variant="outline" className="gap-1">
-                    {filters.isApproved ? 'Approved' : 'Pending'}
+                    {filters.isApproved ? 'Live' : 'Removed'}
                     <button
                       onClick={() => handleApprovalChange('all')}
                       className="ml-1 hover:text-gray-700"

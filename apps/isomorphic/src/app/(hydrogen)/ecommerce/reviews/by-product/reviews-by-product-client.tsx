@@ -135,11 +135,11 @@ export default function ReviewsByProductClient() {
       header: 'Status',
       cell: ({ row }) => (
         <Badge
-          color={row.original.isApproved ? 'success' : 'warning'}
+          color={row.original.isApproved ? 'success' : 'danger'}
           variant="flat"
           className="font-medium"
         >
-          {row.original.isApproved ? 'Approved' : 'Pending'}
+          {row.original.isApproved ? 'Live' : 'Removed'}
         </Badge>
       ),
     }),

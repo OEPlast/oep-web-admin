@@ -27,9 +27,11 @@ export default function UpdateBanner({
       active: data.active ?? banner.active,
       category: data.category,
       mainText: data.mainText,
+      supportingText: data.supportingText,
       fullImage: data.fullImage,
       headerText: data.headerText,
       CTA: data.CTA,
+      ctaColor: data.ctaColor,
       _id: banner._id,
       createdAt: banner.createdAt.toString(),
     };

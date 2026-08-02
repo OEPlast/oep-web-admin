@@ -140,6 +140,18 @@ export const menuItems = [
     permission: { resource: ['campaigns'], action: 'read' },
   },
   {
+    name: 'Marketing',
+    icon: <PiRocketLaunchDuotone />,
+    href: '#',
+    permission: { resource: ['intents'], action: 'read' },
+    dropdownItems: [
+      {
+        name: 'Intent Shops',
+        href: routes.eCommerce.intents,
+      },
+    ],
+  },
+  {
     name: 'Users',
     href: routes.users.list,
     icon: <PiUserDuotone />,
