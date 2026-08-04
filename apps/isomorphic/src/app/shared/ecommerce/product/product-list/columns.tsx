@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { getCdnUrl } from '@core/utils/cdn-url';
 import ProductStatusBadge from '../ProductStatusBadge';
 import StockStatus from '../StockStatus';
-import { PiStar, PiCopySimple } from 'react-icons/pi';
+import { PiStar, PiCopySimple, PiChartLineUp } from 'react-icons/pi';
 import { formatToNaira } from '@/libs/currencyFormatter';
 
 const columnHelper = createColumnHelper<Product>();
@@ -181,6 +181,24 @@ export const productsListColumns = [
           >
             <PiCopySimple className="h-4 w-4" />
           </ActionIcon>
+        </Tooltip>
+
+        <Tooltip
+          size="sm"
+          content="Product Performance"
+          placement="top"
+          color="invert"
+        >
+          <Link href={routes.productPerformance(row.original._id)}>
+            <ActionIcon
+              as="span"
+              size="sm"
+              variant="outline"
+              aria-label="Product Performance"
+            >
+              <PiChartLineUp className="h-4 w-4" />
+            </ActionIcon>
+          </Link>
         </Tooltip>
 
         <DeletePopover

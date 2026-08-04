@@ -12,18 +12,19 @@
 
 import { useState } from 'react';
 import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
-import { Text } from 'rizzui';
 import {
-  useCouponsOverview,
-  useCouponRedemptionTrend,
-  useCouponTypeDistribution,
-  useTopCoupons,
-} from '@/hooks/queries/analytics';
-import CouponsOverviewCards from './components/coupons-overview-cards';
-import CouponRedemptionTrendChart from './components/coupon-redemption-trend-chart';
-import CouponTypeDistributionChart from './components/coupon-type-distribution-chart';
-import TopCouponsTable from './components/top-coupons-table';
+  PiTicketDuotone,
+  PiTagDuotone,
+  PiCheckCircleDuotone,
+  PiStackDuotone,
+} from 'react-icons/pi';
+import { useSeries, useSummary, useBreakdown } from '@/hooks/queries/analytics';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
+import AnalyticsBreakdownTable from '@/app/shared/analytics/analytics-breakdown-table';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 
 const pageHeader = {
   title: 'Coupons Analytics',
@@ -43,33 +44,36 @@ const pageHeader = {
 };
 
 export default function CouponsAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [groupBy, setGroupBy] = useState<'days' | 'months' | 'years'>('days');
+  const range = useAnalyticsRange();
 
-  // Table pagination state
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  // Rankings take a limit, not a page: page 2 of a top-10 is not a top-10.
+  const [limit] = useState(10);
 
-  // Format dates for API
-  const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
-  };
-
-  // Fetch data
-  const { data: overview, isLoading: loadingOverview } = useCouponsOverview(dateParams);
-  const { data: redemptionTrend, isLoading: loadingTrend } = useCouponRedemptionTrend({
-    ...dateParams,
-    groupBy,
+  const summary = useSummary({
+    metrics: ['coupon_redemptions', 'discount_given', 'active_coupons', 'total_coupons'],
+    ...range.range,
+    compare: 'previous',
   });
-  const { data: typeDistribution, isLoading: loadingDistribution } = useCouponTypeDistribution(dateParams);
-  const { data: topCoupons, isLoading: loadingTopCoupons } = useTopCoupons({
-    ...dateParams,
-    page,
+
+  const trend = useSeries({
+    metrics: ['coupon_redemptions'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
+
+  // Coupon type is a split of what exists now, not of the period — the metric
+  // behind it is a stock metric, so the date range correctly does not apply.
+  const typeBreakdown = useBreakdown({
+    metric: 'total_coupons',
+    dimension: 'coupon_type',
+    ...range.range,
+  });
+
+  const topCoupons = useBreakdown({
+    metric: 'coupon_redemptions',
+    dimension: 'coupon',
+    ...range.range,
     limit,
   });
 
@@ -77,59 +81,55 @@ export default function CouponsAnalyticsClient() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex gap-4 items-center">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Overview Cards */}
-      <div className="mb-6">
-        <CouponsOverviewCards data={overview} isLoading={loadingOverview} />
-      </div>
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          { metric: 'coupon_redemptions', label: 'Redemptions', icon: PiTicketDuotone },
+          {
+            metric: 'discount_given',
+            label: 'Discount Given',
+            icon: PiTagDuotone,
+            format: 'currency',
+            hint: 'Coupon discount only. Flash-sale discount is never written by any code path, so it is excluded rather than silently counted as zero.',
+          },
+          {
+            metric: 'active_coupons',
+            label: 'Active Coupons',
+            icon: PiCheckCircleDuotone,
+            isStock: true,
+          },
+          {
+            metric: 'total_coupons',
+            label: 'Total Coupons',
+            icon: PiStackDuotone,
+            isStock: true,
+          },
+        ]}
+      />
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 gap-6 mb-6 @container lg:grid-cols-2">
-        <CouponRedemptionTrendChart
-          data={redemptionTrend || []}
-          isLoading={loadingTrend}
-          groupBy={groupBy}
-          onGroupByChange={setGroupBy}
+        <AnalyticsSeriesChart
+          title="Coupon Redemptions"
+          query={trend}
+          metrics={[{ key: 'coupon_redemptions', label: 'Redemptions', color: '#ec4899' }]}
         />
-        <CouponTypeDistributionChart
-          data={typeDistribution || []}
-          isLoading={loadingDistribution}
+        <AnalyticsBreakdownChart
+          title="Coupon Types"
+          description="All non-deleted coupons, as of now"
+          query={typeBreakdown}
+          kind="pie"
         />
       </div>
 
-      {/* Top Coupons Table */}
-      <TopCouponsTable
-        data={topCoupons}
-        onPageChange={setPage}
-        onLimitChange={(newLimit: number) => {
-          setLimit(newLimit);
-          setPage(1);
-        }}
-        isLoading={loadingTopCoupons}
+      <AnalyticsBreakdownTable
+        title="Top Coupons"
+        description="By redemptions in the selected period"
+        query={topCoupons}
+        valueLabel="Redemptions"
       />
     </>
   );

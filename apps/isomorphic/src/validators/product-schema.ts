@@ -53,7 +53,7 @@ const baseProductSchema = z.object({
       z.object({
         url: z.string(),
         cover_image: z.boolean(),
-        mediaType: z.enum(['image', 'video']).default('image'),
+        mediaType: z.enum(['image', 'video']).optional(),
         miniUrl: z.string().optional(),
       })
     )

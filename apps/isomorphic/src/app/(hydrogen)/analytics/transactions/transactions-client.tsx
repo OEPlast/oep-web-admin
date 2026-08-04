@@ -13,19 +13,18 @@
 
 import { useState } from 'react';
 import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
-import { Text } from 'rizzui';
 import {
-  useTransactionsOverview,
-  useTransactionsTrend,
-  useTransactionStatusDistribution,
-  usePaymentMethods,
-  useTransactionsTable,
-} from '@/hooks/queries/analytics';
-import TransactionsOverviewCards from './components/transactions-overview-cards';
-import TransactionsTrendChart from './components/transactions-trend-chart';
-import TransactionStatusBarChart from './components/transaction-status-bar-chart';
-import PaymentMethodsPieChart from './components/payment-methods-pie-chart';
+  PiArrowsLeftRightDuotone,
+  PiCurrencyNgnDuotone,
+  PiArrowUUpLeftDuotone,
+} from 'react-icons/pi';
+import { Text } from 'rizzui';
+import { useTransactionsTable, useSeries, useSummary, useBreakdown } from '@/hooks/queries/analytics';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 import TransactionsDataTable from './components/transactions-data-table';
 
 const pageHeader = {
@@ -46,17 +45,19 @@ const pageHeader = {
 };
 
 export default function TransactionsAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [trendGroupBy, setTrendGroupBy] = useState<'days' | 'months' | 'years'>(
-    'days'
-  );
-  const [statusGroupBy, setStatusGroupBy] = useState<
-    'days' | 'months' | 'years'
-  >('months');
+  const range = useAnalyticsRange();
+  const statusSeries = useSeries({
+    metrics: ['transactions_count'],
+    dimension: 'transaction_status',
+    ...range.range,
+    granularity: 'auto',
+  });
+
+  const paymentMethods = useBreakdown({
+    metric: 'transactions_count',
+    dimension: 'payment_method',
+    ...range.range,
+  });
 
   // Table pagination and filter state
   const [page, setPage] = useState(1);
@@ -67,32 +68,24 @@ export default function TransactionsAnalyticsClient() {
   const [methodFilter, setMethodFilter] = useState<string | undefined>(
     undefined
   );
-  // Format dates for API
-  const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
-  };
-
-  // Fetch overview data
-  const { data: overview, isLoading: loadingOverview } =
-    useTransactionsOverview(dateParams);
-
-  // Fetch trend data
-  const { data: trendData, isLoading: loadingTrend } = useTransactionsTrend({
-    ...dateParams,
-    groupBy: trendGroupBy,
+  const summary = useSummary({
+    metrics: ['transactions_count', 'transactions_amount', 'refunds'],
+    ...range.range,
+    compare: 'previous',
   });
 
-  // Fetch transaction status distribution (time-series)
-  const { data: statusData, isLoading: loadingStatus } =
-    useTransactionStatusDistribution({
-      ...dateParams,
-      groupBy: statusGroupBy,
-    });
+  const trend = useSeries({
+    metrics: ['transactions_count'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
 
-  // Fetch payment methods distribution
-  const { data: paymentData, isLoading: loadingPayment } =
-    usePaymentMethods(dateParams);
+  const dateParams = {
+    from: summary.data?.from ?? new Date(Date.now() - 30 * 864e5).toISOString(),
+    to: summary.data?.to ?? new Date().toISOString(),
+  };
+
 
   // Fetch transactions table data
   const { data: transactionsData, isLoading: loadingTransactions } =
@@ -108,60 +101,59 @@ export default function TransactionsAnalyticsClient() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Overview Cards */}
-      <div className="mb-6">
-        <TransactionsOverviewCards
-          data={overview}
-          isLoading={loadingOverview}
-        />
-      </div>
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          {
+            metric: 'transactions_count',
+            label: 'Transactions',
+            icon: PiArrowsLeftRightDuotone,
+            hint: 'Every attempt, including failures — this is throughput, not income.',
+          },
+          {
+            metric: 'transactions_amount',
+            label: 'Value Received',
+            icon: PiCurrencyNgnDuotone,
+            format: 'currency',
+            hint: 'Completed transactions only, measured when the payment actually arrived.',
+          },
+          {
+            metric: 'refunds',
+            label: 'Refunded Orders',
+            icon: PiArrowUUpLeftDuotone,
+            hint: 'Orders carrying a refund marker. Transactions remain authoritative for refund amounts.',
+          },
+        ]}
+      />
 
       {/* Charts Section */}
       <div className="mb-6 grid grid-cols-1 gap-6 @container">
         {/* Transaction Status Distribution - Full Width */}
-        <TransactionStatusBarChart
-          data={statusData || []}
-          isLoading={loadingStatus}
-          groupBy={statusGroupBy}
-          onGroupByChange={setStatusGroupBy}
+        {/* Stacked: statuses partition the transaction count, so stack height
+            is the total rather than an overlay artefact. */}
+        <AnalyticsSeriesChart
+          title="Transactions by Status"
+          query={statusSeries}
+          kind="bar"
+          stacked
         />
 
         {/* Transactions Trend and Payment Methods - Side by Side */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <TransactionsTrendChart
-            data={trendData || []}
-            isLoading={loadingTrend}
-            groupBy={trendGroupBy}
-            onGroupByChange={setTrendGroupBy}
+          <AnalyticsSeriesChart
+            title="Transactions Trend"
+            query={trend}
+            metrics={[
+              { key: 'transactions_count', label: 'Transactions', color: '#6366f1' },
+            ]}
           />
-          <PaymentMethodsPieChart
-            data={paymentData || []}
-            isLoading={loadingPayment}
+          <AnalyticsBreakdownChart
+            title="Payment Methods"
+            query={paymentMethods}
+            kind="pie"
           />
         </div>
       </div>

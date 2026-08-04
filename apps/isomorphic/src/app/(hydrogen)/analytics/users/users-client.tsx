@@ -1,78 +1,67 @@
 /**
- * Users Analytics Client Component
+ * Users Analytics
  *
- * Displays comprehensive user analytics including:
- * - Overview metrics (total users, new users, active/inactive)
- * - Customer acquisition trend chart
- * - User demographics (by country/region)
- * - Top customers by spending
+ * Served by the analytics query engine: figures are measured on their own event
+ * timestamps, bucketed in the store timezone, and gap-filled.
  */
 
 'use client';
 
 import { useState } from 'react';
-import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
-import { Text } from 'rizzui';
 import {
-  useUsersOverview,
-  useCustomerAcquisition,
-  useUserDemographics,
-  useTopCustomers,
-} from '@/hooks/queries/analytics';
-import UsersOverviewCards from './components/users-overview-cards';
-import CustomerAcquisitionChart from './components/customer-acquisition-chart';
-import UserDemographicsChart from './components/user-demographics-chart';
-import TopCustomersTable from './components/top-customers-table';
+  PiUsersDuotone,
+  PiUserPlusDuotone,
+  PiUserCheckDuotone,
+  PiUserMinusDuotone,
+} from 'react-icons/pi';
+import PageHeader from '@/app/shared/page-header';
+import { useSeries, useSummary, useBreakdown } from '@/hooks/queries/analytics';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
+import AnalyticsBreakdownTable from '@/app/shared/analytics/analytics-breakdown-table';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 
 const pageHeader = {
   title: 'Users Analytics',
   breadcrumb: [
-    {
-      href: '/',
-      name: 'Home',
-    },
-    {
-      href: '/analytics',
-      name: 'Analytics',
-    },
-    {
-      name: 'Users',
-    },
+    { href: '/', name: 'Home' },
+    { href: '/analytics', name: 'Analytics' },
+    { name: 'Users' },
   ],
 };
 
 export default function UsersAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [groupBy, setGroupBy] = useState<'days' | 'months' | 'years'>('days');
+  const range = useAnalyticsRange();
 
-  // Table pagination state
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  // Rankings take a limit, not a page: page 2 of a top-10 is not a top-10.
+  const [limit] = useState(10);
 
-  // Format dates for API
-  const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
-  };
+  const summary = useSummary({
+    metrics: ['new_customers', 'active_users', 'total_users'],
+    ...range.range,
+    compare: 'previous',
+  });
 
-  // Fetch data
-  const { data: overview, isLoading: loadingOverview } =
-    useUsersOverview(dateParams);
-  const { data: acquisition, isLoading: loadingAcquisition } =
-    useCustomerAcquisition({
-      ...dateParams,
-      groupBy,
-    });
-  const { data: demographics, isLoading: loadingDemographics } =
-    useUserDemographics(dateParams);
-  const { data: topCustomers, isLoading: loadingCustomers } = useTopCustomers({
-    ...dateParams,
-    page,
+  const acquisition = useSeries({
+    metrics: ['new_customers'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
+
+  const demographics = useBreakdown({
+    metric: 'new_customers',
+    dimension: 'country',
+    ...range.range,
+    limit: 10,
+  });
+
+  const topCustomers = useBreakdown({
+    metric: 'orders_placed',
+    dimension: 'customer',
+    ...range.range,
     limit,
   });
 
@@ -80,60 +69,59 @@ export default function UsersAnalyticsClient() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Overview Cards */}
-      <div className="mb-6">
-        <UsersOverviewCards data={overview} isLoading={loadingOverview} />
-      </div>
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          {
+            metric: 'total_users',
+            label: 'Total Users',
+            icon: PiUsersDuotone,
+            isStock: true,
+          },
+          { metric: 'new_customers', label: 'New Users', icon: PiUserPlusDuotone },
+          {
+            metric: 'active_users',
+            label: 'Active Customers',
+            icon: PiUserCheckDuotone,
+            hint: 'Distinct customers who placed an order in the selected period. A repeat customer is counted once.',
+          },
+          {
+            metric: 'inactive_users',
+            label: 'Inactive Users',
+            icon: PiUserMinusDuotone,
+            // Derived rather than queried: "inactive" is the complement of
+            // active, not a thing the database records.
+            derive: (totals) => {
+              const total = Number(totals.total_users ?? 0);
+              const active = Number(totals.active_users ?? 0);
+              return Math.max(total - active, 0);
+            },
+            hint: 'Total users minus those who ordered in the selected period.',
+          },
+        ]}
+      />
 
-      {/* Charts Section */}
       <div className="mb-6 grid grid-cols-1 gap-6 @container lg:grid-cols-2">
-        <CustomerAcquisitionChart
-          data={acquisition || []}
-          isLoading={loadingAcquisition}
-          groupBy={groupBy}
-          onGroupByChange={setGroupBy}
+        <AnalyticsSeriesChart
+          title="Customer Acquisition"
+          query={acquisition}
+          metrics={[{ key: 'new_customers', label: 'New customers', color: '#3b82f6' }]}
         />
-        <UserDemographicsChart
-          data={demographics || []}
-          isLoading={loadingDemographics}
+        <AnalyticsBreakdownChart
+          title="Customers by Country"
+          query={demographics}
+          kind="pie"
         />
       </div>
 
-      {/* Top Customers Table */}
-      <TopCustomersTable
-        data={topCustomers}
-        limit={limit}
-        onPageChange={setPage}
-        onLimitChange={(newLimit: number) => {
-          setLimit(newLimit);
-          setPage(1);
-        }}
-        isLoading={loadingCustomers}
+      <AnalyticsBreakdownTable
+        title="Top Customers"
+        description="By orders placed in the selected period"
+        query={topCustomers}
+        valueLabel="Orders"
       />
     </>
   );

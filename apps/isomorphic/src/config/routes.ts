@@ -111,6 +111,14 @@ export const routes = {
     jobFeed: '/job-board/feed',
   },
   analytics: '/analytics',
+  /**
+   * One product's analytics. Without an id the page prompts for a SKU, so the
+   * bare route is a valid destination rather than a broken link.
+   */
+  productPerformance: (productId?: string) =>
+    productId
+      ? `/analytics/products/performance?product=${productId}`
+      : '/analytics/products/performance',
   financial: {
     dashboard: '/financial',
   },

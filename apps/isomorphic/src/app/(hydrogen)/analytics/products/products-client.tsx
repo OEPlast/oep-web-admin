@@ -13,21 +13,20 @@
 
 import { useState } from 'react';
 import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
-import { Text } from 'rizzui';
 import {
-  useProductsOverview,
-  useTopProductsRevenue,
-  useCategoriesPerformance,
-  useProductPerformance,
-  useMostWishlistedProducts,
-  useMostReviewedProducts,
-} from '@/hooks/queries/analytics';
-import ProductsOverviewCards from './components/products-overview-cards';
-import TopProductsRevenueChart from './components/top-products-revenue-chart';
-import CategoriesPerformanceChart from './components/categories-performance-chart';
+  PiPackageDuotone,
+  PiPlusCircleDuotone,
+  PiWarningDuotone,
+  PiProhibitDuotone,
+} from 'react-icons/pi';
+import { useProductPerformance, useSummary, useBreakdown } from '@/hooks/queries/analytics';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
+import { useMoneyFormat } from '@/app/shared/analytics/analytics-format';
+import AnalyticsBreakdownTable from '@/app/shared/analytics/analytics-breakdown-table';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 import ProductPerformanceTable from './components/product-performance-table';
-import WishlistedReviewedProducts from './components/wishlisted-reviewed-products';
 
 const pageHeader = {
   title: 'Products Analytics',
@@ -47,102 +46,120 @@ const pageHeader = {
 };
 
 export default function ProductsAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const range = useAnalyticsRange();
+  const money = useMoneyFormat();
 
   // Table pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState('');
 
-  // Format dates for API
+  const summary = useSummary({
+    metrics: ['products_added', 'total_products', 'low_stock_products', 'out_of_stock_products'],
+    ...range.range,
+    compare: 'previous',
+  });
+
   const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
+    from: summary.data?.from ?? new Date(Date.now() - 30 * 864e5).toISOString(),
+    to: summary.data?.to ?? new Date().toISOString(),
   };
 
-  // Fetch data
-  const { data: overview, isLoading: loadingOverview } =
-    useProductsOverview(dateParams);
-  const { data: topProducts, isLoading: loadingTopProducts } =
-    useTopProductsRevenue({
-      ...dateParams,
-      limit: 10,
-    });
-  const { data: categories, isLoading: loadingCategories } =
-    useCategoriesPerformance(dateParams);
+  const topProducts = useBreakdown({
+    metric: 'revenue',
+    dimension: 'product',
+    ...range.range,
+    limit: 10,
+  });
+
+  const categories = useBreakdown({
+    metric: 'revenue',
+    dimension: 'category',
+    ...range.range,
+    limit: 10,
+  });
+
+  const wishlisted = useBreakdown({
+    metric: 'wishlist_adds',
+    dimension: 'wishlist_product',
+    ...range.range,
+    limit: 10,
+  });
+
+  const reviewed = useBreakdown({
+    metric: 'reviews_written',
+    dimension: 'review_product',
+    ...range.range,
+    limit: 10,
+  });
   const { data: performance, isLoading: loadingPerformance } =
     useProductPerformance({
+      // Spread the range: without it this table silently reported all-time
+      // figures beside date-filtered widgets.
+      ...dateParams,
       page,
       limit,
       search,
-    });
-  const { data: wishlisted, isLoading: loadingWishlisted } =
-    useMostWishlistedProducts({
-      ...dateParams,
-      limit: 10,
-    });
-  const { data: reviewed, isLoading: loadingReviewed } =
-    useMostReviewedProducts({
-      ...dateParams,
-      limit: 10,
     });
 
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Overview Cards */}
-      <div className="mb-6">
-        <ProductsOverviewCards data={overview} isLoading={loadingOverview} />
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          {
+            metric: 'total_products',
+            label: 'Total Products',
+            icon: PiPackageDuotone,
+            isStock: true,
+          },
+          { metric: 'products_added', label: 'Added in Period', icon: PiPlusCircleDuotone },
+          {
+            metric: 'low_stock_products',
+            label: 'Low Stock',
+            icon: PiWarningDuotone,
+            isStock: true,
+            hint: "In stock but at or below the product's own reorder threshold, as of now.",
+          },
+          {
+            metric: 'out_of_stock_products',
+            label: 'Out of Stock',
+            icon: PiProhibitDuotone,
+            isStock: true,
+          },
+        ]}
+      />
       {/* Charts Section */}
       <div className="mb-6 grid grid-cols-1 gap-6 @container">
-        <TopProductsRevenueChart
-          data={topProducts || []}
-          isLoading={loadingTopProducts}
+        <AnalyticsBreakdownTable
+          title="Top Products by Revenue"
+          query={topProducts}
+          valueLabel="Revenue"
+          valueFormatter={money.valueFormatter}
         />
-        <CategoriesPerformanceChart
-          data={categories || []}
-          isLoading={loadingCategories}
+        <AnalyticsBreakdownChart
+          title="Revenue by Category"
+          query={categories}
+          kind="bar"
+          {...money}
         />
       </div>
 
-      {/* Wishlisted & Reviewed Products */}
-      <div className="mb-6">
-        <WishlistedReviewedProducts
-          wishlistedData={wishlisted || []}
-          reviewedData={reviewed || []}
-          loadingWishlisted={loadingWishlisted}
-          loadingReviewed={loadingReviewed}
+      <div className="mb-6 grid grid-cols-1 gap-6 @container lg:grid-cols-2">
+        <AnalyticsBreakdownTable
+          title="Most Wishlisted"
+          query={wishlisted}
+          valueLabel="Adds"
+        />
+        <AnalyticsBreakdownTable
+          title="Most Reviewed"
+          query={reviewed}
+          valueLabel="Reviews"
         />
       </div>
 

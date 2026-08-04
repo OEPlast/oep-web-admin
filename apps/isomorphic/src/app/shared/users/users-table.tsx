@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getUsersColumns } from './users-columns';
 import { useUsers } from '@/hooks/queries/useUsers';
 import {
@@ -67,25 +67,26 @@ export default function UsersTable() {
       setData(user);
     }
   }, [user, setData]);
+  // Read the reactive value during render so the dep array stays statically checkable
+  const pageIndex = table.getState().pagination.pageIndex;
+
   // Handle pagination changes via table state
   useEffect(() => {
-    const state = table.getState();
-    const newPage = state.pagination.pageIndex + 1;
-    if (usersFullData?.meta && newPage !== usersFullData?.meta.page) {
+    const newPage = pageIndex + 1;
+    if (usersFullData?.meta && newPage !== usersFullData.meta.page) {
       setFilters((prev) => ({
         ...prev,
         page: newPage,
       }));
     }
-  }, [table.getState().pagination.pageIndex, usersFullData?.meta]);
+  }, [pageIndex, usersFullData?.meta]);
 
-
-  const handleFilterChange = (newFilters: Partial<UserFiltersType>) => {
+  const handleFilterChange = useCallback((newFilters: Partial<UserFiltersType>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
     }));
-  };
+  }, []);
 
   return (
     <div>

@@ -27,6 +27,11 @@ export interface Product {
   description_images: {
     url: string;
     cover_image: boolean;
+    // Optional because products created before video support was added predate
+    // the schema default, and list/detail reads go through aggregation
+    // pipelines, which bypass Mongoose defaults. Always narrow with ?? 'image'.
+    mediaType?: 'image' | 'video';
+    miniUrl?: string; // video thumbnail path
   }[];
   specifications?: {
     key: string;

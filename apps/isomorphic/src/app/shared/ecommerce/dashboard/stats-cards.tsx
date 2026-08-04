@@ -8,11 +8,7 @@ import { getChartColorByEngagementRate } from '@core/components/table-utils/get-
 import cn from '@core/utils/class-names';
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
 import { Text, Loader } from 'rizzui';
-import { 
-  useSalesOverview, 
-  useOrdersOverview, 
-  useUsersOverview 
-} from '@/hooks/queries/analytics/useAnalyticsOverview';
+import { useSummary } from '@/hooks/queries/analytics/useAnalyticsQuery';
 import { formatCurrency } from '@/utils/format-currency';
 
 interface StatsCardsProps {
@@ -20,22 +16,27 @@ interface StatsCardsProps {
 }
 
 export default function StatsCards({ className }: StatsCardsProps) {
-  // Default to last 30 days
-  const currentDate = new Date();
-  const thirtyDaysAgo = new Date(currentDate);
-  thirtyDaysAgo.setDate(currentDate.getDate() - 30);
+  /**
+   * One request for all four cards.
+   *
+   * Previously three separate overview calls, each computing its own comparison
+   * period by subtracting elapsed milliseconds — which straddles month
+   * boundaries — and each sending a browser-local date. The engine resolves the
+   * preset in the store timezone and shifts the comparison by whole calendar
+   * units.
+   */
+  const { data, isLoading } = useSummary({
+    metrics: ['orders_placed', 'revenue', 'cancellations', 'active_users'],
+    preset: 'last_30_days',
+    compare: 'previous',
+  });
 
-  const dateParams = useMemo(() => ({
-    from: thirtyDaysAgo.toISOString().split('T')[0],
-    to: currentDate.toISOString().split('T')[0],
-  }), []);
+  const totals = data?.totals ?? {};
+  const changes = data?.comparison?.changePct ?? {};
 
-  // Fetch overview data
-  const { data: salesData, isLoading: salesLoading } = useSalesOverview(dateParams);
-  const { data: ordersData, isLoading: ordersLoading } = useOrdersOverview(dateParams);
-  const { data: usersData, isLoading: usersLoading } = useUsersOverview(dateParams);
-
-  const isLoading = salesLoading || ordersLoading || usersLoading;
+  const num = (key: string) => Number(totals[key] ?? 0);
+  /** A null baseline means "no prior data", which is not the same as 0% growth. */
+  const pct = (key: string) => changes[key] ?? null;
 
   if (isLoading) {
     return (
@@ -49,66 +50,42 @@ export default function StatsCards({ className }: StatsCardsProps) {
     );
   }
 
-  // Calculate returns from orders (cancelled + failed)
-  const returnsCount = (ordersData?.cancelled || 0) + (ordersData?.failed || 0);
+  const card = (
+    id: number,
+    title: string,
+    metricKey: string,
+    metric: string,
+    fill: string,
+    engagementRate: number
+  ) => {
+    const change = pct(metricKey);
 
-  // Calculate returns percentage change (based on cancelled + failed changes)
-  const previousCancelled = Math.max(0, (ordersData?.cancelled || 0) - Math.round((ordersData?.cancelled || 0) * (ordersData?.comparisonPeriod?.percentageChange || 0) / 100));
-  const previousFailed = Math.max(0, (ordersData?.failed || 0) - Math.round((ordersData?.failed || 0) * (ordersData?.comparisonPeriod?.percentageChange || 0) / 100));
-  const previousReturns = previousCancelled + previousFailed;
-  const returnsPercentageChange = previousReturns > 0
-    ? ((returnsCount - previousReturns) / previousReturns) * 100
-    : returnsCount > 0 ? 100 : 0;
+    return {
+      id,
+      title,
+      metric,
+      fill,
+      percentage: change === null ? 0 : Math.abs(change),
+      increased: change !== null && change > 0,
+      decreased: change !== null && change < 0,
+      value: change === null ? '—' : `${change > 0 ? '+' : ''}${change.toFixed(2)}`,
+      engagementRate,
+      chart: [] as Array<{ count: number }>,
+    };
+  };
 
   const statsData = [
-    {
-      id: 1,
-      title: 'Orders',
-      metric: (ordersData?.totalOrders || 0).toLocaleString(),
-      fill: '#3872FA',
-      percentage: Math.abs(ordersData?.comparisonPeriod?.percentageChange || 0),
-      increased: (ordersData?.comparisonPeriod?.percentageChange || 0) > 0,
-      decreased: (ordersData?.comparisonPeriod?.percentageChange || 0) < 0,
-      value: `${(ordersData?.comparisonPeriod?.percentageChange || 0) > 0 ? '+' : ''}${ordersData?.comparisonPeriod?.percentageChange?.toFixed(2) || '0.00'}`,
-      engagementRate: 70.03,
-      chart: [],
-    },
-    {
-      id: 2,
-      title: 'Sales',
-      metric: formatCurrency(salesData?.totalRevenue || 0),
-      fill: '#10B981',
-      percentage: Math.abs(salesData?.comparisonPeriod?.percentageChange || 0),
-      increased: (salesData?.comparisonPeriod?.percentageChange || 0) > 0,
-      decreased: (salesData?.comparisonPeriod?.percentageChange || 0) < 0,
-      value: `${(salesData?.comparisonPeriod?.percentageChange || 0) > 0 ? '+' : ''}${salesData?.comparisonPeriod?.percentageChange?.toFixed(2) || '0.00'}`,
-      engagementRate: 85.5,
-      chart: [],
-    },
-    {
-      id: 3,
-      title: 'Returns',
-      metric: returnsCount.toLocaleString(),
-      fill: '#F59E0B',
-      percentage: Math.abs(returnsPercentageChange),
-      increased: returnsPercentageChange > 0,
-      decreased: returnsPercentageChange < 0,
-      value: `${returnsPercentageChange > 0 ? '+' : ''}${returnsPercentageChange.toFixed(2)}`,
-      engagementRate: 45.2,
-      chart: [],
-    },
-    {
-      id: 4,
-      title: 'Customers',
-      metric: (usersData?.totalUsers || 0).toLocaleString(),
-      fill: '#8B5CF6',
-      percentage: Math.abs(usersData?.comparisonPeriod?.percentageChange || 0),
-      increased: (usersData?.comparisonPeriod?.percentageChange || 0) > 0,
-      decreased: (usersData?.comparisonPeriod?.percentageChange || 0) < 0,
-      value: `${(usersData?.comparisonPeriod?.percentageChange || 0) > 0 ? '+' : ''}${usersData?.comparisonPeriod?.percentageChange?.toFixed(2) || '0.00'}`,
-      engagementRate: 65.8,
-      chart: [],
-    },
+    card(1, 'Orders', 'orders_placed', num('orders_placed').toLocaleString(), '#3872FA', 70.03),
+    // Revenue means paid, measured on paidAt — this figure is lower than the
+    // one this card used to show, and correct where that one was not.
+    card(2, 'Sales', 'revenue', formatCurrency(num('revenue')), '#10B981', 85.5),
+    // Was labelled "Returns" while actually summing cancelled + failed orders,
+    // against a percentage derived from itself. It is a cancellation count, so
+    // it now says so.
+    card(3, 'Cancelled', 'cancellations', num('cancellations').toLocaleString(), '#F59E0B', 45.2),
+    // Distinct customers who ordered in the window, not the size of the user
+    // table — the previous card showed a total that never moved with the period.
+    card(4, 'Active Customers', 'active_users', num('active_users').toLocaleString(), '#8B5CF6', 65.8),
   ];
 
   return (

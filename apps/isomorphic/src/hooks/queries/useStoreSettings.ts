@@ -23,6 +23,8 @@ export interface StoreSettings {
   taxId: string;
   taxRate: number;
   currency: string;
+  /** IANA zone the analytics engine cuts bucket boundaries in. */
+  timezone: string;
   socialLinks?: {
     instagram?: string;
     facebook?: string;

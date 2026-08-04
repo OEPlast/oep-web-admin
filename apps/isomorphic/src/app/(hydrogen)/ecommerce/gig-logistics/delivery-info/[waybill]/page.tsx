@@ -4,6 +4,11 @@ export const metadata = {
   title: 'GIG Delivery Info',
 };
 
-export default function GIGDeliveryInfoPage({ params }: { params: { waybill: string } }) {
-  return <DeliveryInfoClient waybill={params.waybill} />;
+export default async function GIGDeliveryInfoPage({
+  params,
+}: {
+  params: Promise<{ waybill: string }>;
+}) {
+  const { waybill } = await params;
+  return <DeliveryInfoClient waybill={waybill} />;
 }

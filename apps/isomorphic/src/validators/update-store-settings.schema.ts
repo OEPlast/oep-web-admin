@@ -4,8 +4,16 @@ export const updateStoreSettingsSchema = z.object({
   storeName: z.string().optional(),
   companyName: z.string().optional(),
   logoUrl: z.string().optional(),
-  websiteUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  supportEmail: z.string().email('Must be a valid email').optional().or(z.literal('')),
+  websiteUrl: z
+    .string()
+    .url('Must be a valid URL')
+    .optional()
+    .or(z.literal('')),
+  supportEmail: z
+    .string()
+    .email('Must be a valid email')
+    .optional()
+    .or(z.literal('')),
   supportPhone: z.string().optional(),
   address: z
     .object({
@@ -30,15 +38,32 @@ export const updateStoreSettingsSchema = z.object({
     .length(3, 'Currency must be a 3-letter code (e.g., USD)')
     .optional()
     .or(z.literal('')),
+  /* Reporting timezone. Every analytics bucket boundary is cut in this zone, so
+  changing it changes every daily, weekly and monthly figure on the dashboards. */
+  timezone: z.string().min(1, 'Select a timezone').optional(),
   socialLinks: z
     .object({
-      instagram: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-      facebook: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+      instagram: z
+        .string()
+        .url('Must be a valid URL')
+        .optional()
+        .or(z.literal('')),
+      facebook: z
+        .string()
+        .url('Must be a valid URL')
+        .optional()
+        .or(z.literal('')),
       whatsapp: z.string().optional(),
       x: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-      threads: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+      threads: z
+        .string()
+        .url('Must be a valid URL')
+        .optional()
+        .or(z.literal('')),
     })
     .optional(),
 });
 
-export type UpdateStoreSettingsInput = z.infer<typeof updateStoreSettingsSchema>;
+export type UpdateStoreSettingsInput = z.infer<
+  typeof updateStoreSettingsSchema
+>;

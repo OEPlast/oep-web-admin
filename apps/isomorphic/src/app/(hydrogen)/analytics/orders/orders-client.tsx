@@ -12,17 +12,14 @@
 
 import { useState } from 'react';
 import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
+import { PiShoppingCartDuotone, PiCheckCircleDuotone, PiXCircleDuotone, PiClockDuotone, PiTruckDuotone } from 'react-icons/pi';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 import { Text } from 'rizzui';
-import {
-  useOrdersOverview,
-  useOrdersTrend,
-  useOrderStatusDistribution,
-  useOrdersTable,
-} from '@/hooks/queries/analytics';
-import OrdersOverviewCards from './components/orders-overview-cards';
-import OrdersTrendChart from './components/orders-trend-chart';
-import OrderStatusPieChart from './components/order-status-pie-chart';
+import { useSeries, useSummary, useBreakdown, useOrdersTable } from '@/hooks/queries/analytics';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
 import OrdersDataTable from './components/orders-data-table';
 
 const pageHeader = {
@@ -43,37 +40,50 @@ const pageHeader = {
 };
 
 export default function OrdersAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [groupBy, setGroupBy] = useState<'days' | 'months' | 'years'>('days');
+  const range = useAnalyticsRange();
 
   // Table pagination and filter state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [statusFilter, setStatusFilter] = useState<string | undefined>('');
 
-  // Format dates for API
+  const summary = useSummary({
+    metrics: [
+      'orders_placed',
+      'completions',
+      'cancellations',
+      'pending_orders',
+      // Explicitly "not delivered" rather than leaving it to be inferred from a
+      // missing timestamp. Deliveries + awaiting + cancelled accounts for every
+      // order placed.
+      'awaiting_delivery',
+    ],
+    ...range.range,
+    compare: 'previous',
+  });
+
+  const trend = useSeries({
+    metrics: ['orders_placed', 'completions'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
+
   const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
+    from: summary.data?.from ?? new Date(Date.now() - 30 * 864e5).toISOString(),
+    to: summary.data?.to ?? new Date().toISOString(),
   };
 
   // Fetch overview data
-  const { data: overview, isLoading: loadingOverview } =
-    useOrdersOverview(dateParams);
 
   // Fetch trend data
-  const { data: trendData, isLoading: loadingTrend } = useOrdersTrend({
-    ...dateParams,
-    groupBy,
-  });
 
   // Fetch status distribution
-  const { data: statusData, isLoading: loadingStatus } =
-    useOrderStatusDistribution(dateParams);
+  const statusBreakdown = useBreakdown({
+    metric: 'orders_placed',
+    dimension: 'order_status',
+    ...range.range,
+  });
 
   // Fetch orders table data
   const { data: ordersData, isLoading: loadingOrders } = useOrdersTable({
@@ -87,47 +97,40 @@ export default function OrdersAnalyticsClient() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Overview Cards */}
-      <div className="mb-6">
-        <OrdersOverviewCards data={overview} isLoading={loadingOverview} />
-      </div>
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          { metric: 'orders_placed', label: 'Total Orders', icon: PiShoppingCartDuotone },
+          { metric: 'completions', label: 'Completed', icon: PiCheckCircleDuotone },
+          { metric: 'cancellations', label: 'Cancelled', icon: PiXCircleDuotone },
+          { metric: 'pending_orders', label: 'Pending', icon: PiClockDuotone },
+          {
+            metric: 'awaiting_delivery',
+            label: 'Awaiting Delivery',
+            icon: PiTruckDuotone,
+            isStock: true,
+            hint: 'Live orders with no delivery recorded, as of now. Cancelled orders are excluded — they are undelivered, but nothing is waiting on them.',
+          },
+        ]}
+      />
 
       {/* Charts Section */}
       <div className="mb-6 grid grid-cols-1 gap-6 @container lg:grid-cols-2">
-        <OrdersTrendChart
-          data={trendData || []}
-          isLoading={loadingTrend}
-          groupBy={groupBy}
-          onGroupByChange={setGroupBy}
+        <AnalyticsSeriesChart
+          title="Orders Trend"
+          query={trend}
+          metrics={[
+            { key: 'orders_placed', label: 'Placed', color: '#3b82f6' },
+            { key: 'completions', label: 'Completed', color: '#10b981' },
+          ]}
         />
-        <OrderStatusPieChart
-          data={statusData || []}
-          isLoading={loadingStatus}
+        <AnalyticsBreakdownChart
+          title="Order Status"
+          query={statusBreakdown}
+          kind="pie"
         />
       </div>
 

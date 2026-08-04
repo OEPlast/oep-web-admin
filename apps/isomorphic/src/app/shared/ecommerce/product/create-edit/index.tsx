@@ -24,6 +24,7 @@ import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import { Product } from '@/hooks/queries/useProducts';
 import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fields';
+import ProductPerformance from '@/app/shared/ecommerce/product/create-edit/product-performance';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -35,6 +36,7 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.seo]: ProductSeo,
   [formParts.customFields]: CustomFields,
+  [formParts.performance]: ProductPerformance,
 };
 
 interface IndexProps {
@@ -84,7 +86,14 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     price: product.price,
     category: product.category?._id || (product.category as any),
     tags: product.tags || [],
-    description_images: product.description_images || [],
+    // Legacy products can be missing mediaType (see Product type), so default it
+    // here rather than letting an undefined leak into the form state.
+    description_images: (product.description_images || []).map((img) => ({
+      url: img.url,
+      cover_image: img.cover_image,
+      mediaType: img.mediaType ?? 'image',
+      ...(img.miniUrl ? { miniUrl: img.miniUrl } : {}),
+    })),
     specifications: product.specifications || [],
     dimension: product.dimension || [],
     shipping: product.shipping || {
@@ -156,6 +165,19 @@ export default function CreateEditProduct({
                       className="pt-7 @2xl:pt-9 @3xl:pt-11"
                       mode={mode}
                       existingSlug={product?.slug}
+                    />
+                  </Element>
+                );
+              }
+
+              // Performance links out to the product's analytics, so it needs
+              // the id. On create there is none, and the section says so.
+              if (componentKey === formParts.performance) {
+                return (
+                  <Element key={key} name={componentKey}>
+                    <Component
+                      className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                      productId={product?._id}
                     />
                   </Element>
                 );

@@ -1,12 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm, FormProvider, SubmitHandler, Controller } from 'react-hook-form';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  useForm,
+  FormProvider,
+  SubmitHandler,
+  Controller,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Element } from 'react-scroll';
-import { Input, Loader } from 'rizzui';
+import { Input, Loader, Select } from 'rizzui';
 import { Button } from 'rizzui';
-import { PiXBold, PiInstagramLogoBold, PiFacebookLogoBold, PiWhatsappLogoBold, PiThreadsLogoBold } from 'react-icons/pi';
+import {
+  PiXBold,
+  PiInstagramLogoBold,
+  PiFacebookLogoBold,
+  PiWhatsappLogoBold,
+  PiThreadsLogoBold,
+} from 'react-icons/pi';
 import { RiTwitterXLine } from 'react-icons/ri';
 import Image from 'next/image';
 import axios from 'axios';
@@ -29,10 +40,19 @@ import FormFooter from '@core/components/form-footer';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import SettingsFormNav, { settingsFormParts } from './settings-form-nav';
 import CheckoutDeliverySettingsCard from './checkout-delivery-settings-card';
+import {
+  DEFAULT_TIMEZONE,
+  getTimezoneOptions,
+  type TimezoneOption,
+} from './timezone-options';
 
 export default function SettingsForm() {
   const { data: settings, isLoading } = useStoreSettings();
-  const [apiErrors, setApiErrors] = useState<BackendValidationError[] | null>(null);
+  const [apiErrors, setApiErrors] = useState<BackendValidationError[] | null>(
+    null
+  );
+  // ~400 entries, each formatted through Intl — built once, not on every render.
+  const timezoneOptions = useMemo(() => getTimezoneOptions(), []);
 
   const methods = useForm<UpdateStoreSettingsInput>({
     resolver: zodResolver(updateStoreSettingsSchema),
@@ -43,15 +63,37 @@ export default function SettingsForm() {
       websiteUrl: '',
       supportEmail: '',
       supportPhone: '',
-      address: { line1: '', line2: '', city: '', state: '', zip: '', country: '' },
+      address: {
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: '',
+      },
       taxId: '',
       taxRate: 0,
       currency: 'USD',
-      socialLinks: { instagram: '', facebook: '', whatsapp: '', x: '', threads: '' },
+      timezone: DEFAULT_TIMEZONE,
+      socialLinks: {
+        instagram: '',
+        facebook: '',
+        whatsapp: '',
+        x: '',
+        threads: '',
+      },
     },
   });
 
-  const { register, control, watch, setValue, setError, reset, formState: { errors } } = methods;
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    setError,
+    reset,
+    formState: { errors },
+  } = methods;
 
   useEffect(() => {
     if (settings) {
@@ -73,6 +115,7 @@ export default function SettingsForm() {
         taxId: settings.taxId || '',
         taxRate: settings.taxRate || 0,
         currency: settings.currency || 'USD',
+        timezone: settings.timezone || DEFAULT_TIMEZONE,
         socialLinks: {
           instagram: settings.socialLinks?.instagram || '',
           facebook: settings.socialLinks?.facebook || '',
@@ -133,7 +176,6 @@ export default function SettingsForm() {
           className="relative z-[19] [&_label.block>span]:font-medium"
         >
           <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-
             <Element name={settingsFormParts.logo}>
               <VerticalFormBlockWrapper
                 title="Store Logo"
@@ -209,6 +251,28 @@ export default function SettingsForm() {
                     placeholder="USD"
                     {...register('currency')}
                     error={errors.currency?.message}
+                  />
+                  <Controller
+                    name="timezone"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="Reporting Timezone"
+                        options={timezoneOptions}
+                        value={
+                          timezoneOptions.find(
+                            (option) => option.value === field.value
+                          ) || null
+                        }
+                        onChange={(value: string) => field.onChange(value)}
+                        searchable
+                        placeholder="Select timezone..."
+                        helperText="Analytics days, weeks and months are cut in this timezone."
+                        error={errors.timezone?.message}
+                        getOptionValue={(option) => option.value}
+                        getOptionDisplayValue={(option) => option.label}
+                      />
+                    )}
                   />
                 </div>
 
@@ -355,7 +419,6 @@ export default function SettingsForm() {
                 <CheckoutDeliverySettingsCard />
               </div>
             </Element>
-
           </div>
 
           <FormFooter

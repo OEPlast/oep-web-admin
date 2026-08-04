@@ -63,7 +63,6 @@ export default function ProductPerformanceTable({
     return () => clearTimeout(debounceTimer);
   }, [searchInput, onSearchChange]);
 
-
   const products: ProductPerformanceRow[] = data?.data || [];
   const total = data?.pagination?.totalRecords || 0;
   const currentPage = data?.pagination?.currentPage || 1;
@@ -123,65 +122,68 @@ export default function ProductPerformanceTable({
             </tr>
           </thead>
 
- {isLoading ?
-(
-      <tr className="mt-6 w-full">
-        <td className="flex h-64 w-full items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary"></div>
-        </td>
-      </tr>
-    ) :(<tbody>
-            {products.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center">
-                  <Text className="text-gray-500">No products found</Text>
-                </td>
-              </tr>
-            ) : (
-              products.map((product, index) => (
-                <tr
-                  key={product.productId}
-                  className={cn(
-                    'border-b border-gray-100 transition-colors hover:bg-gray-50',
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                  )}
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={routes.eCommerce.productDetails(product.productId)}
-                    >
-                      <Text className="font-medium text-gray-900">
-                        {product.productName}
-                      </Text>
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Text className="font-semibold text-gray-900">
-                      {formatToNaira(product.revenue || 0)}
-                    </Text>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Text className="font-medium text-gray-700">
-                      {formatNumber(product.unitsSold || 0)}
-                    </Text>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col items-center gap-1">
-                      <RatingStars rating={product.averageRating || 0} />
-                      <Text className="text-xs text-gray-500">
-                        {(product.averageRating || 0).toFixed(1)}
-                      </Text>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Text className="font-medium text-gray-700">
-                      {formatNumber(product.reviewCount || 0)}
-                    </Text>
+          {isLoading ? (
+            <tr className="mt-6 w-full">
+              <td className="flex h-64 w-full items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary"></div>
+              </td>
+            </tr>
+          ) : (
+            <tbody>
+              {products.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center">
+                    <Text className="text-gray-500">No products found</Text>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>)}
+              ) : (
+                products.map((product, index) => (
+                  <tr
+                    key={product.productId}
+                    className={cn(
+                      'border-b border-gray-100 transition-colors hover:bg-gray-50',
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                    )}
+                  >
+                    <td className="px-4 py-3">
+                      <Link
+                        href={routes.eCommerce.productDetails(
+                          product.productId
+                        )}
+                      >
+                        <Text className="font-medium text-gray-900 hover:underline">
+                          {product.productName}
+                        </Text>
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Text className="font-semibold text-gray-900">
+                        {formatToNaira(product.revenue || 0)}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Text className="font-medium text-gray-700">
+                        {formatNumber(product.unitsSold || 0)}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col items-center gap-1">
+                        <RatingStars rating={product.averageRating || 0} />
+                        <Text className="text-xs text-gray-500">
+                          {(product.averageRating || 0).toFixed(1)}
+                        </Text>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Text className="font-medium text-gray-700">
+                        {formatNumber(product.reviewCount || 0)}
+                      </Text>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          )}
         </table>
       </div>
 

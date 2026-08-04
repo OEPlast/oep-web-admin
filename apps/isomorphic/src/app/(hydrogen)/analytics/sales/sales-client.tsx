@@ -2,54 +2,52 @@
 
 import { useState } from 'react';
 import cn from '@core/utils/class-names';
-import { DatePicker } from '@core/ui/datepicker';
 import { Title } from 'rizzui';
-import {
-  useSalesOverview,
-  useRevenueExpenseChart,
-  useSalesByCategory,
-  useTopProductsRevenue,
-} from '@/hooks/queries/analytics';
-import SalesOverviewCards from './components/sales-overview-cards';
-import RevenueExpenseChart from './components/revenue-expense-chart';
-import SalesByCategoryTable from './components/sales-by-category-table';
-import TopProductsChart from './components/top-products-chart';
+import { PiCurrencyNgnDuotone, PiReceiptDuotone, PiChartLineUpDuotone, PiTagDuotone } from 'react-icons/pi';
+import { useSeries, useSummary, useBreakdown } from '@/hooks/queries/analytics';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
+import AnalyticsBreakdownTable from '@/app/shared/analytics/analytics-breakdown-table';
+import { useMoneyFormat } from '@/app/shared/analytics/analytics-format';
 
 export default function SalesAnalytics({ className }: { className?: string }) {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(() => {
-    const date = new Date();
-    date.setDate(date.getDate() - 30);
-    return date;
-  });
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [categoryPage, setCategoryPage] = useState(1);
+  const range = useAnalyticsRange();
+  const money = useMoneyFormat();
 
-  // Convert dates to ISO strings for API
+  /**
+   * Revenue now means PAID, measured on `paidAt`.
+   *
+   * The previous figure summed every order not cancelled or failed, dated to
+   * when it was placed — so unpaid pending orders counted as income. Correcting
+   * it lowers all-time revenue by about 20%; the number here is right, the old
+   * one was not.
+   */
+  const summary = useSummary({
+    metrics: ['revenue', 'orders_paid', 'aov', 'discount_given'],
+    ...range.range,
+    compare: 'previous',
+  });
+
+  const revenueSeries = useSeries({
+    metrics: ['revenue'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
+
   const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
+    from: summary.data?.from ?? new Date(Date.now() - 30 * 864e5).toISOString(),
+    to: summary.data?.to ?? new Date().toISOString(),
   };
 
-  // Fetch data using React Query hooks
-  const { data: overview, isLoading: overviewLoading } =
-    useSalesOverview(dateParams);
-  const { data: revenueExpenseData, isLoading: chartLoading } =
-    useRevenueExpenseChart({
-      ...dateParams,
-      groupBy: 'days',
-    });
-  const { data: salesByCategory, isLoading: categoryLoading } =
-    useSalesByCategory({
-      ...dateParams,
-      page: categoryPage,
-      limit: 10,
-    });
-  const { data: topProducts, isLoading: productsLoading } =
-    useTopProductsRevenue({
-      ...dateParams,
-      limit: 10,
-    });
+  const salesByCategory = useBreakdown({
+    metric: 'revenue',
+    dimension: 'category',
+    ...range.range,
+    limit: 10,
+  });
 
   return (
     <div
@@ -69,46 +67,36 @@ export default function SalesAnalytics({ className }: { className?: string }) {
           </p>
         </div>
 
-        <div className="flex gap-3">
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Start Date"
-            inputProps={{
-              placeholder: 'Start Date',
-            }}
-            maxDate={endDate}
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="End Date"
-            inputProps={{
-              placeholder: 'End Date',
-            }}
-            minDate={startDate}
-            maxDate={new Date()}
-          />
-        </div>
       </div>
 
-      {/* Sales Overview Cards */}
-      <SalesOverviewCards data={overview} isLoading={overviewLoading} />
+      <AnalyticsRangePicker range={range} />
 
-      {/* Revenue vs Expense Chart */}
-      <RevenueExpenseChart
-        data={revenueExpenseData || []}
-        isLoading={chartLoading}
+      <AnalyticsSummaryCards
+        query={summary}
+        cards={[
+          { metric: 'revenue', label: 'Revenue (paid)', icon: PiCurrencyNgnDuotone, format: 'currency',
+            hint: 'Paid orders only, measured when payment arrived. Previously this counted unpaid pending orders and dated income to when the order was placed.' },
+          { metric: 'orders_paid', label: 'Paid Orders', icon: PiReceiptDuotone },
+          { metric: 'aov', label: 'Average Order Value', icon: PiChartLineUpDuotone, format: 'currency' },
+          { metric: 'discount_given', label: 'Coupon Discount', icon: PiTagDuotone, format: 'currency',
+            hint: 'Coupon discount only. Flash-sale discount is not captured by any code path, so it is excluded rather than silently counted as zero.' },
+        ]}
       />
 
-      {/* Two-Column Grid: Sales by Category Table + Top Products Chart */}
-      <div className="grid grid-cols-1 gap-5">
-        <SalesByCategoryTable
-          data={salesByCategory}
-          isLoading={categoryLoading}
-          onPageChange={setCategoryPage}
-        />
-      </div>
+      <AnalyticsSeriesChart
+        title="Revenue"
+        query={revenueSeries}
+        metrics={[{ key: 'revenue', label: 'Revenue', color: '#10b981' }]}
+        height={360}
+        {...money}
+      />
+
+      <AnalyticsBreakdownTable
+        title="Revenue by Category"
+        query={salesByCategory}
+        valueLabel="Revenue"
+        valueFormatter={money.valueFormatter}
+      />
     </div>
   );
 }

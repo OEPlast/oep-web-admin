@@ -11,6 +11,7 @@ export const formParts = {
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
   customFields: 'customFields',
+  performance: 'performance',
 };
 
 export const menuItems = [
@@ -49,6 +50,10 @@ export const menuItems = [
   {
     label: 'Custom Fields',
     value: formParts.customFields,
+  },
+  {
+    label: 'Performance',
+    value: formParts.performance,
   },
 ];
 

@@ -12,17 +12,19 @@
 
 import { useState } from 'react';
 import PageHeader from '@/app/shared/page-header';
-import { DatePicker } from '@core/ui/datepicker';
+import { PiChatCircleTextDuotone, PiStarDuotone } from 'react-icons/pi';
 import { Text } from 'rizzui';
 import {
-  useReviewsOverview,
-  useRatingDistribution,
-  useReviewSentiment,
   useReviewsTable,
+  useSeries,
+  useSummary,
+  useBreakdown,
 } from '@/hooks/queries/analytics';
-import ReviewsOverviewCards from './components/reviews-overview-cards';
-import RatingDistributionChart from './components/rating-distribution-chart';
-import ReviewSentimentChart from './components/review-sentiment-chart';
+import AnalyticsBreakdownChart from '@/app/shared/analytics/analytics-breakdown-chart';
+import { useAnalyticsRange } from '@/hooks/useAnalyticsRange';
+import AnalyticsRangePicker from '@/app/shared/analytics/analytics-range-picker';
+import AnalyticsSeriesChart from '@/app/shared/analytics/analytics-series-chart';
+import AnalyticsSummaryCards from '@/app/shared/analytics/analytics-summary-cards';
 import ReviewsDataTable from './components/reviews-data-table';
 
 const pageHeader = {
@@ -43,11 +45,7 @@ const pageHeader = {
 };
 
 export default function ReviewsAnalyticsClient() {
-  // Date range state (default: last 30 days)
-  const [startDate, setStartDate] = useState<Date>(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  );
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const range = useAnalyticsRange();
   const [groupBy, setGroupBy] = useState<'days' | 'months' | 'years'>('days');
 
   // Table pagination and filter state
@@ -56,21 +54,39 @@ export default function ReviewsAnalyticsClient() {
   const [ratingFilter, setRatingFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Format dates for API
+  const summary = useSummary({
+    metrics: ['reviews_written', 'avg_rating'],
+    ...range.range,
+    compare: 'previous',
+  });
+
+  const trend = useSeries({
+    metrics: ['reviews_written'],
+    ...range.range,
+    granularity: 'auto',
+    compare: 'previous',
+  });
+
+  // Rating distribution, sentiment and the table are not metric-shaped; they
+  // keep their existing endpoints and follow the window the engine resolved.
   const dateParams = {
-    from: startDate.toISOString(),
-    to: endDate.toISOString(),
+    from: summary.data?.from ?? new Date(Date.now() - 30 * 864e5).toISOString(),
+    to: summary.data?.to ?? new Date().toISOString(),
   };
 
-  // Fetch data
-  const { data: overview, isLoading: loadingOverview } =
-    useReviewsOverview(dateParams);
-  const { data: ratingDist, isLoading: loadingRating } =
-    useRatingDistribution(dateParams);
-  const { data: sentiment, isLoading: loadingSentiment } = useReviewSentiment({
-    ...dateParams,
-    groupBy,
+  const ratingBreakdown = useBreakdown({
+    metric: 'reviews_written',
+    dimension: 'rating',
+    ...range.range,
   });
+
+  const sentimentSeries = useSeries({
+    metrics: ['reviews_written'],
+    dimension: 'sentiment',
+    ...range.range,
+    granularity: 'auto',
+  });
+
   const { data: reviews, isLoading: loadingReviews } = useReviewsTable({
     ...dateParams,
     page,
@@ -78,53 +94,57 @@ export default function ReviewsAnalyticsClient() {
     rating: ratingFilter === 'all' ? undefined : Number(ratingFilter),
     status: statusFilter === 'all' ? undefined : statusFilter,
   });
-  console.log({ reviews });
 
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
-      {/* Date Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <div>
-          <Text className="mb-1 text-sm font-medium">From</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => date && setStartDate(date)}
-            placeholderText="Select start date"
-            dateFormat="MMM dd, yyyy"
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Text className="mb-1 text-sm font-medium">To</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date: Date | null) => date && setEndDate(date)}
-            placeholderText="Select end date"
-            dateFormat="MMM dd, yyyy"
-            minDate={startDate}
-            className="w-full"
-          />
-        </div>
-      </div>
+      <AnalyticsRangePicker range={range} />
 
-      {/* Overview Cards */}
+      <AnalyticsSummaryCards
+        className="mb-6"
+        query={summary}
+        cards={[
+          {
+            metric: 'reviews_written',
+            label: 'Reviews Written',
+            icon: PiChatCircleTextDuotone,
+            hint: 'Approved reviews only, matching what the storefront actually shows.',
+          },
+          {
+            metric: 'avg_rating',
+            label: 'Average Rating',
+            icon: PiStarDuotone,
+            format: 'decimal',
+            hint: 'Computed across the whole period, not as the mean of daily averages.',
+          },
+        ]}
+      />
+
       <div className="mb-6">
-        <ReviewsOverviewCards data={overview} isLoading={loadingOverview} />
+        <AnalyticsSeriesChart
+          title="Reviews Over Time"
+          query={trend}
+          metrics={[
+            { key: 'reviews_written', label: 'Reviews', color: '#f59e0b' },
+          ]}
+        />
       </div>
 
       {/* Charts Section */}
       <div className="mb-6 grid grid-cols-1 gap-6 @container lg:grid-cols-2">
-        <RatingDistributionChart
-          data={ratingDist || []}
-          isLoading={loadingRating}
+        <AnalyticsBreakdownChart
+          title="Rating Distribution"
+          query={ratingBreakdown}
+          kind="bar"
         />
-        <ReviewSentimentChart
-          data={sentiment || []}
-          isLoading={loadingSentiment}
-          groupBy={groupBy}
-          onGroupByChange={setGroupBy}
+        {/* Stacked: sentiment bands sum to the review count, so the stack height
+            is meaningful rather than an artefact of overlaying series. */}
+        <AnalyticsSeriesChart
+          title="Review Sentiment"
+          query={sentimentSeries}
+          kind="bar"
+          stacked
         />
       </div>
 

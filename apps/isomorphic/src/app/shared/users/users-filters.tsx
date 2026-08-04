@@ -42,7 +42,7 @@ export default function UsersFilters<TData extends Record<string, any>>({
 
   useEffect(() => {
     onFilterChange({ search: searchValue, page: 1 });
-  }, [searchValue]);
+  }, [searchValue, onFilterChange]);
 
   const handleApplyFilters = () => {
     if (Object.keys(pendingFilters).length > 0) {

@@ -19,7 +19,7 @@ import cn from '@core/utils/class-names';
 import TrendingUpIcon from '@core/components/icons/trending-up';
 import DropdownAction from '@core/components/charts/dropdown-action';
 import { formatNumber } from '@core/utils/format-number';
-import { useRevenueExpenseChart } from '@/hooks/queries/analytics/useAnalyticsCharts';
+import { useSeries } from '@/hooks/queries/analytics/useAnalyticsQuery';
 
 const viewOptions = [
   {
@@ -44,30 +44,26 @@ export default function RevenueExpenseChart({
   const isTablet = useMedia('(max-width: 820px)', false);
   const [groupBy, setGroupBy] = useState<'days' | 'months' | 'years'>('days');
 
-  // Default: Last 30 days
-  const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const granularity = groupBy === 'days' ? 'day' : groupBy === 'months' ? 'month' : 'year';
 
-  const dateRange = useMemo(
-    () => ({
-      from: thirtyDaysAgo.toISOString().split('T')[0],
-      to: today.toISOString().split('T')[0],
-      groupBy,
-    }),
-    [groupBy]
-  );
+  const { data, isLoading } = useSeries({
+    metrics: ['revenue', 'refund_amount'],
+    preset: 'last_30_days',
+    granularity,
+  });
 
-  const { data, isLoading } = useRevenueExpenseChart(dateRange);
-
-  // Calculate totals for display
+  /**
+   * Totals come from the response, not from summing the series.
+   *
+   * They are computed server-side over the whole window, which is the only
+   * correct approach for averages and distinct counts and is consistent for the
+   * rest. Reducing the buckets client-side also silently double-counts anything
+   * the server treats as set-valued.
+   */
   const totals = useMemo(() => {
-    if (!data) return { revenue: 0, expense: 0, percentChange: 0 };
-
-    const revenue = data.reduce((sum, item) => sum + item.revenue, 0);
-    const expense = data.reduce((sum, item) => sum + item.expense, 0);
-    const percentChange =
-      expense > 0 ? ((revenue - expense) / expense) * 100 : 0;
+    const revenue = Number(data?.totals?.revenue ?? 0);
+    const expense = Number(data?.totals?.refund_amount ?? 0);
+    const percentChange = expense > 0 ? ((revenue - expense) / expense) * 100 : 0;
 
     return { revenue, expense, percentChange };
   }, [data]);
@@ -76,25 +72,22 @@ export default function RevenueExpenseChart({
     setGroupBy(viewType as 'days' | 'months' | 'years');
   }
 
-  // Format dates for display
-  const chartData = useMemo(() => {
-    if (!data) return [];
-    return data.map((item) => {
-      const date = new Date(item.date);
-      const key =
-        groupBy === 'days'
-          ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-          : date.toLocaleDateString('en-US', {
-              month: 'short',
-              year: 'numeric',
-            });
-
-      return {
-        ...item,
-        key,
-      };
-    });
-  }, [data, groupBy]);
+  /**
+   * `bucketLabel` is formatted server-side in the store's timezone.
+   *
+   * The previous version rebuilt the label with `new Date(item.date)` in the
+   * browser, so an admin in another timezone saw every bucket labelled a day
+   * off from the data it contained.
+   */
+  const chartData = useMemo(
+    () =>
+      (data?.series ?? []).map((row) => ({
+        key: row.bucketLabel,
+        revenue: Number(row.revenue ?? 0),
+        expense: Number(row.refund_amount ?? 0),
+      })),
+    [data]
+  );
 
   return (
     <WidgetCard

@@ -102,161 +102,38 @@ export const api = {
 
   // Analytics endpoints
   analytics: {
-    // NEW ANALYTICS ENDPOINTS (31 total)
-    // Overview endpoints (7)
-    salesOverview: '/admin/analytics/sales-overview',
-    ordersOverview: '/admin/analytics/orders-overview',
-    transactionsOverview: '/admin/analytics/transactions-overview',
-    usersOverview: '/admin/analytics/users-overview',
-    productsOverview: '/admin/analytics/products-overview',
-    reviewsOverview: '/admin/analytics/reviews-overview',
-    couponsOverview: '/admin/analytics/coupons-overview',
+    // QUERY ENGINE — every number comes from the backend metric registry, in the
+    // store's timezone, at any granularity. Supersedes everything below it.
+    series: '/admin/analytics/series',
+    summary: '/admin/analytics/summary',
+    breakdown: '/admin/analytics/breakdown',
+    meta: '/admin/analytics/meta',
+    productAnalytics: (productId: string) =>
+      `/admin/analytics/products/${productId}/performance`,
 
-    // Chart endpoints (14)
-    revenueExpenseChart: '/admin/analytics/revenue-expense-chart',
+    /**
+     * LEGACY — the seven still called from a live screen.
+     *
+     * The other 92 keys that used to sit here were removed: nothing referenced
+     * them, so they described a surface the admin no longer used. The server
+     * still serves those routes; if a screen needs one again, add the key back
+     * rather than reading this list as the API's inventory.
+     *
+     * These seven are what block deleting the server's legacy analytics block.
+     */
+
+    // Dashboard charts — the home page (`app/(hydrogen)/page.tsx`) renders all three.
     profitLossChart: '/admin/analytics/profit-loss-chart',
-    ordersTrend: '/admin/analytics/orders-trend',
-    transactionsTrend: '/admin/analytics/transactions-trend',
-    customerAcquisition: '/admin/analytics/customer-acquisition',
-    orderStatusDistribution: '/admin/analytics/order-status-distribution',
-    transactionStatusDistribution:
-      '/admin/analytics/transaction-status-distribution',
-    ratingDistribution: '/admin/analytics/rating-distribution',
-    reviewSentiment: '/admin/analytics/review-sentiment',
-    couponRedemptionTrend: '/admin/analytics/coupon-redemption-trend',
-    paymentMethods: '/admin/analytics/payment-methods',
     topProductsRevenue: '/admin/analytics/top-products-revenue',
     categoriesPerformance: '/admin/analytics/categories-performance',
-    userDemographics: '/admin/analytics/user-demographics',
-    couponTypeDistribution: '/admin/analytics/coupon-type-distribution',
 
-    // Table endpoints (10)
-    salesByCategory: '/admin/analytics/sales-by-category',
-    topSellingProducts: '/admin/analytics/top-selling-products',
-    lowStockProducts: '/admin/analytics/low-stock-products',
+    // Row listings that take a date range. These are filtered listings rather
+    // than metrics — they return per-row detail (product images, a secondary
+    // count) that a metric breakdown deliberately does not model.
     ordersTable: '/admin/analytics/orders-table',
     transactionsTable: '/admin/analytics/transactions-table',
-    topCustomers: '/admin/analytics/top-customers',
     productPerformance: '/admin/analytics/product-performance',
     reviewsTable: '/admin/analytics/reviews-table',
-    topCoupons: '/admin/analytics/top-coupons',
-    mostWishlistedProducts: '/admin/analytics/most-wishlisted-products',
-    mostReviewedProducts: '/admin/analytics/most-reviewed-products',
-
-    // LEGACY ANALYTICS ENDPOINTS (66 total - organized by category)
-    legacy: {
-      // Standalone endpoints (5)
-      sellerStatistics: '/admin/analytics/seller-statistics',
-      totalSales: '/admin/analytics/total-sales',
-      chartData: '/admin/analytics/chart-data',
-      orderVsReturns: '/admin/analytics/order-vs-returns',
-      rangeCount: '/admin/analytics/range-count',
-
-      // Paginated statistics (4)
-      paginatedStatistics: {
-        byDays: '/admin/analytics/paginated-statistics-days',
-        byWeeks: '/admin/analytics/paginated-statistics-weeks',
-        byMonths: '/admin/analytics/paginated-statistics-months',
-        byYears: '/admin/analytics/paginated-statistics-years',
-      },
-
-      // Time-series metrics (19 groups × 3 time periods = 57 endpoints)
-      wishlistFrequency: {
-        byDays: '/admin/analytics/wishlist-frequency-days',
-        byMonths: '/admin/analytics/wishlist-frequency-months',
-        byYears: '/admin/analytics/wishlist-frequency-years',
-      },
-      orders: {
-        byDays: '/admin/analytics/orders-days',
-        byMonths: '/admin/analytics/orders-months',
-        byYears: '/admin/analytics/orders-years',
-      },
-      ordersCancelled: {
-        byDays: '/admin/analytics/order-cancelled-days',
-        byMonths: '/admin/analytics/order-cancelled-months',
-        byYears: '/admin/analytics/order-cancelled-years',
-      },
-      shipmentsDelivered: {
-        byDays: '/admin/analytics/shipments-delivered-days',
-        byMonths: '/admin/analytics/shipments-delivered-months',
-        byYears: '/admin/analytics/shipments-delivered-years',
-      },
-      ordersReturned: {
-        byDays: '/admin/analytics/order-returned-days',
-        byMonths: '/admin/analytics/order-returned-months',
-        byYears: '/admin/analytics/order-returned-years',
-      },
-      ordersFailed: {
-        byDays: '/admin/analytics/order-failed-days',
-        byMonths: '/admin/analytics/order-failed-months',
-        byYears: '/admin/analytics/order-failed-years',
-      },
-      shipmentsInWarehouse: {
-        byDays: '/admin/analytics/shipments-in-warehouse-days',
-        byMonths: '/admin/analytics/shipments-in-warehouse-months',
-        byYears: '/admin/analytics/shipments-in-warehouse-years',
-      },
-      transactions: {
-        byDays: '/admin/analytics/transactions-days',
-        byMonths: '/admin/analytics/transactions-months',
-        byYears: '/admin/analytics/transactions-years',
-      },
-      totalTransactions: {
-        byDays: '/admin/analytics/total-transactions-days',
-        byMonths: '/admin/analytics/total-transactions-months',
-        byYears: '/admin/analytics/total-transactions-years',
-      },
-      userJoiningRate: {
-        byDays: '/admin/analytics/user-joining-rate-days',
-        byMonths: '/admin/analytics/user-joining-rate-months',
-        byYears: '/admin/analytics/user-joining-rate-years',
-      },
-      couponRedemption: {
-        byDays: '/admin/analytics/coupon-redemption-days',
-        byMonths: '/admin/analytics/coupon-redemption-months',
-        byYears: '/admin/analytics/coupon-redemption-years',
-      },
-      reviews: {
-        byDays: '/admin/analytics/reviews-days',
-        byMonths: '/admin/analytics/reviews-months',
-        byYears: '/admin/analytics/reviews-years',
-      },
-      reviewRate: {
-        byDays: '/admin/analytics/review-rate-days',
-        byMonths: '/admin/analytics/review-rate-months',
-        byYears: '/admin/analytics/review-rate-years',
-      },
-      reviewMood: {
-        byDays: '/admin/analytics/review-mood-days',
-        byMonths: '/admin/analytics/review-mood-months',
-        byYears: '/admin/analytics/review-mood-years',
-      },
-      revenue: {
-        byDays: '/admin/analytics/revenue-days',
-        byMonths: '/admin/analytics/revenue-months',
-        byYears: '/admin/analytics/revenue-years',
-      },
-      productsAdded: {
-        byDays: '/admin/analytics/products-added-days',
-        byMonths: '/admin/analytics/products-added-months',
-        byYears: '/admin/analytics/products-added-years',
-      },
-      currentCarts: {
-        byDays: '/admin/analytics/current-carts-days',
-        byMonths: '/admin/analytics/current-carts-months',
-        byYears: '/admin/analytics/current-carts-years',
-      },
-      sales: {
-        byDays: '/admin/analytics/sales-days',
-        byMonths: '/admin/analytics/sales-months',
-        byYears: '/admin/analytics/sales-years',
-      },
-      salesDiscountTotal: {
-        byDays: '/admin/analytics/sales-discount-total-days',
-        byMonths: '/admin/analytics/sales-discount-total-months',
-        byYears: '/admin/analytics/sales-discount-total-years',
-      },
-    },
   },
 
   // Banner/Marketing endpoints
