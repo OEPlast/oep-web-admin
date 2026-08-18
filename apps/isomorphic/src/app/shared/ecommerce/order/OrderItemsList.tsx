@@ -43,8 +43,8 @@ export default function OrderItemsList({ items }: OrderItemsListProps) {
                 Quantity: {item.quantity} ×{' '}
                 {formatPrice({
                   amount: item.price,
-                  currencyCode: 'USD',
-                  locale: 'en-US',
+                  currencyCode: 'NGN',
+                  locale: 'en-NG',
                   fractions: 2,
                 })}
               </Text>
@@ -53,8 +53,8 @@ export default function OrderItemsList({ items }: OrderItemsListProps) {
               <Text className="font-semibold">
                 {formatPrice({
                   amount: item.subtotal,
-                  currencyCode: 'USD',
-                  locale: 'en-US',
+                  currencyCode: 'NGN',
+                  locale: 'en-NG',
                   fractions: 2,
                 })}
               </Text>
@@ -63,8 +63,8 @@ export default function OrderItemsList({ items }: OrderItemsListProps) {
                   -
                   {formatPrice({
                     amount: item.discount,
-                    currencyCode: 'USD',
-                    locale: 'en-US',
+                    currencyCode: 'NGN',
+                    locale: 'en-NG',
                     fractions: 2,
                   })}{' '}
                   off

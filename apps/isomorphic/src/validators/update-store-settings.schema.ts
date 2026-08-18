@@ -15,6 +15,7 @@ export const updateStoreSettingsSchema = z.object({
     .optional()
     .or(z.literal('')),
   supportPhone: z.string().optional(),
+  whatsappNumber: z.string().optional(),
   address: z
     .object({
       line1: z.string().optional(),

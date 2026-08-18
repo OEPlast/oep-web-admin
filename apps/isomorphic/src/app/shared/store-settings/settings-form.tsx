@@ -63,6 +63,7 @@ export default function SettingsForm() {
       websiteUrl: '',
       supportEmail: '',
       supportPhone: '',
+      whatsappNumber: '',
       address: {
         line1: '',
         line2: '',
@@ -104,6 +105,7 @@ export default function SettingsForm() {
         websiteUrl: settings.websiteUrl || '',
         supportEmail: settings.supportEmail || '',
         supportPhone: settings.supportPhone || '',
+        whatsappNumber: settings.whatsappNumber || '',
         address: {
           line1: settings.address?.line1 || '',
           line2: settings.address?.line2 || '',
@@ -335,6 +337,14 @@ export default function SettingsForm() {
                     placeholder="+1 (555) 123-4567"
                     {...register('supportPhone')}
                     error={errors.supportPhone?.message}
+                  />
+                  <Input
+                    label="WhatsApp Number"
+                    placeholder="+2348012345678"
+                    prefix={<PiWhatsappLogoBold className="h-4 w-4" />}
+                    helperText="Shown as the click-to-chat number on the storefront (header + footer) — separate from the WhatsApp social link above."
+                    {...register('whatsappNumber')}
+                    error={errors.whatsappNumber?.message}
                   />
                 </div>
               </VerticalFormBlockWrapper>

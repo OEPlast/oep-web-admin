@@ -6,6 +6,7 @@ import { metaObject } from '@/config/site.config';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/auth-options';
+import { getStoreName } from '@/utils/storeBranding';
 
 export const metadata = {
   ...metaObject('Sign In'),
@@ -16,6 +17,7 @@ export default async function SignIn() {
   if (session) {
     redirect('/');
   }
+  const storeName = await getStoreName();
   return (
     <AuthWrapperOne
       title={
@@ -28,7 +30,7 @@ export default async function SignIn() {
           continue.
         </>
       }
-      description="Welcome to Rawura Admin."
+      description={`Welcome to ${storeName} Admin.`}
       bannerTitle="Sign in to access your admin account."
       bannerDescription="Have fun managing the best store in the world! 😉."
       isSocialLoginActive={false}

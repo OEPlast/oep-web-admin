@@ -13,6 +13,7 @@ import { Text } from '@react-email/text';
 import { Hr } from '@react-email/hr';
 import { Heading } from '@react-email/heading';
 import { PiClock, PiDeviceMobileLight } from 'react-icons/pi';
+import { ADMIN_NAME } from '@/config/site.config';
 
 const orderedProducts = [
   {
@@ -61,7 +62,7 @@ export default function OrderConfirmationEmail(
               <Column>
                 <Img
                   src="https://isomorphic-furyroad.vercel.app/logo.svg"
-                  alt="rawura admin logo"
+                  alt={`${ADMIN_NAME} logo`}
                   style={{
                     margin: '0',
                   }}

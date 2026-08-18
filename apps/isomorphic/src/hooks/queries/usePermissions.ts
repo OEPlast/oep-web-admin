@@ -20,6 +20,7 @@ export enum PermissionResource {
   COUPONS = 'coupons',
   REVIEWS = 'reviews',
   CAMPAIGNS = 'campaigns',
+  INTENTS = 'intents',
   BANNERS = 'banners',
   GALLERY = 'gallery',
   ANALYTICS = 'analytics',
@@ -27,6 +28,7 @@ export enum PermissionResource {
   LOGISTICS = 'logistics',
   TRANSACTIONS = 'transactions',
   DELIVERY = 'delivery',
+  SETTINGS = 'settings',
 }
 
 /**

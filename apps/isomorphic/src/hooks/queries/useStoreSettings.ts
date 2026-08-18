@@ -12,6 +12,7 @@ export interface StoreSettings {
   websiteUrl: string;
   supportEmail: string;
   supportPhone: string;
+  whatsappNumber: string;
   address: {
     line1: string;
     line2: string;

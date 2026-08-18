@@ -1,9 +1,19 @@
 /**
  * CDN URL utilities
  * Constructs full CDN URLs from relative paths
+ *
+ * Base URL is read from `NEXT_PUBLIC_CDN_BASE_URL` (client-visible — this is called from
+ * Client Components too) with the historical value as the fallback — mirrors
+ * `shared/emails/src/cdn-url.ts` and storefront's `libs/cdn-url.ts`.
  */
 
-const CDN_BASE_URL = 'https://oeptest.b-cdn.net/';
+function resolveCdnBaseUrl(): string {
+  const configured = (process.env.NEXT_PUBLIC_CDN_BASE_URL ?? '').trim();
+  const base = configured.length > 0 ? configured : 'https://oeptest.b-cdn.net/';
+  return base.endsWith('/') ? base : `${base}/`;
+}
+
+const CDN_BASE_URL = resolveCdnBaseUrl();
 
 /**
  * Constructs full CDN URL from a relative path

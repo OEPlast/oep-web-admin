@@ -2,6 +2,7 @@ import ForgetPasswordForm from './forget-password-form';
 import UnderlineShape from '@core/components/shape/underline';
 import Image from 'next/image';
 import AuthWrapperOne from '@/app/shared/auth-layout/auth-wrapper-one';
+import { ADMIN_NAME } from '@/config/site.config';
 
 export default function SignIn() {
   return (
@@ -15,7 +16,7 @@ export default function SignIn() {
           </span>
         </>
       }
-      bannerTitle="Welcome to Rawura Admin."
+      bannerTitle={`Welcome to ${ADMIN_NAME}.`}
       bannerDescription="Have fun managing the best store in the world! 😉."
       pageImage={
         <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[820px]">

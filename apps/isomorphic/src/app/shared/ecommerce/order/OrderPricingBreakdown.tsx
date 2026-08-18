@@ -12,7 +12,7 @@ export default function OrderPricingBreakdown({
   order,
 }: OrderPricingBreakdownProps) {
   const format = (amount: number) =>
-    formatPrice({ amount, currencyCode: 'USD', locale: 'en-US', fractions: 2 });
+    formatPrice({ amount, currencyCode: 'NGN', locale: 'en-NG', fractions: 2 });
 
   return (
     <div className="mb-6 rounded-lg border p-4">

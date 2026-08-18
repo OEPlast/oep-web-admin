@@ -5,6 +5,7 @@ import nodemailer from 'nodemailer';
 import { MAIL } from '@/config/mail';
 import { messages } from '@/config/messages';
 import { env } from '@/env.mjs';
+import { ADMIN_NAME } from '@/config/site.config';
 
 type EmailPayload = {
   to: string;
@@ -19,7 +20,7 @@ export const sendEmail = async (data: EmailPayload) => {
 
   try {
     await transporter.sendMail({
-      from: `Rawura Admin<${env.SMTP_FROM_EMAIL}>`,
+      from: `${ADMIN_NAME}<${env.SMTP_FROM_EMAIL}>`,
       ...data,
     });
     return true;

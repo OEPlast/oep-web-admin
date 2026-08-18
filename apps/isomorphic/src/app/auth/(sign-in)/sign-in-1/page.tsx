@@ -2,7 +2,7 @@ import Image from 'next/image';
 import SignInForm from './sign-in-form';
 import AuthWrapperOne from '@/app/shared/auth-layout/auth-wrapper-one';
 import UnderlineShape from '@core/components/shape/underline';
-import { metaObject } from '@/config/site.config';
+import { metaObject, ADMIN_NAME } from '@/config/site.config';
 
 export const metadata = {
   ...metaObject('Sign In 1'),
@@ -21,7 +21,7 @@ export default function SignIn() {
           continue.
         </>
       }
-      description="Welcome to Rawura Admin."
+      description={`Welcome to ${ADMIN_NAME}.`}
       bannerTitle="Sign in to access your admin account."
       bannerDescription="Have fun managing the best store in the world! 😉."
       isSocialLoginActive={true}
