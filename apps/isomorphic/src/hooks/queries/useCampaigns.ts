@@ -7,7 +7,7 @@ import {
   Campaign,
   CampaignListItem,
   CampaignFilters,
-} from '@/data/campaigns-data';
+} from '@/types/campaign.types';
 
 interface CampaignsListResponse {
   campaigns: CampaignListItem[];

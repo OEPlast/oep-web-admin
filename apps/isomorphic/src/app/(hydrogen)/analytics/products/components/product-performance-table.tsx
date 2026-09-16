@@ -147,7 +147,7 @@ export default function ProductPerformanceTable({
                   >
                     <td className="px-4 py-3">
                       <Link
-                        href={routes.eCommerce.productDetails(
+                        href={routes.eCommerce.ediProduct(
                           product.productId
                         )}
                       >

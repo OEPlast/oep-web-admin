@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Input, Select, Button } from 'rizzui';
+import { Input, Select, Button, Switch } from 'rizzui';
 import { PiMagnifyingGlassBold, PiTrashDuotone } from 'react-icons/pi';
 import type {
   TransactionFilters as TransactionFiltersType,
@@ -65,6 +65,7 @@ export default function TransactionFilters({
       endDate: undefined,
       minAmount: undefined,
       maxAmount: undefined,
+      needsReview: undefined,
     });
   };
 
@@ -100,6 +101,13 @@ export default function TransactionFilters({
         options={methodOptions}
         className="w-44"
       /> */}
+
+      <Switch
+        label="Needs review"
+        checked={!!currentParams.needsReview}
+        onChange={(e) => onChange({ needsReview: e.target.checked || undefined })}
+        className="self-center"
+      />
 
       <Button variant="outline" onClick={handleClearFilters} size="sm">
         <PiTrashDuotone className="mr-2 h-4 w-4" />

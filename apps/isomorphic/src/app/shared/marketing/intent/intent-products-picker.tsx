@@ -35,7 +35,7 @@ import {
   IntentProduct,
   MIN_PUBLISHED_PRODUCTS,
   intentProductCover,
-} from '@/data/intents-data';
+} from '@/types/intent.types';
 
 interface IntentProductsPickerProps {
   /** Selected products in display order. */

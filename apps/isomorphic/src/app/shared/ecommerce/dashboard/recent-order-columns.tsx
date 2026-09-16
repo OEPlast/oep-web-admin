@@ -1,6 +1,7 @@
 'use client';
 
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 import TableAvatar from '@core/ui/avatar-card';
@@ -9,7 +10,6 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { Text } from 'rizzui';
 import type { OrderTableRow } from '@/types/analytics.types';
 import { formatCurrency } from '@/utils/format-currency';
-import Link from 'next/link';
 import cn from '@core/utils/class-names';
 
 const columnHelper = createColumnHelper<OrderTableRow>();
@@ -20,9 +20,12 @@ export const recentOrderColumns = [
     size: 120,
     header: 'Order Id',
     cell: ({ row }) => (
-      <Link href={routes.eCommerce.orderDetails(row.original._id)}>
+      <IdLink
+        href={routes.eCommerce.orderDetails(row.original._id)}
+        title={row.original._id}
+      >
         {row.original._id}
-      </Link>
+      </IdLink>
     ),
   }),
   columnHelper.accessor('user', {
@@ -96,7 +99,6 @@ export const recentOrderColumns = [
       },
     }) => (
       <TableRowActionGroup
-        editUrl={routes.eCommerce.editOrder(row.original._id)}
         viewUrl={routes.eCommerce.orderDetails(row.original._id)}
         hideDelete
       />

@@ -38,9 +38,9 @@ export const metaObject = (
     openGraph: openGraph ?? {
       title: title ? `${title} - ${ADMIN_NAME}` : title,
       description,
-      url:
-        process.env.NEXT_PUBLIC_SITE_URL ||
-        'https://isomorphic-furyroad.vercel.app',
+      ...(process.env.NEXT_PUBLIC_SITE_URL
+        ? { url: process.env.NEXT_PUBLIC_SITE_URL }
+        : {}),
       siteName: ADMIN_NAME, // https://developers.google.com/search/docs/appearance/site-names
       images: {
         url: '/opengraph-thumb.png',

@@ -11,6 +11,8 @@ import {
   useModerateReview,
   useDeleteReview,
   useAddReply,
+  useUpdateReply,
+  useDeleteReply,
 } from '@/hooks/mutations/useReviewMutations';
 import { Avatar, Badge, Button, Text, Title, Loader, Textarea } from 'rizzui';
 import {
@@ -19,6 +21,8 @@ import {
   PiTrash,
   PiCheckCircle,
   PiXCircle,
+  PiPencilSimple,
+  PiStorefront,
 } from 'react-icons/pi';
 import { useState } from 'react';
 import dayjs from 'dayjs';
@@ -52,8 +56,12 @@ export default function ReviewDetailDrawer({
   const moderateMutation = useModerateReview();
   const deleteMutation = useDeleteReview();
   const addReplyMutation = useAddReply();
+  const updateReplyMutation = useUpdateReply();
+  const deleteReplyMutation = useDeleteReply();
 
   const [replyText, setReplyText] = useState('');
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
   const [moderationNote, setModerationNote] = useState('');
   const [showModeration, setShowModeration] = useState(false);
 
@@ -113,7 +121,7 @@ export default function ReviewDetailDrawer({
     addReplyMutation.mutate(
       {
         reviewId,
-        data: { reply: replyText },
+        data: { reply: replyText.trim() },
       },
       {
         onSuccess: () => {
@@ -121,6 +129,19 @@ export default function ReviewDetailDrawer({
         },
       }
     );
+  };
+
+  const handleSaveReplyEdit = (replyId: string) => {
+    if (!editingText.trim()) return;
+    updateReplyMutation.mutate(
+      { reviewId, replyId, data: { reply: editingText.trim() } },
+      { onSuccess: () => setEditingReplyId(null) }
+    );
+  };
+
+  const handleDeleteReply = (replyId: string) => {
+    if (!confirm('Delete this reply? It will disappear from the product page.')) return;
+    deleteReplyMutation.mutate({ reviewId, replyId });
   };
 
   if (isLoading) {
@@ -277,7 +298,7 @@ export default function ReviewDetailDrawer({
               {review.images.map((image, index) => (
                 <img
                   key={index}
-                  src={image}
+                  src={getCdnUrl(image)}
                   alt={`Review image ${index + 1}`}
                   className="h-24 w-full rounded-lg object-cover"
                 />
@@ -285,6 +306,101 @@ export default function ReviewDetailDrawer({
             </div>
           </div>
         )}
+
+        {/* Store replies: shown publicly under the review as the store's response
+            (no staff name). */}
+        <div>
+          <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Store replies
+          </Text>
+          <div className="space-y-3">
+            {(review.replies ?? []).map((reply) => (
+              <div key={reply._id} className="rounded-lg border border-muted p-3">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                    <PiStorefront className="h-4 w-4" />
+                    {isReviewUser(reply.replyBy)
+                      ? `${reply.replyBy.firstName ?? ''} ${reply.replyBy.lastName ?? ''}`.trim() || 'Staff'
+                      : 'Staff'}
+                    <span className="font-normal text-gray-400">
+                      · {dayjs(reply.createdAt).fromNow()}
+                    </span>
+                  </span>
+                  {editingReplyId !== reply._id && (
+                    <span className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="text"
+                        aria-label="Edit reply"
+                        onClick={() => {
+                          setEditingReplyId(reply._id);
+                          setEditingText(reply.reply);
+                        }}
+                      >
+                        <PiPencilSimple className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="text"
+                        aria-label="Delete reply"
+                        onClick={() => handleDeleteReply(reply._id)}
+                        isLoading={deleteReplyMutation.isPending}
+                      >
+                        <PiTrash className="h-4 w-4 text-red" />
+                      </Button>
+                    </span>
+                  )}
+                </div>
+                {editingReplyId === reply._id ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      rows={3}
+                      maxLength={1000}
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setEditingReplyId(null)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleSaveReplyEdit(reply._id)}
+                        isLoading={updateReplyMutation.isPending}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Text className="whitespace-pre-line text-sm text-gray-700">{reply.reply}</Text>
+                )}
+              </div>
+            ))}
+            <div className="space-y-2">
+              <Textarea
+                placeholder="Write a reply to this customer…"
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                rows={3}
+                maxLength={1000}
+              />
+              <div className="flex items-center justify-between gap-3">
+                <Text className="text-xs text-gray-500">
+                  Shown on the product page under this review, signed as the store.
+                </Text>
+                <Button
+                  size="sm"
+                  onClick={handleAddReply}
+                  disabled={!replyText.trim()}
+                  isLoading={addReplyMutation.isPending}
+                >
+                  Post reply
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Additional Details */}
         {(review.size || review.style?.color || review.fit) && (

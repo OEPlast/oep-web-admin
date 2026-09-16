@@ -13,6 +13,8 @@ export interface StoreSettings {
   supportEmail: string;
   supportPhone: string;
   whatsappNumber: string;
+  /** Free text such as "Mon–Sat, 9am–6pm WAT"; shown on the storefront when set. */
+  supportHours?: string;
   address: {
     line1: string;
     line2: string;

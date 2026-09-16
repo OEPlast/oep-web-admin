@@ -5,18 +5,15 @@ import { routes } from '@/config/routes';
 import { Button } from 'rizzui/button';
 import WelcomeBanner from '@core/components/banners/welcome';
 import StatCards from '@/app/shared/ecommerce/dashboard/stats-cards';
-import ProfitWidget from '@/app/shared/ecommerce/dashboard/profit-widget';
 import SalesReport from '@/app/shared/ecommerce/dashboard/sales-report';
 import BestSellers from '@/app/shared/ecommerce/dashboard/best-sellers';
 import CustomerRetentionRate from '@/app/shared/ecommerce/dashboard/repeat-customer-rate';
 import UserLocation from '@/app/shared/ecommerce/dashboard/user-location';
 import PromotionalSales from '@/app/shared/ecommerce/dashboard/promotional-sales';
 import RecentOrder from '@/app/shared/ecommerce/dashboard/recent-order';
-import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
 import { PiPlusBold } from 'react-icons/pi';
 import welcomeImg from '@public/shop-illustration.png';
 import HandWaveIcon from '@core/components/icons/hand-wave';
-import TotalProfitLoss from './total-profit-loss';
 import RevenueExpenseChart from './revenue-expense';
 import TopSellingProducts from './top-selling-products';
 import {
@@ -69,8 +66,6 @@ export default function EcommerceDashboard() {
 
         {hasPermission([PermissionResource.SALES], PermissionAction.READ) ? (
           <>
-            {/* <ProfitWidget className="relative @4xl:col-span-2 @7xl:col-span-12" /> */}
-            {/* <TotalProfitLoss className="relative @4xl:col-span-2 @7xl:col-span-12" /> */}
             <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
             <TopSellingProducts className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
           </>

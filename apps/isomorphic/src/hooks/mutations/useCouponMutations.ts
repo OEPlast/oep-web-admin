@@ -9,7 +9,7 @@ import {
   CouponDataType,
   CreateCouponInput,
   UpdateCouponInput,
-} from '@/data/coupon-data';
+} from '@/types/coupon.types';
 import { toast } from 'react-hot-toast';
 
 type MutationContext = {

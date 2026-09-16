@@ -1,11 +1,10 @@
-import { Metadata } from 'next';
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 import EditShipmentForm from '@/app/shared/shipment/edit-shipment-form';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Edit Shipment | Admin Dashboard',
-  description: 'Edit shipment details',
+export const metadata = {
+  ...metaObject('Edit Shipment', undefined, 'Edit shipment details'),
 };
 
 interface EditShipmentPageProps {

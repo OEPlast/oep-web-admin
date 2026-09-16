@@ -1,4 +1,3 @@
-import { DUMMY_ID } from '@/config/constants';
 import { routes } from '@/config/routes';
 import {
   PiAirplaneTiltDuotone,
@@ -61,6 +60,7 @@ import {
   PiUserGearDuotone,
   PiUserPlusDuotone,
   PiTruckDuotone,
+  PiWarehouseDuotone,
 } from 'react-icons/pi';
 import { GoHome, GoPeople } from 'react-icons/go';
 import { MdOutlineCampaign, MdOutlineSell, MdPayments } from 'react-icons/md';
@@ -88,6 +88,12 @@ export const menuItems = [
     href: routes.eCommerce.categories,
     icon: <PiSquaresFourDuotone />,
     permission: { resource: ['categories'], action: 'read' },
+  },
+  {
+    name: 'Inventory',
+    href: routes.inventory,
+    icon: <PiWarehouseDuotone />,
+    permission: { resource: ['inventory'], action: 'read' },
   },
   {
     name: 'Returns',
@@ -249,12 +255,6 @@ export const menuItems = [
     icon: <PiCurrencyDollarDuotone />,
     permission: { resource: ['invoices'], action: 'read' },
   },
-  // {
-  //   name: 'Account Settings',
-  //   href: routes.forms.profileSettings,
-  //   icon: <PiUserGearDuotone />,
-  //   permission: { resource: ['*'], action: '*' },
-  // },
   {
     name: 'Roles & Permissions',
     href: routes.rolesPermissions,

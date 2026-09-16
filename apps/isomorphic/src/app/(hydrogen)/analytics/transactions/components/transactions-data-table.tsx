@@ -14,7 +14,7 @@ import type {
   TransactionsTableResponse,
   TransactionTableRow,
 } from '@/types/analytics.types';
-import Link from 'next/link';
+import IdLink from '@/app/shared/id-link';
 import { routes } from '@/config/routes';
 import { formatToNaira } from '@/libs/currencyFormatter';
 
@@ -210,11 +210,13 @@ export default function TransactionsDataTable({
                   )}
                 >
                   <td className="px-4 py-3">
-                    <Link href={routes.transactions.details(transaction._id)}>
-                      <Text className="font-medium text-gray-900 hover:underline">
-                        {transaction._id}
-                      </Text>
-                    </Link>
+                    <IdLink
+                      href={routes.transactions.details(transaction._id)}
+                      title={transaction._id}
+                      className="text-gray-900"
+                    >
+                      {transaction._id}
+                    </IdLink>
                   </td>
                   <td className="px-4 py-3">
                     <div>

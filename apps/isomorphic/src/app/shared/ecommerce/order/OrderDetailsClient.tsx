@@ -3,6 +3,8 @@
 import { Alert, Text, Badge } from 'rizzui';
 import { useOrderById } from '@/hooks/queries/useOrders';
 import { handleApiError } from '@/libs/axios';
+import { getCdnUrl } from '@core/utils/cdn-url';
+import OrderActions from './OrderActions';
 
 interface OrderDetailsClientProps {
   id: string;
@@ -50,12 +52,13 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
 
   // Helper to get order status badge
   const getOrderStatusBadge = (status: string) => {
+    // The order statuses Main-server actually uses; shipping progress lives on the shipment.
     const statusMap: Record<string, { color: any; label: string }> = {
-      Pending: { color: 'warning', label: 'Pending' },
+      Pending: { color: 'warning', label: 'Pending payment' },
       Processing: { color: 'info', label: 'Processing' },
-      Shipped: { color: 'secondary', label: 'Shipped' },
-      Delivered: { color: 'success', label: 'Delivered' },
+      Completed: { color: 'success', label: 'Completed' },
       Cancelled: { color: 'danger', label: 'Cancelled' },
+      Failed: { color: 'danger', label: 'Failed' },
     };
     const statusInfo = statusMap[status] || { color: 'default', label: status };
     return <Badge color={statusInfo.color}>{statusInfo.label}</Badge>;
@@ -112,7 +115,7 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
               >
                 {product.image && (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL || ''}/${product.image}`}
+                    src={getCdnUrl(product.image)}
                     alt={product.name}
                     className="h-16 w-16 rounded object-cover"
                   />
@@ -345,6 +348,9 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
           </div>
         </div>
       )}
+
+      {/* Actions — renders nothing once the order is finished (completed, cancelled, failed). */}
+      <OrderActions order={order} />
     </div>
   );
 }

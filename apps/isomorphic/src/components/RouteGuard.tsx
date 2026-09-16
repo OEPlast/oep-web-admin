@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { usePermissions, PermissionResource, PermissionAction } from '@/hooks/queries/usePermissions';
-import AccessDeniedPage from '@/app/(other-pages)/access-denied/page';
+import AccessDeniedPage from '@/app/shared/access-denied';
 
 interface RouteGuardProps {
   children: React.ReactNode;

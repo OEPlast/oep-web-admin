@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import ReviewsAnalyticsClient from './reviews-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Reviews Analytics | OEPlast Admin',
-  description: 'Comprehensive reviews and ratings analytics',
+export const metadata = {
+  ...metaObject('Reviews Analytics', undefined, 'Comprehensive reviews and ratings analytics'),
 };
 
 export default function ReviewsAnalyticsPage() {

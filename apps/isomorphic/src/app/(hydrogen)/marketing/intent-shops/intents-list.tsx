@@ -15,7 +15,7 @@ import cn from '@core/utils/class-names';
 import { routes } from '@/config/routes';
 import { useIntents } from '@/hooks/queries/useIntents';
 import { useDeleteIntent, useToggleIntentStatus } from '@/hooks/mutations/useIntentMutations';
-import { Intent, IntentStatus, MIN_PUBLISHED_PRODUCTS } from '@/data/intents-data';
+import { Intent, IntentStatus, MIN_PUBLISHED_PRODUCTS } from '@/types/intent.types';
 
 type FilterType = 'all' | IntentStatus;
 

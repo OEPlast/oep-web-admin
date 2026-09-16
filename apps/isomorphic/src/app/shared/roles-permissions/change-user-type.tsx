@@ -10,7 +10,7 @@ import {
   changeUserTypeSchema,
 } from '@/validators/edit-role.schema';
 import { useModal } from '@/app/shared/modal-views/use-modal';
-import { userTypeOptions } from '@/data/roles-permissions';
+import { userTypeOptions } from '@/types/roles-permissions.types';
 import { useChangeUserRole } from '@/hooks/use-role-management';
 
 interface ChangeUserTypeProps {

@@ -16,7 +16,7 @@ import {
   INTENT_STATUS_OPTIONS,
   MIN_PUBLISHED_PRODUCTS,
   slugifyIntent,
-} from '@/data/intents-data';
+} from '@/types/intent.types';
 import { useCreateIntent, useUpdateIntent } from '@/hooks/mutations/useIntentMutations';
 import IntentProductsPicker from './intent-products-picker';
 

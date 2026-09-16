@@ -46,7 +46,12 @@ export function useUpdateGIGConfig(
       MutationContext
     >,
     'mutationFn'
-  >
+  >,
+  /**
+   * `successMessage: null` saves without a toast — for screens that save GIG config as part of a
+   * bigger form and report the result once themselves.
+   */
+  notify: { successMessage?: string | null } = {}
 ) {
   const queryClient = useQueryClient();
 
@@ -66,9 +71,16 @@ export function useUpdateGIGConfig(
       }
       return response.data;
     },
+    // Spread the caller's options FIRST: with them last, a caller passing `onSuccess` replaced
+    // these handlers wholesale, so the cached config was never invalidated after a save.
+    ...options,
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['gigConfig'] });
-      toast.success('GIG configuration updated successfully');
+      const successMessage =
+        notify.successMessage === undefined
+          ? 'GIG configuration updated successfully'
+          : notify.successMessage;
+      if (successMessage) toast.success(successMessage);
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -77,6 +89,5 @@ export function useUpdateGIGConfig(
       console.error('Update GIG config error:', error);
       options?.onError?.(error, variables, context);
     },
-    ...options,
   });
 }

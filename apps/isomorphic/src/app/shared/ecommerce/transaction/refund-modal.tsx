@@ -44,8 +44,9 @@ export default function RefundModal({
 
   if (!transaction) return null;
 
+  // Pending refunds count too: Paystack has been asked for that money already.
   const totalRefunded = transaction.refunds.reduce((sum, refund) => {
-    if (refund.status === 'completed') {
+    if (refund.status !== 'failed') {
       return sum + refund.amount;
     }
     return sum;
@@ -120,6 +121,10 @@ export default function RefundModal({
           </Text>
           <Text className="mt-1 text-sm text-gray-500">
             Refund transaction: {transaction.reference}
+          </Text>
+          <Text className="mt-2 text-sm text-gray-600">
+            The refund is requested from Paystack now and shows as <strong>pending</strong> until Paystack
+            confirms it (usually within a few minutes; bank refunds can take days to reach the customer).
           </Text>
         </div>
 

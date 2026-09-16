@@ -2,6 +2,7 @@
 
 import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Badge, Flex, Text, Tooltip } from 'rizzui';
@@ -16,7 +17,13 @@ export const shipmentsListColumns = [
     id: 'trackingNumber',
     header: 'Tracking Number',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-900">{row.original.trackingNumber}</Text>
+      <IdLink
+        href={routes.eCommerce.shipment.shipmentDetails(row.original._id)}
+        title={row.original.trackingNumber}
+        className="text-gray-900"
+      >
+        {row.original.trackingNumber}
+      </IdLink>
     ),
     size: 220,
   }),
@@ -26,7 +33,16 @@ export const shipmentsListColumns = [
     cell: ({ row }) => {
       const order = row.original.orderId as any;
       const orderId = typeof order === 'string' ? order : order?.orderNumber || order?._id;
-      return <Text className="text-gray-700">{orderId?.slice(0, 8)}...</Text>;
+      const orderRecordId = typeof order === 'string' ? order : order?._id;
+      return (
+        <IdLink
+          href={orderRecordId ? routes.eCommerce.orderDetails(orderRecordId) : null}
+          title={orderId}
+          className="text-gray-700"
+        >
+          {orderId?.slice(0, 8)}...
+        </IdLink>
+      );
     },
     size: 140,
   }),

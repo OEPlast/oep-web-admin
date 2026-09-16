@@ -1,10 +1,9 @@
-import { Metadata } from 'next';
 import PageHeader from '@/app/shared/page-header';
 import ReturnDetailsClient from './return-details-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Return Details | Admin Dashboard',
-  description: 'View and manage return request details',
+export const metadata = {
+  ...metaObject('Return Details', undefined, 'View and manage return request details'),
 };
 
 const pageHeader = {

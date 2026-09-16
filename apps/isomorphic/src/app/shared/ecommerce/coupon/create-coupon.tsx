@@ -4,9 +4,9 @@ import { Button, Input, Select, Text, Switch, Alert } from 'rizzui';
 import { Form } from '@core/ui/form';
 import { FormLabelWithTooltip } from '@core/ui/form-label-with-tooltip';
 import { Controller, ControllerRenderProps } from 'react-hook-form';
-import { CreateCouponInput } from '@/data/coupon-data';
+import { CreateCouponInput } from '@/types/coupon.types';
 import { DatePicker } from '@core/ui/datepicker';
-import QuantityInput from '@/app/shared/explore-flight/listing-filters/quantity-input';
+import QuantityInput from '@/app/shared/quantity-input';
 import { useCreateCoupon } from '@/hooks/mutations/useCouponMutations';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/config/routes';
@@ -125,7 +125,7 @@ export default function CreateCoupon() {
                       label={
                         <FormLabelWithTooltip
                           label="Discount Type"
-                          tooltip="Choose between percentage discount (e.g., 10% off) or fixed amount (e.g., $5 off)."
+                          tooltip="Choose between percentage discount (e.g., 10% off) or a fixed amount (e.g. ₦500 off)."
                           required
                         />
                       }

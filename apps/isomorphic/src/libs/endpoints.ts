@@ -69,20 +69,20 @@ export const api = {
   },
 
   // Order endpoints
+  // Only routes Main-server actually serves (routes/admin/order.ts). The previous list named
+  // eight endpoints that did not exist, which is why every order action failed.
   orders: {
     list: '/admin/orders', // List with filters & pagination
     byId: (id: string) => `/admin/orders/${id}`, // Get single order with full data
-    updateStatus: (id: string) => `/admin/orders/${id}/status`,
-    updatePaymentStatus: (id: string) => `/admin/orders/${id}/payment-status`,
-    updateTracking: (id: string) => `/admin/orders/${id}/tracking`,
-    updateNotes: (id: string) => `/admin/orders/${id}/notes`,
-    refund: (id: string) => `/admin/orders/${id}/refund`,
+    /** PUT { status?, shippingAddress?, deliveredAt? } — status changes follow the order state machine. */
+    update: (id: string) => `/admin/orders/${id}`,
+    /** DELETE with body { reason? } — cancels, releases stock, refunds a paid order via Paystack. */
     cancel: (id: string) => `/admin/orders/${id}/cancel`,
-    resendNotification: (id: string) =>
-      `/admin/orders/${id}/resend-notification`,
+    /** DELETE with body { reason? } — a cancellation with a default customer-facing reason. */
+    reject: (id: string) => `/admin/orders/${id}`,
+    /** PATCH { timeline } */
+    deliveryTimeline: (id: string) => `/admin/orders/${id}/delivery`,
     statistics: '/admin/orders/statistics',
-    bulkUpdate: '/admin/orders/bulk-update',
-    export: '/admin/orders/export',
   },
 
   // Customer endpoints
@@ -94,10 +94,20 @@ export const api = {
 
   // Inventory endpoints
   inventory: {
+    /** GET ?page&limit&q&status&lowOnly=true */
     list: '/admin/inventory',
-    byId: (id: string) => `/admin/inventory/${id}`,
-    update: (id: string) => `/admin/inventory/${id}`,
-    lowStock: '/admin/inventory/low-stock',
+    /** PATCH { threshold } */
+    setThreshold: (productId: string) => `/admin/inventory/${productId}/threshold`,
+    /** PATCH { stock?, variants? } */
+    setStock: (productId: string) => `/admin/inventory/${productId}/stock`,
+  },
+
+  // Staff notifications (bell) and the admin audit trail
+  notifications: {
+    summary: '/admin/notifications/summary',
+  },
+  auditLog: {
+    list: '/admin/audit-log',
   },
 
   // Analytics endpoints
@@ -112,18 +122,12 @@ export const api = {
       `/admin/analytics/products/${productId}/performance`,
 
     /**
-     * LEGACY — the seven still called from a live screen.
-     *
-     * The other 92 keys that used to sit here were removed: nothing referenced
-     * them, so they described a surface the admin no longer used. The server
-     * still serves those routes; if a screen needs one again, add the key back
-     * rather than reading this list as the API's inventory.
-     *
-     * These seven are what block deleting the server's legacy analytics block.
+     * Row listings still served by the legacy analytics controller (the rest of that API was
+     * deleted from Main-server on 2026-09-15, because nothing called it). A new screen should
+     * use the query engine above rather than bringing any of these back.
      */
 
-    // Dashboard charts — the home page (`app/(hydrogen)/page.tsx`) renders all three.
-    profitLossChart: '/admin/analytics/profit-loss-chart',
+    // Dashboard charts — the home page (`app/(hydrogen)/page.tsx`) renders both.
     topProductsRevenue: '/admin/analytics/top-products-revenue',
     categoriesPerformance: '/admin/analytics/categories-performance',
 

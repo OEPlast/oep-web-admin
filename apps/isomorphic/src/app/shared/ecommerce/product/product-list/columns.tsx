@@ -2,6 +2,7 @@
 
 import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import { Product } from '@/hooks/queries/useProducts';
 import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -73,9 +74,13 @@ export const productsListColumns = [
     size: 150,
     header: 'SKU',
     cell: ({ row }) => (
-      <Text className="text-sm font-medium text-gray-700">
+      <IdLink
+        href={routes.eCommerce.ediProduct(row.original._id)}
+        title={String(row.original.sku)}
+        className="text-sm text-gray-700"
+      >
         {row.original.sku}
-      </Text>
+      </IdLink>
     ),
   }),
   // Hidden column for category filtering

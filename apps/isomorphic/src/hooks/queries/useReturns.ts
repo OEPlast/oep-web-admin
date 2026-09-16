@@ -4,40 +4,74 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
 
+/** A line of a return, as Main-server stores it (models/Return.ts). `product` is populated. */
 export interface ReturnItem {
-  productId: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  variant?: string;
+  product: {
+    _id: string;
+    name: string;
+    slug?: string;
+    price?: number;
+    description_images?: Array<{ url?: string; cover_image?: boolean }>;
+  } | null;
+  qty: number;
+  reason: string;
+  reasonDetails?: string;
+  images?: string[];
+  refundAmount?: number;
 }
 
+export type ReturnStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'items_received'
+  | 'inspecting'
+  | 'inspection_passed'
+  | 'inspection_failed'
+  | 'completed'
+  | 'cancelled';
+
+export interface ReturnRefundTransaction {
+  _id: string;
+  reference: string;
+  amount: number;
+  status: string;
+  paymentMethod: string;
+  paymentGateway: string;
+  createdAt?: string;
+}
+
+/**
+ * A return as the admin API returns it. This used to describe a shape (`customer`, `reason`,
+ * `items[].productName`) that the backend never produced, so the returns screens rendered
+ * undefined everywhere.
+ */
 export interface Return {
   _id: string;
   returnNumber: string;
   order: {
     _id: string;
+    orderNumber?: string;
     total: number;
     createdAt: string;
+    deliveredAt?: string;
   };
-  customer: {
+  user: {
     _id: string;
-    firstName: string;
-    lastName: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
     phoneNumber?: string;
   };
   items: ReturnItem[];
   type: 'refund' | 'exchange';
-  reason: string;
-  status: 'pending' | 'cancelled' | 'approved' | 'rejected' | 'items_received' | 'inspecting' | 'inspection_passed' | 'inspection_failed' | 'completed';
-  refundStatus?: 'processed' | 'failed' | 'pending';
-  refundAmount?: number;
-  refundMethod?: 'paystack' | 'store_credit' | 'bank_transfer';
-  refundTransactionId?: string;
+  status: ReturnStatus;
+  totalRefundAmount: number | null;
+  refundTransaction?: ReturnRefundTransaction | string | null;
+  customerNotes?: string;
   adminNotes?: string;
   requestedAt: string;
-  completedAt?: string;
+  statusHistory?: Array<{ status: ReturnStatus; at: string; by: string; note?: string }>;
   createdAt: string;
   updatedAt: string;
 }

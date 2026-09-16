@@ -31,15 +31,16 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-// Helper to get next logical statuses based on current status
+// The moves the backend allows (Main-server services/returnService.ts RETURN_TRANSITIONS).
+// `completed` is never set by hand: paying the refund is what completes a return.
 function getAvailableStatuses(currentStatus: string) {
   const statusFlow: Record<string, string[]> = {
     pending: ['approved', 'rejected', 'cancelled'],
-    approved: ['items_received', 'rejected', 'cancelled'],
-    items_received: ['inspecting', 'rejected'],
+    approved: ['items_received', 'cancelled'],
+    items_received: ['inspecting', 'inspection_passed', 'inspection_failed'],
     inspecting: ['inspection_passed', 'inspection_failed'],
-    inspection_passed: ['approved'], // Final approval before refund
-    inspection_failed: ['rejected'],
+    inspection_passed: [], // next step is the refund
+    inspection_failed: ['rejected'], // or a refund with an override
     // Final states (no transitions)
     rejected: [],
     completed: [],

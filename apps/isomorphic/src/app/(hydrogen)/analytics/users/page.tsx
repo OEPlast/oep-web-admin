@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import UsersAnalyticsClient from './users-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Users Analytics | OEPlast Admin',
-  description: 'Comprehensive users and customer analytics',
+export const metadata = {
+  ...metaObject('Users Analytics', undefined, 'Comprehensive users and customer analytics'),
 };
 
 export default function UsersAnalyticsPage() {

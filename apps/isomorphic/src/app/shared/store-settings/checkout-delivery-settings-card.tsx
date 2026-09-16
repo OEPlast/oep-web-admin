@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Alert, Button, Checkbox, Input } from 'rizzui';
+import { Alert, Checkbox, Input } from 'rizzui';
 import { useGIGConfig } from '@/hooks/queries/useGIGConfig';
 import { useUpdateGIGConfig } from '@/hooks/mutations/useGIGConfigMutation';
 import { handleApiError } from '@/libs/axios';
@@ -65,18 +65,43 @@ type CheckoutDeliverySettingsData = z.infer<
   typeof checkoutDeliverySettingsSchema
 >;
 
-export default function CheckoutDeliverySettingsCard() {
+export type SaveDeliverySettingsResult =
+  | { ok: true }
+  | { ok: false; reason: 'invalid' | 'failed' };
+
+export interface CheckoutDeliverySettingsHandle {
+  /** Validates and saves. The store settings form calls this from its own Save button. */
+  save: () => Promise<SaveDeliverySettingsResult>;
+  /** Puts the fields back to the saved configuration. */
+  reset: () => void;
+}
+
+/**
+ * Delivery settings live on the GIG config, not on the Settings document, so they save through
+ * their own endpoint. The card has no save button of its own: the store settings form owns the
+ * one Save button and drives this through the ref, so the two halves of the page can't be saved
+ * out of step with each other.
+ */
+function CheckoutDeliverySettingsCard(
+  _props: unknown,
+  ref: React.Ref<CheckoutDeliverySettingsHandle>
+) {
   const [formError, setFormError] = useState<string | null>(null);
   const { data: config, isLoading, isError, error } = useGIGConfig();
 
-  const updateConfig = useUpdateGIGConfig({
-    onSuccess: () => {
-      setFormError(null);
+  const updateConfig = useUpdateGIGConfig(
+    {
+      onSuccess: () => {
+        setFormError(null);
+      },
+      onError: (mutationError) => {
+        setFormError(handleApiError(mutationError));
+      },
     },
-    onError: (mutationError) => {
-      setFormError(handleApiError(mutationError));
-    },
-  });
+    // The store settings form reports the whole save once; two success toasts for one click read
+    // as two saves.
+    { successMessage: null }
+  );
 
   const {
     watch,
@@ -137,19 +162,37 @@ export default function CheckoutDeliverySettingsCard() {
     });
   };
 
-  const onSubmit = (data: CheckoutDeliverySettingsData) => {
+  const save = async (): Promise<SaveDeliverySettingsResult> => {
+    // Nothing configured yet (or still loading): there is nothing of ours to save, so the store
+    // settings save should carry on.
+    if (!config) return { ok: true };
+
     setFormError(null);
-    updateConfig.mutate({
-      enabledDeliveryMethods: data.enabledDeliveryMethods,
-      shippingDiscountAmountOff: data.shippingDiscountAmountOff,
-      gigDiscountAmountOff: data.gigDiscountAmountOff,
-      freeShippingThreshold: data.freeShippingEnabled
-        ? (data.freeShippingThresholdAmount ?? 0)
-        : null,
-      shippingMinDeliveryDays: data.shippingMinDeliveryDays,
-      shippingMaxDeliveryDays: data.shippingMaxDeliveryDays,
-    });
+    let result: SaveDeliverySettingsResult = { ok: false, reason: 'invalid' };
+
+    await handleSubmit(async (data) => {
+      try {
+        await updateConfig.mutateAsync({
+          enabledDeliveryMethods: data.enabledDeliveryMethods,
+          shippingDiscountAmountOff: data.shippingDiscountAmountOff,
+          gigDiscountAmountOff: data.gigDiscountAmountOff,
+          freeShippingThreshold: data.freeShippingEnabled
+            ? (data.freeShippingThresholdAmount ?? 0)
+            : null,
+          shippingMinDeliveryDays: data.shippingMinDeliveryDays,
+          shippingMaxDeliveryDays: data.shippingMaxDeliveryDays,
+        });
+        result = { ok: true };
+      } catch {
+        // The mutation's onError already showed the message and set `formError`.
+        result = { ok: false, reason: 'failed' };
+      }
+    })();
+
+    return result;
   };
+
+  useImperativeHandle(ref, () => ({ save, reset: () => reset() }));
 
   if (isLoading) {
     return null;
@@ -287,16 +330,8 @@ export default function CheckoutDeliverySettingsCard() {
         />
       </div>
 
-      <div className="mt-6 flex justify-end">
-        <Button
-          type="button"
-          isLoading={updateConfig.isPending}
-          disabled={updateConfig.isPending}
-          onClick={handleSubmit(onSubmit)}
-        >
-          {updateConfig.isPending ? 'Saving...' : 'Save Delivery Settings'}
-        </Button>
-      </div>
     </div>
   );
 }
+
+export default forwardRef(CheckoutDeliverySettingsCard);

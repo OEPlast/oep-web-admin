@@ -4,9 +4,9 @@ import { Button, Input, Select, Text, Switch, Loader } from 'rizzui';
 import { Form } from '@core/ui/form';
 import { FormLabelWithTooltip } from '@core/ui/form-label-with-tooltip';
 import { Controller } from 'react-hook-form';
-import { UpdateCouponInput } from '@/data/coupon-data';
+import { UpdateCouponInput } from '@/types/coupon.types';
 import { DatePicker } from '@core/ui/datepicker';
-import QuantityInput from '@/app/shared/explore-flight/listing-filters/quantity-input';
+import QuantityInput from '@/app/shared/quantity-input';
 import { useCoupon } from '@/hooks/queries/useCoupons';
 import {
   useUpdateCoupon,
@@ -191,7 +191,7 @@ export default function EditCoupon({ id }: { id: string }) {
                       label={
                         <FormLabelWithTooltip
                           label="Discount Type"
-                          tooltip="Choose between percentage discount (e.g., 10% off) or fixed amount (e.g., $5 off)."
+                          tooltip="Choose between percentage discount (e.g., 10% off) or a fixed amount (e.g. ₦500 off)."
                           required
                           placement="right-start"
                         />

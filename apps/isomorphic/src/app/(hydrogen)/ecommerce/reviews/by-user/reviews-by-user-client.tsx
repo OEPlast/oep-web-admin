@@ -24,6 +24,8 @@ import cn from '@core/utils/class-names';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { getCdnUrl } from '@core/utils/cdn-url';
+import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 
 dayjs.extend(relativeTime);
 
@@ -95,7 +97,13 @@ export default function ReviewsByUserClient() {
                 {prod?.name || 'Unknown Product'}
               </Text>
               <Text className="text-sm text-gray-500">
-                SKU: {prod?.sku || 'N/A'}
+                SKU:{' '}
+                <IdLink
+                  href={prod ? routes.eCommerce.ediProduct(prod._id) : null}
+                  title={prod?.name}
+                >
+                  {prod?.sku || 'N/A'}
+                </IdLink>
               </Text>
             </div>
           </div>

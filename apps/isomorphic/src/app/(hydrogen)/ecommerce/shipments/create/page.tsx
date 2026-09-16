@@ -1,11 +1,10 @@
-import { Metadata } from 'next';
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 import CreateShipmentForm from '@/app/shared/shipment/create-shipment-form';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Create Shipment | Admin Dashboard',
-  description: 'Create a new shipment',
+export const metadata = {
+  ...metaObject('Create Shipment', undefined, 'Create a new shipment'),
 };
 
 const pageHeader = {

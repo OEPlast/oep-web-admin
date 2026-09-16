@@ -1,27 +1,25 @@
 export const routes = {
   eCommerce: {
-    dashboard: '/ecommerce',
+    dashboard: '/',
     products: '/ecommerce/products',
     createProduct: '/ecommerce/products/create',
+    // Redirects to the edit page; kept for links that still target it.
     productDetails: (slug: string) => `/ecommerce/products/${slug}`,
-    ediProduct: (slug: string) => `/ecommerce/products/${slug}/edit`,
+    /** The edit page looks products up by id, not slug. */
+    ediProduct: (id: string) => `/ecommerce/products/${id}/edit`,
     categories: '/ecommerce/categories',
     createCategory: '/ecommerce/categories/create',
     categoryDetails: (id: string) => `/ecommerce/categories/${id}`,
     editCategory: (id: string) => `/ecommerce/categories/${id}/edit`,
     orders: '/ecommerce/orders',
     orderDetails: (id: string) => `/ecommerce/orders/${id}`,
-    editOrder: (id: string) => `/ecommerce/orders/${id}/edit`,
     returns: '/ecommerce/returns',
-    createReturns: '/ecommerce/returns/create',
     returnDetails: (id: string) => `/ecommerce/returns/${id}`,
-    editReturns: (id: string) => `/ecommerce/returns/${id}/edit`,
     coupons: '/ecommerce/coupons',
     createCoupon: '/ecommerce/coupons/create',
     couponDetails: (id: string) => `/ecommerce/coupons/${id}`,
     editCoupon: (id: string) => `/ecommerce/coupons/${id}/edit`,
     banners: '/ecommerce/banners',
-    createBanner: '/ecommerce/banners/create',
     bannerDetails: (id: string) => `/ecommerce/banners/${id}`,
     editBanner: (id: string) => `/ecommerce/banners/${id}/edit`,
     flashSales: '/ecommerce/sales',
@@ -39,19 +37,13 @@ export const routes = {
     reviews: '/ecommerce/reviews',
     reviewsByProduct: '/ecommerce/reviews/by-product',
     reviewsByUser: '/ecommerce/reviews/by-user',
-    shop: '/ecommerce/shop',
-    cart: '/ecommerce/cart',
-    checkout: '/ecommerce/checkout',
-    trackingId: (id: string) => `/ecommerce/tracking/${id}`,
     // Moved under eCommerce: Shipment and Logistics
     shipment: {
       dashboard: '/ecommerce/shipments',
       shipmentList: '/ecommerce/shipments',
-      customerProfile: '/ecommerce/shipments/customer-profile',
       createShipment: '/ecommerce/shipments/create',
       editShipment: (id: string) => `/ecommerce/shipments/${id}/edit`,
       shipmentDetails: (id: string) => `/ecommerce/shipments/${id}`,
-      tracking: (id: string) => `/ecommerce/shipments/tracking/${id}`,
     },
     logistics: {
       home: '/ecommerce/logistics',
@@ -59,7 +51,6 @@ export const routes = {
       configDetails: (id: string) => `/ecommerce/logistics/${id}`,
       editConfig: (id: string) => `/ecommerce/logistics/${id}/edit`,
     },
-    gigConfig: '/ecommerce/gig-config',
     gigLogistics: {
       config: '/ecommerce/gig-logistics/config',
       deliveryTracking: '/ecommerce/gig-logistics/delivery-tracking',
@@ -71,46 +62,6 @@ export const routes = {
       edit: (id: string) => `/ecommerce/delivery/${id}/edit`,
     },
   },
-  searchAndFilter: {
-    realEstate: '/search/real-estate',
-    nft: '/search/nft',
-    flight: '/search/flight',
-  },
-  support: {
-    dashboard: '/support',
-    inbox: '/support/inbox',
-    supportCategory: (category: string) => `/support/inbox/${category}`,
-    messageDetails: (id: string) => `/support/inbox/${id}`,
-    snippets: '/support/snippets',
-    createSnippet: '/support/snippets/create',
-    viewSnippet: (id: string) => `/support/snippets/${id}`,
-    editSnippet: (id: string) => `/support/snippets/${id}/edit`,
-    templates: '/support/templates',
-    createTemplate: '/support/templates/create',
-    viewTemplate: (id: string) => `/support/templates/${id}`,
-    editTemplate: (id: string) => `/support/templates/${id}/edit`,
-  },
-  appointment: {
-    dashboard: '/appointment',
-    appointmentList: '/appointment/list',
-  },
-  storeAnalytics: {
-    dashboard: '/store-analytics',
-  },
-  executive: {
-    dashboard: '/executive',
-  },
-  project: {
-    dashboard: '/project',
-  },
-  socialMedia: {
-    dashboard: '/social-media',
-  },
-  jobBoard: {
-    dashboard: '/job-board',
-    jobFeed: '/job-board/feed',
-  },
-  analytics: '/analytics',
   /**
    * One product's analytics. Without an id the page prompts for a SKU, so the
    * bare route is a valid destination rather than a broken link.
@@ -119,24 +70,9 @@ export const routes = {
     productId
       ? `/analytics/products/performance?product=${productId}`
       : '/analytics/products/performance',
-  financial: {
-    dashboard: '/financial',
-  },
-  podcast: {
-    dashboard: '/podcast',
-  },
-  file: {
-    dashboard: '/file',
-    manager: '/file-manager',
-    upload: '/file-manager/upload',
-    create: '/file-manager/create',
-  },
-  pos: {
-    index: '/point-of-sale',
-  },
-  eventCalendar: '/event-calendar',
   rolesPermissions: '/roles-permissions',
   storeSettings: '/store-settings',
+  inventory: '/inventory',
   transactions: {
     list: '/transactions',
     details: (id: string) => `/transactions/${id}`,
@@ -146,74 +82,9 @@ export const routes = {
     details: (id: string) => `/users/${id}`,
   },
   invoice: '/invoice',
-  imageViewer: '/image-viewer',
-  widgets: {
-    cards: '/widgets/cards',
-    icons: '/widgets/icons',
-    charts: '/widgets/charts',
-    maps: '/widgets/maps',
-    banners: '/widgets/banners',
-  },
-  tables: {
-    basic: '/tables/basic',
-    collapsible: '/tables/collapsible',
-    enhanced: '/tables/enhanced',
-    pagination: '/tables/pagination',
-    search: '/tables/search',
-    stickyHeader: '/tables/sticky-header',
-    resizable: '/tables/resizable',
-    pinning: '/tables/pinning',
-    dnd: '/tables/dnd',
-  },
-  multiStep: '/multi-step',
-  multiStep2: '/multi-step-2',
-  forms: {
-    profileSettings: '/account/profile-settings',
-    notificationPreference: '/account/profile-settings/notification',
-    personalInformation: '/account/profile-settings/profile',
-    newsletter: '/account/newsletter',
-  },
-  emailTemplates: '/email-templates',
-  profile: '/profile',
-  welcome: '/welcome',
-  comingSoon: '/coming-soon',
-  accessDenied: '/access-denied',
-  notFound: '/not-found',
-  maintenance: '/maintenance',
-  blank: '/blank',
-  auth: {
-    signUp1: '/auth/sign-up',
-    signUp2: '/auth/sign-up-2',
-    signUp3: '/auth/sign-up-3',
-    signUp4: '/auth/sign-up-4',
-    signUp5: '/auth/sign-up-5',
-    // sign in
-    signIn1: '/auth/sign-in-1',
-    signIn2: '/auth/sign-in-2',
-    signIn3: '/auth/sign-in-3',
-    signIn4: '/auth/sign-in-4',
-    signIn5: '/auth/sign-in-5',
-    // forgot password
-    forgotPassword1: '/auth/forgot-password-1',
-    forgotPassword2: '/auth/forgot-password-2',
-    forgotPassword3: '/auth/forgot-password-3',
-    forgotPassword4: '/auth/forgot-password-4',
-    forgotPassword5: '/auth/forgot-password-5',
-    // OTP
-    otp1: '/auth/otp-1',
-    otp2: '/auth/otp-2',
-    otp3: '/auth/otp-3',
-    otp4: '/auth/otp-4',
-    otp5: '/auth/otp-5',
-  },
   signIn: '/signin',
-  returns: {
-    list: '/returns',
-    details: (id: string) => `/returns/${id}`,
-  },
   storefront: {
     signUpPage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/register`,
     forgotPasswordPage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}/forgot-password`,
-    homePage: `${process.env.NEXT_PUBLIC_STOREFRONT_URL}`,
   },
 };

@@ -7,7 +7,7 @@ import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Tab
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
-import { CouponDataType } from '@/data/coupon-data';
+import { CouponDataType } from '@/types/coupon.types';
 import { useCoupons } from '@/hooks/queries/useCoupons';
 import { useDeleteCoupon } from '@/hooks/mutations/useCouponMutations';
 import { Loader, Text } from 'rizzui';

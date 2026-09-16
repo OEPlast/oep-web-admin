@@ -1,8 +1,6 @@
-import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
-import Link from 'next/link';
-import OneOrderNav from '@/app/shared/account-settings/navigation';
+import OneOrderNav from '@/app/shared/mini-nav';
 
 export default async function OrderDetailsPage({
   params,
@@ -42,16 +40,7 @@ export default async function OrderDetailsPage({
 
   return (
     <>
-      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
-        {/* <Link
-          href={routes.eCommerce.editOrder(id)}
-          className="mt-4 w-full @lg:mt-0 @lg:w-auto"
-        >
-          <Button as="span" className="w-full @lg:w-auto">
-            Edit Order
-          </Button>
-        </Link> */}
-      </PageHeader>
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
       <OneOrderNav menuItems={menuItemsForMiniNav} />
       {children}
     </>

@@ -11,6 +11,7 @@ import { PiEyeBold } from 'react-icons/pi';
 import { formatPrice } from '@core/hooks/use-price';
 import { getCdnUrl } from '@core/utils/cdn-url';
 import Link from 'next/link';
+import IdLink from '@/app/shared/id-link';
 import { routes } from '@/config/routes';
 
 const columnHelper = createColumnHelper<Order>();
@@ -21,7 +22,12 @@ export const ordersColumns = (onViewOrder: (order: Order) => void) => [
     size: 140,
     header: 'Order #',
     cell: ({ row }) => (
-      <Text className="font-medium">{row.original._id}</Text>
+      <IdLink
+        href={routes.eCommerce.orderDetails(row.original._id)}
+        title={row.original._id}
+      >
+        {row.original._id}
+      </IdLink>
     ),
   }),
 

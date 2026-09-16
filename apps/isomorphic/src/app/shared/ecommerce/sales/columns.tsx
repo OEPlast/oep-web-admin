@@ -15,6 +15,7 @@ import {
   useDeleteSale,
 } from '@/hooks/mutations/useSalesMutations';
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import { SalesDataType } from './table';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -132,37 +133,12 @@ export const salesColumns = [
     size: 200,
     header: 'Title',
     cell: ({ row }) => (
-      <Text className="text-sm font-medium">
+      <IdLink
+        href={routes.eCommerce.flashSaleDetails(row.original._id)}
+        className="text-sm"
+      >
         {row.original.title || 'Untitled Sale'}
-      </Text>
-    ),
-  }),
-
-  columnHelper.display({
-    id: 'productName',
-    size: 200,
-    header: 'Product',
-    cell: ({ row }) => (
-      <div className="flex gap-1 items-center">
-        <img
-          src={
-       getCdnUrl( row.original.product?.description_images?.find((img) => img.cover_image)?.url ||
-        '/placeholder.png')
-          }
-          alt={row.original.product?.name || 'Product'}
-          className="h-10 w-10 rounded-sm object-cover"
-        />
-        <div>
-          <Text className="text-sm font-medium">
-        {row.original.product?.name || 'N/A'}
-          </Text>
-          {row.original.product?.slug && (
-        <Text className="text-xs text-gray-500">
-          {row.original.product.slug}
-        </Text>
-          )}
-        </div>
-      </div>
+      </IdLink>
     ),
   }),
   columnHelper.accessor('type', {

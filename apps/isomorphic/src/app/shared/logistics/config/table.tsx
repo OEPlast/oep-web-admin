@@ -18,6 +18,7 @@ import cn from '@core/utils/class-names';
 import { createColumnHelper } from '@tanstack/react-table';
 import type { CountryListItem } from '@/types/logistics.types';
 import DeletePopover from '@core/components/delete-popover';
+import IdLink from '@/app/shared/id-link';
 
 const columnHelper = createColumnHelper<CountryListItem>();
 
@@ -45,9 +46,13 @@ export default function LogisticsConfigTable() {
         size: 120,
         header: 'Code',
         cell: ({ row }) => (
-          <Text className="font-semibold text-gray-900">
+          <IdLink
+            href={routes.eCommerce.logistics.configDetails(row.original._id)}
+            title={row.original.countryName}
+            className="text-gray-900"
+          >
             {row.original.countryCode}
-          </Text>
+          </IdLink>
         ),
       }),
       columnHelper.accessor('countryName', {

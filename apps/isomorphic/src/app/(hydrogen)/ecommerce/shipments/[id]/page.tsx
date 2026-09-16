@@ -1,11 +1,10 @@
-import { Metadata } from 'next';
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 import ShipmentDetails from '@/app/shared/shipment/shipment-details';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Shipment Details ',
-  description: 'View shipment details',
+export const metadata = {
+  ...metaObject('Shipment Details', undefined, 'View shipment details'),
 };
 
 interface ShipmentDetailsPageProps {

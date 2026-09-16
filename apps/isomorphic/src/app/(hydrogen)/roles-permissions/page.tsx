@@ -5,7 +5,7 @@ import UsersTable from '@/app/shared/roles-permissions/users-table';
 import CreateRole from '@/app/shared/roles-permissions/create-role';
 
 const pageHeader = {
-  title: 'Roles and Permissions ',
+  title: 'Roles and Permissions',
   breadcrumb: [
     {
       href: '/',

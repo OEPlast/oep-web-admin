@@ -16,6 +16,7 @@ export const updateStoreSettingsSchema = z.object({
     .or(z.literal('')),
   supportPhone: z.string().optional(),
   whatsappNumber: z.string().optional(),
+  supportHours: z.string().max(120, 'Keep support hours under 120 characters').optional(),
   address: z
     .object({
       line1: z.string().optional(),

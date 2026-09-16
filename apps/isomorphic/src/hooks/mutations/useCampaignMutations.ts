@@ -12,7 +12,7 @@ import {
   Campaign,
   CreateCampaignInput,
   UpdateCampaignInput,
-} from '@/data/campaigns-data';
+} from '@/types/campaign.types';
 
 /**
  * Create a new campaign

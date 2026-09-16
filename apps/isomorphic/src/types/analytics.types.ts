@@ -32,12 +32,6 @@ export interface PaginationMeta {
  * Total Profit/Loss Chart (Line Chart with 3 metrics)
  * Time-series data showing revenue, expenses, and returns
  */
-export interface ProfitLossChartData {
-  date: string; // ISO date string (e.g., "2025-01-15")
-  revenue: number;
-  expenses: number;
-  returns: number;
-}
 
 /**
  * Top Products by Revenue (Bar Chart)

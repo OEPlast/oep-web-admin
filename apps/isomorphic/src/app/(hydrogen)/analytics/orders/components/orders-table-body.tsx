@@ -2,7 +2,7 @@ import { Badge, Text } from 'rizzui';
 import { formatNumber } from '@core/utils/format-number';
 import cn from '@core/utils/class-names';
 import type { OrdersTableResponse } from '@/types/analytics.types';
-import Link from 'next/link';
+import IdLink from '@/app/shared/id-link';
 import { routes } from '@/config/routes';
 
 interface OrdersTableBodyProps {
@@ -70,9 +70,9 @@ export default function OrdersTableBody({
           )}
         >
           <td className="px-4 py-3">
-            <Link href={routes.eCommerce.orderDetails(order._id)} className="font-medium text-gray-900">
+            <IdLink href={routes.eCommerce.orderDetails(order._id)} title={order._id}>
               {order._id}
-            </Link>
+            </IdLink>
           </td>
           <td className="px-4 py-3">
             <div>

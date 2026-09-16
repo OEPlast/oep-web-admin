@@ -14,7 +14,7 @@ import {
   IntentStatus,
   CreateIntentInput,
   UpdateIntentInput,
-} from '@/data/intents-data';
+} from '@/types/intent.types';
 
 /**
  * The backend surfaces slug clashes (409) and Mongoose validation failures (400)

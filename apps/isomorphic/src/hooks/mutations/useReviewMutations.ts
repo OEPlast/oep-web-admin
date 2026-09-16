@@ -229,7 +229,7 @@ export const useModerateReview = (
 export const useAddReply = (
   options?: Omit<
     UseMutationOptions<
-      Review,
+      null,
       Error,
       { reviewId: string; data: AddReplyInput },
       MutationContext
@@ -240,20 +240,18 @@ export const useAddReply = (
   const queryClient = useQueryClient();
 
   return useMutation<
-    Review,
+    null,
     Error,
     { reviewId: string; data: AddReplyInput },
     MutationContext
   >({
     mutationFn: async ({ reviewId, data }) => {
-      const response = await apiClient.post<Review>(
+      const response = await apiClient.post<null>(
         api.reviews.addReply(reviewId),
         data
       );
-      if (!response.data) {
-        throw new Error('Failed to add reply');
-      }
-      return response.data;
+      // The reply endpoints answer { message, data: null }; a 2xx is the success signal.
+      return response.data ?? null;
     },
     onSuccess: (data, variables, context) => {
       // Invalidate review
@@ -281,7 +279,7 @@ export const useAddReply = (
 export const useUpdateReply = (
   options?: Omit<
     UseMutationOptions<
-      Review,
+      null,
       Error,
       { reviewId: string; replyId: string; data: UpdateReplyInput },
       MutationContext
@@ -292,20 +290,18 @@ export const useUpdateReply = (
   const queryClient = useQueryClient();
 
   return useMutation<
-    Review,
+    null,
     Error,
     { reviewId: string; replyId: string; data: UpdateReplyInput },
     MutationContext
   >({
     mutationFn: async ({ reviewId, replyId, data }) => {
-      const response = await apiClient.patch<Review>(
+      const response = await apiClient.put<null>(
         api.reviews.updateReply(reviewId, replyId),
         data
       );
-      if (!response.data) {
-        throw new Error('Failed to update reply');
-      }
-      return response.data;
+      // The reply endpoints answer { message, data: null }; a 2xx is the success signal.
+      return response.data ?? null;
     },
     onSuccess: (data, variables, context) => {
       // Invalidate review
@@ -332,7 +328,7 @@ export const useUpdateReply = (
 export const useDeleteReply = (
   options?: Omit<
     UseMutationOptions<
-      Review,
+      null,
       Error,
       { reviewId: string; replyId: string },
       MutationContext
@@ -343,19 +339,17 @@ export const useDeleteReply = (
   const queryClient = useQueryClient();
 
   return useMutation<
-    Review,
+    null,
     Error,
     { reviewId: string; replyId: string },
     MutationContext
   >({
     mutationFn: async ({ reviewId, replyId }) => {
-      const response = await apiClient.delete<Review>(
+      const response = await apiClient.delete<null>(
         api.reviews.deleteReply(reviewId, replyId)
       );
-      if (!response.data) {
-        throw new Error('Failed to delete reply');
-      }
-      return response.data;
+      // The reply endpoints answer { message, data: null }; a 2xx is the success signal.
+      return response.data ?? null;
     },
     onSuccess: (data, variables, context) => {
       // Invalidate review

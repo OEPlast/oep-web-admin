@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
 import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
 import LogisticsConfigForm from '@/app/shared/logistics/config/logistics-form';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Create Logistics Configuration | OEPlast Admin',
-  description: 'Add a new country with shipping pricing',
+export const metadata = {
+  ...metaObject('Create Logistics Configuration', undefined, 'Add a new country with shipping pricing'),
 };
 
 const pageHeader = {

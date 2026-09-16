@@ -27,7 +27,7 @@ const pageHeader = {
   title: 'Users Analytics',
   breadcrumb: [
     { href: '/', name: 'Home' },
-    { href: '/analytics', name: 'Analytics' },
+    { name: 'Analytics' },
     { name: 'Users' },
   ],
 };

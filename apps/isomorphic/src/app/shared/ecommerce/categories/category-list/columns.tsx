@@ -2,6 +2,7 @@
 
 import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
@@ -58,8 +59,13 @@ export const categoriesColumns = [
     id: 'slug',
     size: 180,
     header: 'Slug',
-    cell: ({ getValue }) => (
-      <Text className="text-xs font-mono text-gray-600">{getValue()}</Text>
+    cell: ({ getValue, row }) => (
+      <IdLink
+        href={routes.eCommerce.categoryDetails(row.original._id)}
+        className="text-xs font-mono text-gray-600"
+      >
+        {getValue()}
+      </IdLink>
     ),
   }),
   columnHelper.accessor('priority', {

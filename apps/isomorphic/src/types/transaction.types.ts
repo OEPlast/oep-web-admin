@@ -35,9 +35,20 @@ export interface Refund {
   refundId: string;
   amount: number;
   reason: string;
+  /** `pending` until Paystack's refund webhook confirms it. */
   status: RefundStatus;
   refundDate: string;
   gatewayRefundId?: string;
+  /** Admin user id, or 'system' for automatic refunds. */
+  initiatedBy?: string;
+}
+
+/** Set when staff must look at this payment: a late payment, a customer-cancelled paid order, a failed refund. */
+export interface TransactionReview {
+  required: boolean;
+  reason?: string;
+  flaggedAt?: string;
+  resolvedAt?: string;
 }
 
 // Transaction Fees
@@ -137,6 +148,7 @@ export interface Transaction {
   paidAt?: string;
   gatewayResponse?: GatewayResponse;
   refunds: Refund[];
+  review?: TransactionReview;
   fees: TransactionFees;
   customerInfo: TransactionCustomerInfo;
   billingAddress?: BillingAddress;
@@ -163,6 +175,8 @@ export interface TransactionFilters {
   minAmount?: number;
   maxAmount?: number;
   search?: string;
+  /** Only payments flagged for staff attention. */
+  needsReview?: boolean;
 }
 
 // Pagination metadata

@@ -49,7 +49,7 @@ export default function UpdateProduct({ product }: UpdateProductProps) {
   const deleteProduct = useDeleteProduct({
     onSuccess: () => {
       toast.success('Product deleted successfully');
-      router.push(routes.eCommerce.productDetails(product._id));
+      router.push(routes.eCommerce.products);
     },
     onError: (error) => {
       const errorMessage =

@@ -1,10 +1,9 @@
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import ProductPerformanceClient from './performance-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Product Performance | OEPlast Admin',
-  description: 'Full analytics for a single product',
+export const metadata = {
+  ...metaObject('Product Performance', undefined, 'Full analytics for a single product'),
 };
 
 export default function ProductPerformancePage() {

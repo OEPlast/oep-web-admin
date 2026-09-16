@@ -1,36 +1,13 @@
+import { redirect } from 'next/navigation';
 import { routes } from '@/config/routes';
-import PageHeader from '@/app/shared/page-header';
-import ProductDetails from '@/app/shared/ecommerce/product/product-details';
-import { metaObject } from '@/config/site.config';
 
-export const metadata = {
-  ...metaObject('Product Details'),
-};
-
-export default async function ProductDetailsPage({ params }: any) {
-  const slug = (await params).slug;
-
-  const pageHeader = {
-    title: 'Shop',
-    breadcrumb: [
-      {
-        href: routes.eCommerce.dashboard,
-        name: 'E-Commerce',
-      },
-      {
-        href: routes.eCommerce.shop,
-        name: 'Shop',
-      },
-      {
-        name: slug,
-      },
-    ],
-  };
-
-  return (
-    <>
-      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-      <ProductDetails />
-    </>
-  );
+// There is no read-only product view in the admin; product links land on the
+// edit page, which loads the product by its id.
+export default async function ProductDetailsRedirect({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  redirect(routes.eCommerce.ediProduct(slug));
 }

@@ -81,7 +81,7 @@ export default function ProductPerformanceClient() {
         title={product?.name ?? 'Product Performance'}
         breadcrumb={[
           { href: '/', name: 'Home' },
-          { href: routes.analytics, name: 'Analytics' },
+          { name: 'Analytics' },
           { href: '/analytics/products', name: 'Products' },
           { name: product?.name ?? 'Performance' },
         ]}

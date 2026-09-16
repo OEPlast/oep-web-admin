@@ -12,6 +12,10 @@ export interface Product {
   name: string;
   sku: number;
   slug: string;
+  brand?: string;
+  gtin?: string;
+  mpn?: string;
+  condition?: 'new' | 'used' | 'refurbished';
   description: string;
   price: number;
   stock: number;

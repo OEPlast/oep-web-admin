@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
-import { Intent, IntentFilters } from '@/data/intents-data';
+import { Intent, IntentFilters } from '@/types/intent.types';
 
 interface IntentsResponse {
   intents: Intent[];

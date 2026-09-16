@@ -8,6 +8,8 @@ import TablePagination from '@core/components/table/pagination';
 import { Badge, Text, Tooltip, ActionIcon } from 'rizzui';
 import { PiEyeBold } from 'react-icons/pi';
 import { ColumnDef } from '@tanstack/react-table';
+import IdLink from '@/app/shared/id-link';
+import { routes } from '@/config/routes';
 
 interface ReturnsTableProps {
   returns: Return[];
@@ -74,35 +76,45 @@ export default function ReturnsTable({
         header: 'Return Number',
         accessorKey: 'returnNumber',
         cell: ({ row }) => (
-          <Text className="font-medium text-gray-900">
+          <IdLink
+            href={routes.eCommerce.returnDetails(row.original._id)}
+            title={row.original.returnNumber}
+          >
             {row.original.returnNumber}
-          </Text>
+          </IdLink>
         ),
       },
       {
         header: 'Order',
         accessorKey: 'order',
-        cell: ({ row }) => (
-          <div>
-            <Text className="text-sm font-medium">
-              #{row.original.order._id.slice(-6)}
-            </Text>
-            <Text className="text-xs text-gray-500">
-              {formatCurrency(row.original.order.total)}
-            </Text>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const order = row.original.order;
+          return (
+            <div>
+              <IdLink
+                href={order?._id ? routes.eCommerce.orderDetails(order._id) : null}
+                title={order?._id}
+                className="text-sm"
+              >
+                {order?.orderNumber ?? `#${order?._id?.slice(-6) ?? '—'}`}
+              </IdLink>
+              <Text className="text-xs text-gray-500">
+                {formatCurrency(order?.total ?? 0)}
+              </Text>
+            </div>
+          );
+        },
       },
       {
         header: 'Customer',
-        accessorKey: 'customer',
+        accessorKey: 'user',
         cell: ({ row }) => (
           <div>
             <Text className="text-sm font-medium">
-              {row.original.customer.firstName} {row.original.customer.lastName}
+              {row.original.user?.firstName} {row.original.user?.lastName}
             </Text>
             <Text className="text-xs text-gray-500">
-              {row.original.customer.email}
+              {row.original.user?.email}
             </Text>
           </div>
         ),

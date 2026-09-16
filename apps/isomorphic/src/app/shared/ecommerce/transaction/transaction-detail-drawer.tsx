@@ -215,7 +215,7 @@ export default function TransactionDetailDrawer({
                 </Button>
               )}
               {order && (
-                <Link href={routes.eCommerce.editOrder(order._id)} className="flex-1">
+                <Link href={routes.eCommerce.orderDetails(order._id)} className="flex-1">
                   <Button variant="outline" className="w-full">
                     <PiPackageBold className="mr-2 h-4 w-4" />
                     View Order

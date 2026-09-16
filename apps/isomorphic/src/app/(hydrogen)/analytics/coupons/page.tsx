@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import CouponsAnalyticsClient from './coupons-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Coupons Analytics | OEPlast Admin',
-  description: 'Comprehensive coupon usage and performance analytics',
+export const metadata = {
+  ...metaObject('Coupons Analytics', undefined, 'Comprehensive coupon usage and performance analytics'),
 };
 
 export default function CouponsAnalyticsPage() {

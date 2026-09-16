@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import TransactionsAnalyticsClient from './transactions-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Transactions Analytics | OEPlast Admin',
-  description: 'Comprehensive transactions analytics and insights',
+export const metadata = {
+  ...metaObject('Transactions Analytics', undefined, 'Comprehensive transactions analytics and insights'),
 };
 
 export default function TransactionsAnalyticsPage() {

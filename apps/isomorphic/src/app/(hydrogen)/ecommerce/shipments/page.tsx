@@ -1,9 +1,8 @@
-import { Metadata } from 'next';
 import ShipmentsClient from '@/app/shared/ecommerce/shipment/ShipmentsClient';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Shipments | Admin Dashboard',
-  description: 'Manage all shipments',
+export const metadata = {
+  ...metaObject('Shipments', undefined, 'Manage all shipments'),
 };
 
 export default function ShipmentsPage() {

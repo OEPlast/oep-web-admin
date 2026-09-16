@@ -226,9 +226,9 @@ export default function CampaignDetails({ id }: CampaignDetailsProps) {
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      {product.slug ? (
+                      {product._id ? (
                         <Link
-                          href={routes.eCommerce.productDetails(product.slug)}
+                          href={routes.eCommerce.ediProduct(product._id)}
                           className="truncate font-medium text-primary hover:underline"
                         >
                           {product.name}

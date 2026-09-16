@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import ProductsAnalyticsClient from './products-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Products Analytics | OEPlast Admin',
-  description: 'Comprehensive products performance analytics',
+export const metadata = {
+  ...metaObject('Products Analytics', undefined, 'Comprehensive products performance analytics'),
 };
 
 export default function ProductsAnalyticsPage() {

@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Controller } from 'react-hook-form';
-import { Button, Input, Select, Textarea, Alert } from 'rizzui';
+import { Button, Input, Select, Textarea, Alert, Switch } from 'rizzui';
 import axios from 'axios';
 import { Form } from '@core/ui/form';
 import { refundProcessSchema, RefundProcessInput } from '@/validators/return-schema';
@@ -10,35 +10,36 @@ import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import { BackendValidationError, extractBackendErrors } from '@/libs/form-errors';
 import { useProcessRefund } from '@/hooks/mutations/useProcessRefund';
 import { handleApiError } from '@/libs/axios';
-import toast from 'react-hot-toast';
 
-// Format currency helper
-const formatCurrency = (value: number, currency = 'NGN') => {
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const formatCurrency = (value: number, currency = 'NGN') =>
+  new Intl.NumberFormat('en-NG', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
 interface RefundProcessFormProps {
   returnId: string;
+  /** Naira. What the returned items were sold for; the default refund. */
   totalRefundAmount: number | null;
+  /** Naira. The order total; a refund can't exceed it. */
+  orderTotal?: number;
   currentStatus: string;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 const REFUND_METHOD_OPTIONS = [
-  { value: 'original_payment', label: 'Original Payment Method (Paystack)' },
-  { value: 'store_credit', label: 'Store Credit' },
-  { value: 'bank_transfer', label: 'Manual Bank Transfer' },
+  { value: 'original_payment', label: 'Original payment (Paystack refund)' },
+  { value: 'store_credit', label: 'Store credit (paid outside Paystack)' },
+  { value: 'bank_transfer', label: 'Manual bank transfer' },
 ];
+
+/** Refund without an override only after the goods came back and passed inspection. */
+const REFUNDABLE = ['inspection_passed'];
+/** Refund with a written override: the goods are waived (e.g. not worth shipping back). */
+const OVERRIDABLE = ['approved', 'items_received', 'inspecting', 'inspection_failed'];
 
 export default function RefundProcessForm({
   returnId,
   totalRefundAmount,
+  orderTotal,
   currentStatus,
   onSuccess,
   onCancel,
@@ -53,27 +54,26 @@ export default function RefundProcessForm({
       onSuccess?.();
     },
     onError: (error: Error) => {
-      const errorMessage = handleApiError(error);
-      setComponentError(errorMessage);
-
-      // Extract backend validation errors if available
+      setComponentError(handleApiError(error));
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
         const backendErrors = extractBackendErrors(error.response.data);
-        if (backendErrors) {
-          setApiErrors(backendErrors);
-        }
+        if (backendErrors) setApiErrors(backendErrors);
       }
     },
   });
 
-  // Check if return is in refundable state
-  const isRefundable = currentStatus === 'approved';
-  const canProcessRefund = isRefundable && totalRefundAmount && totalRefundAmount > 0;
+  const passedInspection = REFUNDABLE.includes(currentStatus);
+  const needsOverride = !passedInspection && OVERRIDABLE.includes(currentStatus);
+  const canProcessRefund = passedInspection || needsOverride;
 
   const handleSubmit = (data: RefundProcessInput) => {
     setComponentError(null);
     setApiErrors(null);
-    processRefundMutation.mutate(data);
+    processRefundMutation.mutate({
+      ...data,
+      override: needsOverride ? true : undefined,
+      overrideReason: needsOverride ? data.overrideReason : undefined,
+    });
   };
 
   return (
@@ -86,78 +86,58 @@ export default function RefundProcessForm({
           refundAmount: totalRefundAmount || 0,
           refundMethod: 'original_payment',
           adminNotes: '',
+          override: needsOverride,
+          overrideReason: '',
         },
       }}
       className="flex flex-col gap-6"
     >
-      {({ register, control, formState: { errors, isSubmitting }, setError }) => {
-        // Set backend errors when apiErrors changes
-          if (apiErrors && apiErrors.length > 0) {
-            apiErrors.forEach((error) => {
-              if (error.path && error.msg) {
-                setError(error.path as any, {
-                  type: 'manual',
-                  message: error.msg,
-                });
-              }
-            });
-          }
+      {({ register, control, watch, formState: { errors, isSubmitting }, setError }) => {
+        if (apiErrors && apiErrors.length > 0) {
+          apiErrors.forEach((error) => {
+            if (error.path && error.msg) setError(error.path as any, { type: 'manual', message: error.msg });
+          });
+        }
+        const method = watch('refundMethod');
 
         return (
           <>
-            {/* Display component-level error */}
             {componentError && (
               <Alert color="danger" className="mb-4">
                 <strong>Error:</strong> {componentError}
               </Alert>
             )}
 
-            {/* Status Warning */}
-            {!isRefundable && (
+            {!canProcessRefund && (
               <Alert color="warning" className="mb-4">
-                <strong>Note:</strong> Refunds can only be processed when the return status is
-                {` "approved"`} (after inspection passes). Current status: <strong>{currentStatus}</strong>
+                A refund needs the returned items to pass inspection first. Current status:{' '}
+                <strong>{currentStatus.replace('_', ' ')}</strong>.
               </Alert>
             )}
 
-            {/* Refund Amount Display */}
-            <VerticalFormBlockWrapper
-              title="Calculated Refund Amount"
-              description="Total amount eligible for refund based on returned items"
-            >
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <p className="text-2xl font-semibold text-gray-900">
-                  {formatCurrency(totalRefundAmount || 0, 'NGN')}
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                  {totalRefundAmount ? 'Calculated from returned item prices' : 'No refund amount calculated yet'}
-                </p>
-              </div>
-            </VerticalFormBlockWrapper>
+            {needsOverride && (
+              <Alert color="warning" className="mb-4">
+                The items have <strong>not passed inspection</strong>. Refunding now waives the goods; say why
+                below. The reason is kept on the return.
+              </Alert>
+            )}
 
-            {/* Refund Amount Input */}
-            <VerticalFormBlockWrapper
-              title="Refund Amount"
-              description="Enter the amount to refund (in Kobo - Nigerian currency subunit)"
-            >
+            <VerticalFormBlockWrapper title="Refund amount" description="In naira. Defaults to what the returned items were sold for.">
               <Input
                 type="number"
+                step="0.01"
                 {...register('refundAmount', { valueAsNumber: true })}
-                placeholder="15000"
-                suffix="Kobo"
+                prefix="₦"
                 error={errors.refundAmount?.message as string}
                 disabled={!canProcessRefund || isSubmitting}
               />
               <p className="mt-2 text-sm text-gray-500">
-                1 Naira = 100 Kobo. Example: ₦150.00 = 15000 Kobo
+                Items: {formatCurrency(totalRefundAmount || 0)}
+                {typeof orderTotal === 'number' ? ` · Order total: ${formatCurrency(orderTotal)} (maximum)` : ''}
               </p>
             </VerticalFormBlockWrapper>
 
-            {/* Refund Method */}
-            <VerticalFormBlockWrapper
-              title="Refund Method"
-              description="Select how the refund should be processed"
-            >
+            <VerticalFormBlockWrapper title="Refund method" description="Original payment goes to Paystack now and completes when Paystack confirms it. The other two record a payout you make yourself.">
               <Controller
                 name="refundMethod"
                 control={control}
@@ -169,69 +149,46 @@ export default function RefundProcessForm({
                     placeholder="Select refund method"
                     error={errors.refundMethod?.message as string}
                     getOptionValue={(option) => option.value}
-                    displayValue={(selected: string) =>
-                      REFUND_METHOD_OPTIONS.find((opt) => opt.value === selected)?.label ?? selected
-                    }
+                    displayValue={(selected: string) => REFUND_METHOD_OPTIONS.find((opt) => opt.value === selected)?.label ?? selected}
                     disabled={!canProcessRefund || isSubmitting}
                   />
                 )}
               />
-              <div className="mt-3 space-y-2 text-sm text-gray-600">
-                <p><strong>Original Payment Method:</strong> {`Refund via Paystack to customer's payment source`}</p>
-                <p><strong>Store Credit:</strong> {`Add refund amount to customer's store credit balance`}</p>
-                <p><strong>Bank Transfer:</strong> Manual bank transfer processed by finance team</p>
-              </div>
+              {method !== 'original_payment' && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Recorded as paid immediately. Make sure the customer has actually received it.
+                </p>
+              )}
             </VerticalFormBlockWrapper>
 
-            {/* Admin Notes */}
-            <VerticalFormBlockWrapper
-              title="Admin Notes"
-              description="Add notes about this refund (optional)"
-            >
+            {needsOverride && (
+              <VerticalFormBlockWrapper title="Override reason" description="Why the refund is being paid without a passed inspection.">
+                <Textarea
+                  {...register('overrideReason')}
+                  placeholder="e.g. Item arrived damaged; customer sent photos; not worth shipping back"
+                  error={errors.overrideReason?.message as string}
+                  disabled={isSubmitting}
+                />
+              </VerticalFormBlockWrapper>
+            )}
+
+            <VerticalFormBlockWrapper title="Notes" description="Shown to the customer in the refund email.">
               <Textarea
                 {...register('adminNotes')}
-                placeholder="e.g., Full refund processed after confirming defect"
-                rows={4}
+                placeholder="e.g. Refund for the damaged bucket"
                 error={errors.adminNotes?.message as string}
                 disabled={!canProcessRefund || isSubmitting}
               />
             </VerticalFormBlockWrapper>
 
-            {/* Warning Message */}
-            {canProcessRefund && (
-              <Alert color="info" className="mt-4">
-                <strong>Important:</strong> Processing this refund will:
-                <ul className="mt-2 list-inside list-disc space-y-1">
-                  <li>Create a refund transaction</li>
-                  <li>{`Update the return status to "completed"`}</li>
-                  <li>
-                    {totalRefundAmount && totalRefundAmount > 0
-                      ? `Refund ${formatCurrency(totalRefundAmount, 'NGN')} to the customer`
-                      : 'Process the specified refund amount'}
-                  </li>
-                </ul>
-              </Alert>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3">
               {onCancel && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onCancel}
-                  disabled={isSubmitting || processRefundMutation.isPending}
-                >
+                <Button variant="outline" onClick={onCancel} disabled={isSubmitting}>
                   Cancel
                 </Button>
               )}
-              <Button
-                type="submit"
-                isLoading={isSubmitting || processRefundMutation.isPending}
-                disabled={!canProcessRefund}
-                color="danger"
-              >
-                Process Refund
+              <Button type="submit" isLoading={isSubmitting || processRefundMutation.isPending} disabled={!canProcessRefund}>
+                {method === 'original_payment' ? 'Request refund from Paystack' : 'Record refund'}
               </Button>
             </div>
           </>

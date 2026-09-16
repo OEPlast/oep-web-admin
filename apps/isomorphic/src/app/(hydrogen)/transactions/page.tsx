@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 import TransactionsClient from './transactions-client';
+import { metaObject } from '@/config/site.config';
 
-export const metadata: Metadata = {
-  title: 'Transactions | OEPlast Admin',
-  description: 'Manage and monitor all transactions',
+export const metadata = {
+  ...metaObject('Transactions', undefined, 'Manage and monitor all transactions'),
 };
 
 const pageHeader = {

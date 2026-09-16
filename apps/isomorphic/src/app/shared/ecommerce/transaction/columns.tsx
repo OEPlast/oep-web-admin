@@ -7,6 +7,7 @@ import { PiEyeBold, PiCopyBold } from 'react-icons/pi';
 import { formatDate } from '@core/utils/format-date';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import IdLink from '@/app/shared/id-link';
 import { routes } from '@/config/routes';
 
 const columnHelper = createColumnHelper<Transaction>();
@@ -75,7 +76,13 @@ export const transactionsColumns = (
     header: 'Reference',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">{row.original.reference}</span>
+        <IdLink
+          href={routes.transactions.details(row.original._id)}
+          title={row.original.reference}
+          className="text-sm"
+        >
+          {row.original.reference}
+        </IdLink>
       </div>
     ),
   }),
@@ -109,12 +116,13 @@ export const transactionsColumns = (
       const order = row.original.order;
       if (typeof order === 'object' && order !== null) {
         return (
-          <Link
+          <IdLink
             href={routes.eCommerce.orderDetails(order._id)}
-            className="flex items-center gap-2 hover:underline"
+            title={order._id}
+            className="font-mono text-sm"
           >
-            <span className="font-mono text-sm">{order._id}</span>
-          </Link>
+            {order._id}
+          </IdLink>
         );
       }
       return <span className="text-xs text-gray-400">N/A</span>;
@@ -194,13 +202,22 @@ export const transactionsColumns = (
     size: 140,
     header: 'Status',
     cell: ({ row }) => (
-      <Badge
-        variant="flat"
-        color={statusColorMap[row.original.status] || 'secondary'}
-        className="capitalize"
-      >
-        {row.original.status.replace('_', ' ')}
-      </Badge>
+      <div className="flex flex-col items-start gap-1">
+        <Badge
+          variant="flat"
+          color={statusColorMap[row.original.status] || 'secondary'}
+          className="capitalize"
+        >
+          {row.original.status.replace('_', ' ')}
+        </Badge>
+        {row.original.review?.required && (
+          <Tooltip content={row.original.review.reason || 'Flagged for review'}>
+            <Badge variant="flat" color="danger" size="sm">
+              Needs review
+            </Badge>
+          </Tooltip>
+        )}
+      </div>
     ),
   }),
   columnHelper.accessor('createdAt', {

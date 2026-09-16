@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   useForm,
   FormProvider,
@@ -39,7 +39,9 @@ import { getCdnUrl } from '@core/utils/cdn-url';
 import FormFooter from '@core/components/form-footer';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import SettingsFormNav, { settingsFormParts } from './settings-form-nav';
-import CheckoutDeliverySettingsCard from './checkout-delivery-settings-card';
+import CheckoutDeliverySettingsCard, {
+  type CheckoutDeliverySettingsHandle,
+} from './checkout-delivery-settings-card';
 import {
   DEFAULT_TIMEZONE,
   getTimezoneOptions,
@@ -53,6 +55,9 @@ export default function SettingsForm() {
   );
   // ~400 entries, each formatted through Intl — built once, not on every render.
   const timezoneOptions = useMemo(() => getTimezoneOptions(), []);
+  // Delivery settings save through the GIG config endpoint, so one Save button drives two saves.
+  const deliveryRef = useRef<CheckoutDeliverySettingsHandle>(null);
+  const [isSavingDelivery, setIsSavingDelivery] = useState(false);
 
   const methods = useForm<UpdateStoreSettingsInput>({
     resolver: zodResolver(updateStoreSettingsSchema),
@@ -64,6 +69,7 @@ export default function SettingsForm() {
       supportEmail: '',
       supportPhone: '',
       whatsappNumber: '',
+      supportHours: '',
       address: {
         line1: '',
         line2: '',
@@ -106,6 +112,7 @@ export default function SettingsForm() {
         supportEmail: settings.supportEmail || '',
         supportPhone: settings.supportPhone || '',
         whatsappNumber: settings.whatsappNumber || '',
+        supportHours: settings.supportHours || '',
         address: {
           line1: settings.address?.line1 || '',
           line2: settings.address?.line2 || '',
@@ -155,7 +162,19 @@ export default function SettingsForm() {
     },
   });
 
-  const handleSubmit: SubmitHandler<UpdateStoreSettingsInput> = (data) => {
+  const handleSubmit: SubmitHandler<UpdateStoreSettingsInput> = async (data) => {
+    // Delivery first: if it is invalid, stop before writing half the page.
+    setIsSavingDelivery(true);
+    const delivery = await (deliveryRef.current?.save() ?? Promise.resolve({ ok: true as const }));
+    setIsSavingDelivery(false);
+
+    if (!delivery.ok) {
+      if (delivery.reason === 'invalid') {
+        toast.error('Check the delivery settings below, then save again');
+      }
+      return;
+    }
+
     updateMutation.mutate(data);
   };
 
@@ -321,7 +340,7 @@ export default function SettingsForm() {
             <Element name={settingsFormParts.contact}>
               <VerticalFormBlockWrapper
                 title="Contact Information"
-                description="Support contact details shown to customers"
+                description="Shown to customers on the contact, FAQ and policy pages and in the footer. Leave a field empty to hide it."
                 className="pt-7 @2xl:pt-9 @3xl:pt-11"
               >
                 <div className="grid gap-4 @md:grid-cols-2">
@@ -345,6 +364,14 @@ export default function SettingsForm() {
                     helperText="Shown as the click-to-chat number on the storefront (header + footer) — separate from the WhatsApp social link above."
                     {...register('whatsappNumber')}
                     error={errors.whatsappNumber?.message}
+                  />
+                  <Input
+                    label="Support Hours"
+                    placeholder="Mon–Sat, 9am–6pm WAT"
+                    helperText="Free text shown next to the contact details, e.g. on the contact page and product pages."
+                    maxLength={120}
+                    {...register('supportHours')}
+                    error={errors.supportHours?.message}
                   />
                 </div>
               </VerticalFormBlockWrapper>
@@ -426,16 +453,19 @@ export default function SettingsForm() {
 
             <Element name={settingsFormParts.delivery}>
               <div className="pt-7 @2xl:pt-9 @3xl:pt-11">
-                <CheckoutDeliverySettingsCard />
+                <CheckoutDeliverySettingsCard ref={deliveryRef} />
               </div>
             </Element>
           </div>
 
           <FormFooter
-            isLoading={updateMutation.isPending}
+            isLoading={updateMutation.isPending || isSavingDelivery}
             submitBtnText="Save Settings"
             altBtnText="Reset"
-            handleAltBtn={() => reset()}
+            handleAltBtn={() => {
+              reset();
+              deliveryRef.current?.reset();
+            }}
           />
         </form>
       </FormProvider>

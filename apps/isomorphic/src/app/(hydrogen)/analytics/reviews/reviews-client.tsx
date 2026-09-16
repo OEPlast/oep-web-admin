@@ -35,7 +35,6 @@ const pageHeader = {
       name: 'Home',
     },
     {
-      href: '/analytics',
       name: 'Analytics',
     },
     {

@@ -2,11 +2,12 @@
 
 import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
+import IdLink from '@/app/shared/id-link';
 import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Switch, Text, Title, Tooltip } from 'rizzui';
+import { ActionIcon, Checkbox, Switch, Text, Tooltip } from 'rizzui';
 import { BannerType } from '../banner-types';
 import { getCdnUrl } from '@core/utils/cdn-url';
 
@@ -46,9 +47,12 @@ export const bannersColumns = [
     size: 200,
     header: 'Banner Name',
     cell: ({ row }) => (
-      <Title as="h6" className="!text-sm font-medium">
+      <IdLink
+        href={routes.eCommerce.bannerDetails(row.original._id)}
+        className="text-sm"
+      >
         {row.original.name}
-      </Title>
+      </IdLink>
     ),
   }),
   columnHelper.accessor('pageLink', {

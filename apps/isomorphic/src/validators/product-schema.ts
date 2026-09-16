@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+/** GTIN-8/12/13/14 with the GS1 mod-10 check digit; mirrors Main-server's isValidGtin. */
+export const isValidGtin = (value: string): boolean => {
+  if (!/^(\d{8}|\d{12}|\d{13}|\d{14})$/.test(value)) return false;
+  const digits = value.split('').map(Number);
+  const check = digits.pop()!;
+  const sum = digits
+    .reverse()
+    .reduce((total, digit, index) => total + digit * (index % 2 === 0 ? 3 : 1), 0);
+  return (10 - (sum % 10)) % 10 === check;
+};
+
 // Helper to handle optional numbers with proper typing
 const optionalNumber = (isInteger = false) => {
   const base = z.number().min(0);
@@ -127,6 +138,18 @@ const baseProductSchema = z.object({
   status: z.enum(['active', 'inactive', 'archived']),
 
   slug: z.string().optional(),
+
+  // Google Shopping identity (Merchant Center feed + product structured data).
+  brand: z.string().trim().max(70, 'Brand must be at most 70 characters').optional(),
+  gtin: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => !value || isValidGtin(value), {
+      message: 'Enter the 8, 12, 13 or 14 digit barcode number (check the digits)',
+    }),
+  mpn: z.string().trim().max(70, 'MPN must be at most 70 characters').optional(),
+  condition: z.enum(['new', 'used', 'refurbished']).optional(),
 });
 
 // Product schema with refinement for create/update

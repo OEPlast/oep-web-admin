@@ -11,7 +11,7 @@ import {
 } from '@/validators/create-user.schema';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import { useRoles, useAddUserAsEmployee } from '@/hooks/use-role-management';
-import { userTypeOptions } from '@/data/roles-permissions';
+import { userTypeOptions } from '@/types/roles-permissions.types';
 import toast from 'react-hot-toast';
 
 export default function CreateUser() {

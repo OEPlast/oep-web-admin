@@ -76,6 +76,10 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
       lowStockThreshold: 5,
       status: 'inactive',
       slug: '',
+      brand: '',
+      gtin: '',
+      mpn: '',
+      condition: 'new',
     };
   }
 
@@ -112,6 +116,10 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     lowStockThreshold: product.lowStockThreshold,
     status: product.status,
     slug: product.slug,
+    brand: product.brand ?? '',
+    gtin: product.gtin ?? '',
+    mpn: product.mpn ?? '',
+    condition: product.condition ?? 'new',
   };
 }
 

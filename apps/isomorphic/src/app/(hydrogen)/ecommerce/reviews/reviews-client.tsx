@@ -86,7 +86,7 @@ export default function ReviewsPageClient() {
         const prod = typeof product === 'object' ? product : null;
         return (
           <Link
-            href={routes.eCommerce.productDetails(prod!._id)}
+            href={routes.eCommerce.ediProduct(prod!._id)}
             className="group"
           >
             <Text className="font-medium text-gray-900 group-hover:underline">

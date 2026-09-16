@@ -7,6 +7,7 @@ import { Badge, Checkbox, Flex } from 'rizzui';
 import { UsersTableDataType } from '.';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
+import IdLink from '@/app/shared/id-link';
 
 const columnHelper = createColumnHelper<UsersTableDataType>();
 
@@ -35,7 +36,11 @@ export const usersColumns = [
     id: 'id',
     size: 100,
     header: 'User ID',
-    cell: ({ row }) => <>#{row.original.id}</>,
+    cell: ({ row }) => (
+      <IdLink href={`/roles-permissions/${row.original._id}`}>
+        #{row.original.id}
+      </IdLink>
+    ),
   }),
   columnHelper.accessor('fullName', {
     id: 'fullName',

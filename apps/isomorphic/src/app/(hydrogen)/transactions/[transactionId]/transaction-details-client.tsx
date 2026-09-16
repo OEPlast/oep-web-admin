@@ -222,19 +222,35 @@ export default function TransactionDetailsClient({
     : null;
 
   const totalRefunded = transaction.refunds.reduce((sum, refund) => {
-    if (refund.status === 'completed') {
+    if (refund.status !== 'failed') {
       return sum + refund.amount;
     }
     return sum;
   }, 0);
 
   const canRefund =
-    transaction.status === 'completed' && totalRefunded < transaction.amount;
+    ['completed', 'partially_refunded'].includes(transaction.status) &&
+    transaction.paymentGateway === 'paystack' &&
+    transaction.transactionType === 'order_payment' &&
+    totalRefunded < transaction.amount;
 
   return (
     <>
       <div className="@container">
         <div className="grid gap-6 @4xl:gap-7">
+          {transaction.review?.required && (
+            <Alert color="danger">
+              <div className="flex flex-col gap-1">
+                <Text className="font-semibold">This payment needs your attention</Text>
+                <Text className="text-sm">{transaction.review.reason}</Text>
+                {canRefund && (
+                  <Text className="text-sm text-gray-600">
+                    Processing the refund below clears this flag.
+                  </Text>
+                )}
+              </div>
+            </Alert>
+          )}
           {/* Header Card with Transaction Summary */}
           <div className="rounded-xl border border-muted bg-gradient-to-br from-primary-lighter/10 via-white to-white p-6 shadow-sm @4xl:p-8">
             <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -289,7 +305,7 @@ export default function TransactionDetailsClient({
                   </Link>
                 )}
                 {returnData && (
-                  <Link href={routes.returns.details(returnData._id)}>
+                  <Link href={routes.eCommerce.returnDetails(returnData._id)}>
                     <Button variant="outline" className="gap-2">
                       <PiArrowCounterClockwiseBold className="h-4 w-4" />
                       View Return
@@ -421,7 +437,7 @@ export default function TransactionDetailsClient({
                   value={returnData.reason}
                 />
                 <div className="pt-3">
-                  <Link href={routes.returns.details(returnData._id)}>
+                  <Link href={routes.eCommerce.returnDetails(returnData._id)}>
                     <Button variant="text" size="sm" className="gap-1.5 px-0">
                       View Full Return Details
                       <PiArrowCounterClockwiseBold className="h-3.5 w-3.5" />

@@ -9,11 +9,20 @@ export const returnStatusUpdateSchema = z.object({
 export type ReturnStatusUpdateInput = z.infer<typeof returnStatusUpdateSchema>;
 
 // Refund process schema
-export const refundProcessSchema = z.object({
-  refundMethod: z.enum(['original_payment', 'store_credit', 'bank_transfer']),
-  refundAmount: z.number().positive('Refund amount must be positive'),
-  adminNotes: z.string().min(1, 'Admin notes are required for refund processing').max(500, 'Notes must be less than 500 characters'),
-});
+export const refundProcessSchema = z
+  .object({
+    refundMethod: z.enum(['original_payment', 'store_credit', 'bank_transfer']),
+    /** Naira. */
+    refundAmount: z.number().positive('Refund amount must be positive'),
+    adminNotes: z.string().min(1, 'Admin notes are required for refund processing').max(500, 'Notes must be less than 500 characters'),
+    /** Pay out without the goods having passed inspection. Needs a written reason. */
+    override: z.boolean().optional(),
+    overrideReason: z.string().max(500).optional(),
+  })
+  .refine((v) => !v.override || (v.overrideReason ?? '').trim().length >= 10, {
+    message: 'Give a reason of at least 10 characters for refunding without a passed inspection',
+    path: ['overrideReason'],
+  });
 
 export type RefundProcessInput = z.infer<typeof refundProcessSchema>;
 

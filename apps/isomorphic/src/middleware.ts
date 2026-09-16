@@ -11,15 +11,14 @@ export const config = {
   // restricted routes
   matcher: [
     '/',
-    '/executive',
-    '/financial',
-    '/analytics',
-    '/logistics/:path*',
     '/ecommerce/:path*',
-    '/support/:path*',
-    '/file/:path*',
-    '/file-manager',
+    '/inventory/:path*',
+    '/transactions/:path*',
+    '/users/:path*',
+    '/roles-permissions/:path*',
+    '/store-settings/:path*',
+    '/analytics/:path*',
+    '/marketing/:path*',
     '/invoice/:path*',
-    '/account/profile-settings/:path*',
   ],
 };

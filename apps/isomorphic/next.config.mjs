@@ -38,19 +38,6 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 's3.amazonaws.com',
-        pathname: '/redqteam.com/isomorphic-furyroad/public/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'isomorphic-furyroad.s3.amazonaws.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'isomorphic-furyroad.vercel.app',
-      },
-      {
-        protocol: 'https',
         hostname: 'oeptest.b-cdn.net',
       },
       {

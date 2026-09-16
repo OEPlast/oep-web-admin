@@ -1,235 +1,119 @@
-import {
-  useMutation,
-  useQueryClient,
-  UseMutationOptions,
-} from '@tanstack/react-query';
-import { apiClient } from '@/libs/axios';
+import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
+import { apiClient, handleApiError } from '@/libs/axios';
 import api from '@/libs/endpoints';
-import type {
-  Order,
-  UpdateOrderStatusInput,
-  UpdatePaymentStatusInput,
-  UpdateTrackingInput,
-  ProcessRefundInput,
-  CancelOrderInput,
-  UpdateNotesInput,
-} from '@/types/order.types';
+import type { OrderStatus } from '@/types/order.types';
 import { toast } from 'react-hot-toast';
 
-// Update Order Status
+/**
+ * Order mutations, matched to the routes Main-server serves (routes/admin/order.ts).
+ *
+ * The previous hooks called eight endpoints that did not exist (`/status`, `/tracking`, `/refund`
+ * …), so no order action in the admin has ever worked. Cancel and reject are DELETEs with a JSON
+ * body, which axios sends through `config.data`.
+ */
+
+type MutationResult = { message?: string };
+
+const invalidateOrder = (queryClient: ReturnType<typeof useQueryClient>, orderId: string) => {
+  queryClient.invalidateQueries({ queryKey: ['orders'] });
+  queryClient.invalidateQueries({ queryKey: ['order', orderId] });
+  queryClient.invalidateQueries({ queryKey: ['orderStatistics'] });
+  queryClient.invalidateQueries({ queryKey: ['transactions'] });
+  queryClient.invalidateQueries({ queryKey: ['staff-notifications'] });
+};
+
+export interface UpdateOrderStatusInput {
+  /** Backend statuses, capitalised. Allowed moves: Pending→Processing/Cancelled/Failed, Processing→Completed/Cancelled. */
+  status: OrderStatus;
+}
+
 export function useUpdateOrderStatus(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order },
-    Error,
-    { orderId: string; data: UpdateOrderStatusInput }
-  >
+  options?: UseMutationOptions<MutationResult, Error, { orderId: string; data: UpdateOrderStatusInput }>
 ) {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: UpdateOrderStatusInput;
-    }) => {
-      const response = await apiClient.put(
-        api.orders.updateStatus(orderId),
-        data
-      );
-      return response.data;
+  return useMutation<MutationResult, Error, { orderId: string; data: UpdateOrderStatusInput }>({
+    mutationFn: async ({ orderId, data }) => {
+      const response = await apiClient.put<MutationResult>(api.orders.update(orderId), data);
+      return { message: response.message };
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      queryClient.invalidateQueries({ queryKey: ['orderStatistics'] });
-      toast.success('Order status updated successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
+    onSuccess: (data, variables, context) => {
+      invalidateOrder(queryClient, variables.orderId);
+      toast.success(data.message || 'Order updated');
+      options?.onSuccess?.(data, variables, context);
     },
-    onError: (error, variables) => {
-      toast.error('Failed to update order status');
-      options?.onError?.(error, variables, {} as any);
+    onError: (error, variables, context) => {
+      toast.error(handleApiError(error));
+      options?.onError?.(error, variables, context);
     },
   });
 }
 
-// Update Payment Status
-export function useUpdatePaymentStatus(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order },
-    Error,
-    { orderId: string; data: UpdatePaymentStatusInput }
-  >
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: UpdatePaymentStatusInput;
-    }) => {
-      const response = await apiClient.put(
-        api.orders.updatePaymentStatus(orderId),
-        data
-      );
-      return response.data;
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      toast.success('Payment status updated successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
-    },
-    onError: (error, variables) => {
-      toast.error('Failed to update payment status');
-      options?.onError?.(error, variables, {} as any);
-    },
-  });
+export interface CancelOrderInput {
+  /** Shown to the customer in the cancellation email. */
+  reason?: string;
 }
 
-// Update Tracking Information
-export function useUpdateTracking(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order },
-    Error,
-    { orderId: string; data: UpdateTrackingInput }
-  >
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: UpdateTrackingInput;
-    }) => {
-      const response = await apiClient.put(
-        api.orders.updateTracking(orderId),
-        data
-      );
-      return response.data;
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      toast.success('Tracking information updated successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
-    },
-    onError: (error, variables) => {
-      toast.error('Failed to update tracking information');
-      options?.onError?.(error, variables, {} as any);
-    },
-  });
-}
-
-// Process Refund
-export function useProcessRefund(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order; refundTransaction: any },
-    Error,
-    { orderId: string; data: ProcessRefundInput }
-  >
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: ProcessRefundInput;
-    }) => {
-      const response = await apiClient.post(api.orders.refund(orderId), data);
-      return response.data;
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      queryClient.invalidateQueries({ queryKey: ['orderStatistics'] });
-      toast.success('Refund processed successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
-    },
-    onError: (error, variables) => {
-      toast.error('Failed to process refund');
-      options?.onError?.(error, variables, {} as any);
-    },
-  });
-}
-
-// Cancel Order
+/** Cancels the order: stock and coupons are released, and a paid order is refunded via Paystack. */
 export function useCancelOrder(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order },
-    Error,
-    { orderId: string; data: CancelOrderInput }
-  >
+  options?: UseMutationOptions<MutationResult, Error, { orderId: string; data: CancelOrderInput }>
 ) {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: CancelOrderInput;
-    }) => {
-      const response = await apiClient.put(api.orders.cancel(orderId), data);
-      return response.data;
+  return useMutation<MutationResult, Error, { orderId: string; data: CancelOrderInput }>({
+    mutationFn: async ({ orderId, data }) => {
+      const response = await apiClient.delete<MutationResult>(api.orders.cancel(orderId), { data });
+      return { message: response.message };
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      queryClient.invalidateQueries({ queryKey: ['orderStatistics'] });
-      toast.success('Order cancelled successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
+    onSuccess: (data, variables, context) => {
+      invalidateOrder(queryClient, variables.orderId);
+      toast.success(data.message || 'Order cancelled');
+      options?.onSuccess?.(data, variables, context);
     },
-    onError: (error, variables) => {
-      toast.error('Failed to cancel order');
-      options?.onError?.(error, variables, {} as any);
+    onError: (error, variables, context) => {
+      toast.error(handleApiError(error));
+      options?.onError?.(error, variables, context);
     },
   });
 }
 
-// Update Internal Notes
-export function useUpdateOrderNotes(
-  options?: UseMutationOptions<
-    { success: boolean; data: Order },
-    Error,
-    { orderId: string; data: UpdateNotesInput }
-  >
+/** Rejects (cancels) the order with a default "we could not fulfil this order" reason unless one is given. */
+export function useRejectOrder(
+  options?: UseMutationOptions<MutationResult, Error, { orderId: string; data: CancelOrderInput }>
 ) {
   const queryClient = useQueryClient();
+  return useMutation<MutationResult, Error, { orderId: string; data: CancelOrderInput }>({
+    mutationFn: async ({ orderId, data }) => {
+      const response = await apiClient.delete<MutationResult>(api.orders.reject(orderId), { data });
+      return { message: response.message };
+    },
+    onSuccess: (data, variables, context) => {
+      invalidateOrder(queryClient, variables.orderId);
+      toast.success(data.message || 'Order rejected');
+      options?.onSuccess?.(data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      toast.error(handleApiError(error));
+      options?.onError?.(error, variables, context);
+    },
+  });
+}
 
-  return useMutation({
-    mutationFn: async ({
-      orderId,
-      data,
-    }: {
-      orderId: string;
-      data: UpdateNotesInput;
-    }) => {
-      const response = await apiClient.put(
-        api.orders.updateNotes(orderId),
-        data
-      );
-      return response.data;
+export function useUpdateDeliveryTimeline(
+  options?: UseMutationOptions<MutationResult, Error, { orderId: string; data: { timeline: string } }>
+) {
+  const queryClient = useQueryClient();
+  return useMutation<MutationResult, Error, { orderId: string; data: { timeline: string } }>({
+    mutationFn: async ({ orderId, data }) => {
+      const response = await apiClient.patch<MutationResult>(api.orders.deliveryTimeline(orderId), data);
+      return { message: response.message };
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
-      toast.success('Notes updated successfully');
-      options?.onSuccess?.(data!, variables, {} as any);
+    onSuccess: (data, variables, context) => {
+      invalidateOrder(queryClient, variables.orderId);
+      toast.success(data.message || 'Delivery timeline updated');
+      options?.onSuccess?.(data, variables, context);
     },
-    onError: (error, variables) => {
-      toast.error('Failed to update notes');
-      options?.onError?.(error, variables, {} as any);
+    onError: (error, variables, context) => {
+      toast.error(handleApiError(error));
+      options?.onError?.(error, variables, context);
     },
   });
 }

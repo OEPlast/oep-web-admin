@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
-import { CouponDataType } from '@/data/coupon-data';
+import { CouponDataType } from '@/types/coupon.types';
 
 export type CouponListParams = {
   page?: number;
