@@ -35,18 +35,16 @@ export default async function SignIn() {
       bannerDescription="Have fun managing the best store in the world! 😉."
       isSocialLoginActive={false}
       pageImage={
-        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[820px]">
-          <Image
-            src={
-              'https://isomorphic-furyroad.s3.amazonaws.com/public/auth/sign-up.webp'
-            }
-            alt="Sign Up Thumbnail"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw"
-            className="object-cover"
-          />
-        </div>
+        <Image
+          src={
+            'https://images.unsplash.com/photo-1449247666642-264389f5f5b1?q=80&w=2338&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+          }
+          alt="Sign Up Thumbnail"
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw"
+          className="h-full w-auto object-cover"
+        />
       }
       showBackButton={false}
     >
