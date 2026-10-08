@@ -1,4 +1,5 @@
 import { UseFormSetError, FieldValues, Path } from 'react-hook-form';
+import { handleApiError } from '@/libs/axios';
 
 /**
  * Backend validation error structure
@@ -42,4 +43,16 @@ export function setBackendFormErrors<T extends FieldValues>(
       });
     }
   });
+}
+
+/**
+ * One line for a toast: the backend's validation messages when it sent some (a 400 from
+ * express-validator has `errors` but no `message`), otherwise handleApiError's message.
+ */
+export function describeApiError(error: unknown): string {
+  const errors = extractBackendErrors(error);
+  if (errors) {
+    return Array.from(new Set(errors.map((e) => e.msg).filter(Boolean))).join(', ');
+  }
+  return handleApiError(error);
 }

@@ -41,7 +41,13 @@ export default function CreateCategory({ isModalView = true }: { isModalView?: b
   const handleSubmit = (data: CreateCategoryFormInput) => {
     console.log(data);
     setApiErrors(null); // Clear previous errors
-    createCategory.mutate(data);
+    // Leave the optional extras out while unused, so the payload is what it was before them.
+    const { sizeChart, isAddOnCategory, ...rest } = data;
+    createCategory.mutate({
+      ...rest,
+      ...(sizeChart ? { sizeChart } : {}),
+      ...(isAddOnCategory ? { isAddOnCategory } : {}),
+    });
   };
 
   return (

@@ -18,6 +18,8 @@ export interface ReturnItem {
   reasonDetails?: string;
   images?: string[];
   refundAmount?: number;
+  /** For exchanges: the option the customer wants instead, e.g. { name: 'Ring Size', value: '8' }. */
+  exchangeFor?: { name: string; value: string };
 }
 
 export type ReturnStatus =
@@ -65,6 +67,8 @@ export interface Return {
   };
   items: ReturnItem[];
   type: 'refund' | 'exchange';
+  /** How the items come back; absent on returns requested before it was asked. */
+  method?: 'drop-off' | 'courier';
   status: ReturnStatus;
   totalRefundAmount: number | null;
   refundTransaction?: ReturnRefundTransaction | string | null;

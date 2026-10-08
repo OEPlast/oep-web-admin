@@ -55,7 +55,7 @@ export const api = {
     search: '/admin/products/all', // Use getAllProducts with search param
     featured: '/products/featured',
     newArrivals: '/products/new-arrivals',
-    listMinimal: '/products//list-minimal', // Minimal product data for dropdowns
+    listMinimal: '/admin/products/list-minimal', // Minimal product data for dropdowns (active products only)
   },
 
   // Category endpoints
@@ -352,6 +352,41 @@ export const api = {
     track: (waybill: string) => `/admin/gig/track/${waybill}`,
     shipments: '/admin/gig/shipments',
     shipmentInfo: (waybill: string) => `/admin/gig/shipments/${waybill}`,
+  },
+
+  // Storefront content (feature `content`; the size chart list also feeds the product and category forms)
+  content: {
+    /** GET ?page&limit&status&search (list omits body; meta = { total, page, limit, pages }), POST */
+    articles: '/admin/content/articles',
+    article: (id: string) => `/admin/content/articles/${id}`,
+    /** GET, PUT { testimonials?, instagram?, popularSearches?, articleCategories?, newsletterPopup? } */
+    site: '/admin/content/site',
+    /** GET (groups in order), POST */
+    faqs: '/admin/content/faqs',
+    faq: (id: string) => `/admin/content/faqs/${id}`,
+    /** GET (list omits sections), POST */
+    legal: '/admin/content/legal',
+    legalDoc: (id: string) => `/admin/content/legal/${id}`,
+    sizeCharts: '/admin/content/size-charts',
+    sizeChart: (id: string) => `/admin/content/size-charts/${id}`,
+  },
+
+  // Support inbox and back-in-stock alerts (features `support` / `stockAlerts`)
+  support: {
+    /** GET ?status&search&page&limit; meta adds `open` */
+    tickets: '/admin/support/tickets',
+    /** GET (order and note authors populated), PATCH { status } */
+    ticket: (id: string) => `/admin/support/tickets/${id}`,
+    /** POST { text, email? } — email: true also sends it to the customer (502 when it can't) */
+    ticketNotes: (id: string) => `/admin/support/tickets/${id}/notes`,
+    stockAlerts: '/admin/support/stock-alerts',
+    stockAlertsForProduct: (productId: string) => `/admin/support/stock-alerts/${productId}`,
+  },
+
+  // Pickup locations (feature `pickup`)
+  pickupLocations: {
+    list: '/admin/pickup-locations',
+    byId: (id: string) => `/admin/pickup-locations/${id}`,
   },
 
   // Vylux scraper import (answers 503 unless the deployment sets VYLUX_API_URL/VYLUX_API_KEY)

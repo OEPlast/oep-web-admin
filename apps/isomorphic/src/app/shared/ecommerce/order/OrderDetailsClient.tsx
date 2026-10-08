@@ -336,6 +336,50 @@ export default function OrderDetailsClient({ id }: OrderDetailsClientProps) {
         <Badge className="capitalize">{order.deliveryType}</Badge>
       </div>
 
+      {/* Pickup location (a copy taken at checkout) */}
+      {order.deliveryType === 'pickup' && order.pickupLocation && (
+        <div className="rounded-lg border p-4">
+          <Text className="mb-3 text-lg font-semibold">Pickup Location</Text>
+          <div className="space-y-1">
+            {order.pickupLocation.name && (
+              <Text className="font-medium">{order.pickupLocation.name}</Text>
+            )}
+            {order.pickupLocation.address && (
+              <Text className="text-sm text-gray-600">
+                {order.pickupLocation.address}
+              </Text>
+            )}
+            {(order.pickupLocation.city || order.pickupLocation.state) && (
+              <Text className="text-sm text-gray-600">
+                {[order.pickupLocation.city, order.pickupLocation.state]
+                  .filter(Boolean)
+                  .join(', ')}
+              </Text>
+            )}
+            {order.pickupLocation.phone && (
+              <Text className="text-sm text-gray-600">
+                {order.pickupLocation.phone}
+              </Text>
+            )}
+            {order.pickupLocation.hours && (
+              <Text className="text-sm text-gray-600">
+                Hours: {order.pickupLocation.hours}
+              </Text>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Gift message — print it on the card / packing slip */}
+      {order.giftMessage && (
+        <div className="rounded-lg border p-4">
+          <Text className="mb-2 text-lg font-semibold">Gift Message</Text>
+          <Text className="whitespace-pre-line italic text-gray-700">
+            {order.giftMessage}
+          </Text>
+        </div>
+      )}
+
       {/* GIG Logistics Tracking */}
       {order.deliveryType === 'gig' && order.gigWaybill && (
         <div className="rounded-lg border p-4">

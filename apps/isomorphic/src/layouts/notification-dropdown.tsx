@@ -5,9 +5,17 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Link from 'next/link';
 import { ReactElement, RefObject, useCallback, useEffect, useMemo, useState } from 'react';
-import { PiArrowCounterClockwiseBold, PiMoneyBold, PiPackageBold, PiWarningBold } from 'react-icons/pi';
+import {
+  PiArrowCounterClockwiseBold,
+  PiBellBold,
+  PiChatCircleTextBold,
+  PiMoneyBold,
+  PiPackageBold,
+  PiWarningBold,
+} from 'react-icons/pi';
 import { Badge, Button, Popover, Text, Title } from 'rizzui';
 import { routes } from '@/config/routes';
+import { hasFeature } from '@/config/features';
 import { useStaffNotifications, type StaffNotification } from '@/hooks/queries/useStaffNotifications';
 
 dayjs.extend(relativeTime);
@@ -19,6 +27,7 @@ const KIND_ICON: Record<StaffNotification['kind'], ReactElement> = {
   return: <PiArrowCounterClockwiseBold />,
   transaction: <PiMoneyBold />,
   inventory: <PiWarningBold />,
+  ticket: <PiChatCircleTextBold />,
 };
 
 /** When the bell was last opened, kept per browser. Items newer than this count as unread. */
@@ -77,6 +86,9 @@ function NotificationsList({ setIsOpen }: { setIsOpen: React.Dispatch<React.SetS
           <CountTile label="Returns pending" value={counts.pendingReturns} href={`${routes.eCommerce.returns}?status=pending`} onClick={() => setIsOpen(false)} />
           <CountTile label="Payments to review" value={counts.transactionsForReview} href={`${routes.transactions.list}?needsReview=true`} onClick={() => setIsOpen(false)} />
           <CountTile label="Low stock" value={counts.lowStock} href={`${routes.inventory}?low=1`} onClick={() => setIsOpen(false)} />
+          {hasFeature('support') && (
+            <CountTile label="Open messages" value={counts.openTickets ?? 0} href={routes.support.tickets} onClick={() => setIsOpen(false)} />
+          )}
         </div>
       )}
 
@@ -96,7 +108,7 @@ function NotificationsList({ setIsOpen }: { setIsOpen: React.Dispatch<React.SetS
                 className="group grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-md px-2 py-2 pe-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-50"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded bg-gray-100/70 p-1 dark:bg-gray-50/50 [&>svg]:h-auto [&>svg]:w-5">
-                  {KIND_ICON[item.kind]}
+                  {KIND_ICON[item.kind] ?? <PiBellBold />}
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center">
                   <div className="w-full">

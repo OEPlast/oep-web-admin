@@ -7,6 +7,7 @@ export const settingsFormParts = {
   contact: 'contact',
   address: 'address',
   tax: 'tax',
+  catalog: 'catalog',
   delivery: 'delivery',
 };
 
@@ -16,6 +17,7 @@ export const settingsMenuItems = [
   { label: 'Contact Information', value: settingsFormParts.contact },
   { label: 'Address', value: settingsFormParts.address },
   { label: 'Tax Information', value: settingsFormParts.tax },
+  { label: 'Storefront Catalog', value: settingsFormParts.catalog },
   { label: 'Checkout & Delivery', value: settingsFormParts.delivery },
 ];
 

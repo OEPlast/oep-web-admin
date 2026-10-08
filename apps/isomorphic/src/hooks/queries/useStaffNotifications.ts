@@ -3,10 +3,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
+import { hasFeature } from '@/config/features';
 
 export interface StaffNotification {
   id: string;
-  kind: 'order' | 'return' | 'transaction' | 'inventory';
+  kind: 'order' | 'return' | 'transaction' | 'inventory' | 'ticket';
   title: string;
   detail?: string;
   at: string;
@@ -19,6 +20,8 @@ export interface StaffNotificationSummary {
     pendingReturns: number;
     transactionsForReview: number;
     lowStock: number;
+    /** Open contact-form tickets; absent on backends without the support inbox. */
+    openTickets?: number;
   };
   items: StaffNotification[];
   generatedAt: string;
@@ -31,6 +34,10 @@ export function useStaffNotifications() {
     queryFn: async () => {
       const response = await apiClient.get<StaffNotificationSummary>(api.notifications.summary);
       if (!response.data) throw new Error('Invalid notification response');
+      // Ticket items link to the support inbox, which only exists when the feature is on.
+      if (!hasFeature('support')) {
+        return { ...response.data, items: response.data.items.filter((item) => item.kind !== 'ticket') };
+      }
       return response.data;
     },
     refetchInterval: 60 * 1000,

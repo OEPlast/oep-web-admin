@@ -19,6 +19,7 @@ import {
   createRoleSchema,
 } from '@/validators/create-role.schema';
 import { useModal } from '@/app/shared/modal-views/use-modal';
+import { featureRoleResources } from '@/libs/constants';
 
 const RESOURCES = [
   'products',
@@ -39,7 +40,8 @@ const RESOURCES = [
   'invoices',
   'logistics',
   'transactions',
-  'delivery'
+  'delivery',
+  ...featureRoleResources(),
 ];
 
 const ACTIONS = ['*', 'create', 'read', 'update', 'delete'];

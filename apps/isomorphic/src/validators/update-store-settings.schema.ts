@@ -43,6 +43,19 @@ export const updateStoreSettingsSchema = z.object({
   /* Reporting timezone. Every analytics bucket boundary is cut in this zone, so
   changing it changes every daily, weekly and monthly figure on the dashboards. */
   timezone: z.string().min(1, 'Select a timezone').optional(),
+  // Storefront catalog: how long a product counts as a new arrival, and how many best sellers.
+  newArrivalDays: z
+    .number({ invalid_type_error: 'Enter a number of days' })
+    .int('Use a whole number of days')
+    .min(1, 'At least 1 day')
+    .max(365, 'At most 365 days')
+    .optional(),
+  bestSellerCount: z
+    .number({ invalid_type_error: 'Enter a number' })
+    .int('Use a whole number')
+    .min(1, 'At least 1')
+    .max(200, 'At most 200')
+    .optional(),
   socialLinks: z
     .object({
       instagram: z

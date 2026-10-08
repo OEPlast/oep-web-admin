@@ -10,6 +10,7 @@ export const formParts = {
   seo: 'seo',
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
+  merchandising: 'merchandising',
   customFields: 'customFields',
   performance: 'performance',
 };
@@ -42,6 +43,10 @@ export const menuItems = [
   {
     label: 'Tags & Category',
     value: formParts.tagsAndCategory,
+  },
+  {
+    label: 'Add-ons & Size Chart',
+    value: formParts.merchandising,
   },
     {
     label: 'SEO',

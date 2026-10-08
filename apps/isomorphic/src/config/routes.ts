@@ -71,6 +71,29 @@ export const routes = {
     productId
       ? `/analytics/products/performance?product=${productId}`
       : '/analytics/products/performance',
+  // Optional features (see config/features.ts); every page 404s when its feature is off.
+  content: {
+    articles: '/content/articles',
+    createArticle: '/content/articles/create',
+    editArticle: (id: string) => `/content/articles/${id}/edit`,
+    site: '/content/site',
+    faqs: '/content/faqs',
+    createFaqGroup: '/content/faqs/create',
+    editFaqGroup: (id: string) => `/content/faqs/${id}/edit`,
+    legal: '/content/legal',
+    createLegal: '/content/legal/create',
+    editLegal: (id: string) => `/content/legal/${id}/edit`,
+    sizeCharts: '/content/size-charts',
+    createSizeChart: '/content/size-charts/create',
+    editSizeChart: (id: string) => `/content/size-charts/${id}/edit`,
+  },
+  support: {
+    tickets: '/support/tickets',
+    // Main-server's staff emails link to ${ADMIN_URL}/support/tickets/<id>; keep the path.
+    ticketDetails: (id: string) => `/support/tickets/${id}`,
+    stockAlerts: '/support/stock-alerts',
+  },
+  pickupLocations: '/ecommerce/pickup-locations',
   rolesPermissions: '/roles-permissions',
   storeSettings: '/store-settings',
   inventory: '/inventory',

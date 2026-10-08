@@ -28,6 +28,10 @@ export interface StoreSettings {
   currency: string;
   /** IANA zone the analytics engine cuts bucket boundaries in. */
   timezone: string;
+  /** Days a product is labelled a new arrival (Main-server default 30). */
+  newArrivalDays?: number;
+  /** How many top sellers get the best-seller badge and list (default 20). */
+  bestSellerCount?: number;
   socialLinks?: {
     instagram?: string;
     facebook?: string;

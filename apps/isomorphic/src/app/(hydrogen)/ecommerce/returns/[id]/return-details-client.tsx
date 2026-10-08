@@ -40,6 +40,8 @@ const formatCurrency = (amount: number) =>
 
 const humaniseReason = (reason: string) => reason.replace(/_/g, ' ');
 
+const RETURN_METHOD_LABEL: Record<string, string> = { 'drop-off': 'Drop-off', courier: 'Courier' };
+
 const lineValue = (item: ReturnItem) => (item.refundAmount ?? (item.product?.price ?? 0) * item.qty);
 
 export default function ReturnDetailsClient({ returnId }: ReturnDetailsClientProps) {
@@ -132,6 +134,12 @@ export default function ReturnDetailsClient({ returnId }: ReturnDetailsClientPro
                   {returnData.type}
                 </Badge>
               </div>
+              {returnData.method && (
+                <div>
+                  <Text className="mb-1 text-sm font-medium text-gray-500">Return method</Text>
+                  <Text className="font-semibold">{RETURN_METHOD_LABEL[returnData.method] ?? returnData.method}</Text>
+                </div>
+              )}
               <div>
                 <Text className="mb-1 text-sm font-medium text-gray-500">Requested</Text>
                 <div className="flex items-center gap-2">
@@ -219,6 +227,11 @@ export default function ReturnDetailsClient({ returnId }: ReturnDetailsClientPro
                         <span>Qty: {item.qty}</span>
                         <span className="capitalize">Reason: {humaniseReason(item.reason)}</span>
                       </div>
+                      {item.exchangeFor && (
+                        <Text className="mt-1 text-sm font-medium text-gray-700">
+                          Exchange for {item.exchangeFor.name} {item.exchangeFor.value}
+                        </Text>
+                      )}
                       {item.reasonDetails && <Text className="mt-1 text-sm text-gray-600">{item.reasonDetails}</Text>}
                       {item.images && item.images.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">

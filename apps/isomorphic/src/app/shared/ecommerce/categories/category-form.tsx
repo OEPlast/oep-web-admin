@@ -26,6 +26,8 @@ import { BackendValidationError } from '@/libs/form-errors';
 import UploadZone from '@core/ui/file-upload/upload-zone';
 import { PiTrashBold } from 'react-icons/pi';
 import { getCdnUrl } from '@core/utils/cdn-url';
+import { hasFeature } from '@/config/features';
+import { useSizeChartOptions } from '@/hooks/queries/useContent';
 type CategoryFormInput = CreateCategoryFormInput | UpdateCategoryFormInput;
 
 interface CategoryFormProps {
@@ -58,6 +60,8 @@ export default function CategoryForm({
     defaultValues?.banner || ''
   );
   const [slugTouched, setSlugTouched] = useState(false);
+  const { options: chartOptions, isLoading: chartsLoading } = useSizeChartOptions(defaultValues?.sizeChart);
+  const sizeChartOptions = [{ value: '', label: 'No size chart' }, ...chartOptions];
 
   // Get validation schema based on mode
   const validationSchema =
@@ -77,6 +81,8 @@ export default function CategoryForm({
           banner: defaultValues?.banner,
           parent: defaultValues?.parent || [],
           priority: defaultValues?.priority ?? false,
+          sizeChart: defaultValues?.sizeChart ?? '',
+          isAddOnCategory: defaultValues?.isAddOnCategory ?? false,
         },
       }}
       className="flex flex-grow flex-col @container [&_label]:font-medium"
@@ -207,6 +213,52 @@ export default function CategoryForm({
                           {value
                             ? 'Priority category enabled'
                             : 'Priority category disabled'}
+                        </span>
+                      </div>
+                    )}
+                  />
+                </VeritcalFormBlockWrapper>
+
+                {/* Size chart */}
+                <VeritcalFormBlockWrapper
+                  title="Size Chart"
+                  description="Shown on products in this category that don't pick their own chart"
+                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                >
+                  <Controller
+                    name="sizeChart"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        options={sizeChartOptions}
+                        value={sizeChartOptions.find((o) => o.value === (value ?? '')) ?? null}
+                        onChange={(v: string) => onChange(v)}
+                        getOptionValue={(o) => o.value}
+                        getOptionDisplayValue={(o) => o.label}
+                        disabled={chartsLoading}
+                        helperText={
+                          hasFeature('content') ? 'Size charts are managed under Storefront content.' : undefined
+                        }
+                        error={errors.sizeChart?.message as string}
+                      />
+                    )}
+                  />
+                </VeritcalFormBlockWrapper>
+
+                {/* Add-on category */}
+                <VeritcalFormBlockWrapper
+                  title="Add-on Category"
+                  description="Add-on category (e.g. gift boxes): its products are suggested as add-ons on product pages"
+                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                >
+                  <Controller
+                    name="isAddOnCategory"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <div className="flex items-center gap-3">
+                        <Switch checked={!!value} onChange={(e) => onChange(e.target.checked)} />
+                        <span className="text-sm text-gray-600">
+                          {value ? 'Suggested as add-ons' : 'Not an add-on category'}
                         </span>
                       </div>
                     )}

@@ -157,6 +157,18 @@ export interface Order {
   carrier?: string;
   deliveryType?: string; // New API field ('shipping' | 'pickup' | 'gig')
   gigWaybill?: string | null; // GIG Logistics waybill number
+  /** Copy of the pickup location chosen at checkout (deliveryType 'pickup'). */
+  pickupLocation?: {
+    locationId?: string;
+    name?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    phone?: string;
+    hours?: string;
+  } | null;
+  /** Message for the gift card / packing slip. */
+  giftMessage?: string | null;
 
   // Contact info (new API format)
   contact?: {

@@ -8,6 +8,10 @@ export type CategoryType = {
   description?: string;
   parent: string[];
   priority: boolean;
+  /** Size chart slug used by products in this category that don't set their own. */
+  sizeChart?: string;
+  /** Products here are suggested as add-ons (e.g. gift boxes). */
+  isAddOnCategory?: boolean;
   createdAt: Date;
   updatedAt: Date;
   subcategoryCount?: number;

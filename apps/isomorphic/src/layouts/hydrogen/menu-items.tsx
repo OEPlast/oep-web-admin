@@ -2,8 +2,10 @@ import { routes } from '@/config/routes';
 import {
   PiAirplaneTiltDuotone,
   PiApplePodcastsLogoDuotone,
+  PiArticleDuotone,
   PiArrowsOutDuotone,
   PiArrowsOutLineHorizontalDuotone,
+  PiBellRingingDuotone,
   PiBellSimpleRingingDuotone,
   PiBinocularsDuotone,
   PiBriefcaseDuotone,
@@ -36,7 +38,9 @@ import {
   PiHourglassSimpleDuotone,
   PiHouseLineDuotone,
   PiListNumbersDuotone,
+  PiLifebuoyDuotone,
   PiLockKeyDuotone,
+  PiMapPinDuotone,
   PiMapPinLineDuotone,
   PiMoneyDuotone,
   PiNewspaperClippingDuotone,
@@ -167,6 +171,35 @@ const allMenuItems = [
     ],
   },
   {
+    name: 'Storefront content',
+    icon: <PiArticleDuotone />,
+    href: '#',
+    permission: { resource: ['content'], action: 'read' },
+    feature: 'content' as StoreFeature,
+    dropdownItems: [
+      {
+        name: 'Articles',
+        href: routes.content.articles,
+      },
+      {
+        name: 'Home & site content',
+        href: routes.content.site,
+      },
+      {
+        name: 'FAQs',
+        href: routes.content.faqs,
+      },
+      {
+        name: 'Legal pages',
+        href: routes.content.legal,
+      },
+      {
+        name: 'Size charts',
+        href: routes.content.sizeCharts,
+      },
+    ],
+  },
+  {
     name: 'Users',
     href: routes.users.list,
     icon: <PiUserDuotone />,
@@ -177,6 +210,20 @@ const allMenuItems = [
     href: routes.eCommerce.orders,
     icon: <PiShoppingCartDuotone />,
     permission: { resource: ['orders'], action: 'read' },
+  },
+  {
+    name: 'Support inbox',
+    href: routes.support.tickets,
+    icon: <PiLifebuoyDuotone />,
+    permission: { resource: ['support'], action: 'read' },
+    feature: 'support' as StoreFeature,
+  },
+  {
+    name: 'Stock alerts',
+    href: routes.support.stockAlerts,
+    icon: <PiBellRingingDuotone />,
+    permission: { resource: ['support'], action: 'read' },
+    feature: 'stockAlerts' as StoreFeature,
   },
   {
     name: 'Transactions',
@@ -225,6 +272,13 @@ const allMenuItems = [
     href: routes.eCommerce.logistics.home,
     icon: <PiPackageDuotone />,
     permission: { resource: ['logistics'], action: 'read' },
+  },
+  {
+    name: 'Pickup locations',
+    href: routes.pickupLocations,
+    icon: <PiMapPinDuotone />,
+    permission: { resource: ['pickup'], action: 'read' },
+    feature: 'pickup' as StoreFeature,
   },
   {
     name: 'GIG Logistics',

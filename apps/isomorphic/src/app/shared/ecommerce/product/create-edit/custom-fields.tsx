@@ -7,6 +7,10 @@ import { PiPlusBold } from 'react-icons/pi';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import QuillEditor from '@core/ui/quill-editor';
 
+/** Common specification names offered while typing (free text is still allowed). */
+const SPEC_KEY_PRESETS = ['Material', 'Stone', 'Clarity', 'Plating', 'Clasp', 'Warranty', 'Length', 'Weight'];
+const SPEC_KEY_LIST_ID = 'product-spec-key-presets';
+
 export default function CustomFields() {
   const { control, register, formState: { errors } } = useFormContext();
 
@@ -53,6 +57,7 @@ export default function CustomFields() {
               label="Specification Name"
               placeholder="e.g. Material, Color, etc."
               className="flex-grow"
+              list={SPEC_KEY_LIST_ID}
               {...register(`specifications.${index}.key`)}
               error={(errors.specifications as any)?.[index]?.key?.message}
             />
@@ -72,6 +77,12 @@ export default function CustomFields() {
             </ActionIcon>
           </div>
         ))}
+        {/* Suggestions only: any other name can still be typed. */}
+        <datalist id={SPEC_KEY_LIST_ID}>
+          {SPEC_KEY_PRESETS.map((key) => (
+            <option key={key} value={key} />
+          ))}
+        </datalist>
         <Button
           type="button"
           onClick={() => appendSpec({ key: '', value: '' })}

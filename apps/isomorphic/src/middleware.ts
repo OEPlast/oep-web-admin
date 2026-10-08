@@ -20,5 +20,7 @@ export const config = {
     '/analytics/:path*',
     '/marketing/:path*',
     '/invoice/:path*',
+    '/content/:path*',
+    '/support/:path*',
   ],
 };

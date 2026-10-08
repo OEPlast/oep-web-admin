@@ -63,6 +63,8 @@ export interface Product {
       price: number;
       stock: number;
       image: string;
+      /** Gallery for this value (bare CDN paths from description_images). */
+      images?: string[];
       pricingTiers?: Array<{
         minQty: number;
         maxQty?: number;
@@ -77,6 +79,10 @@ export interface Product {
     strategy: 'fixedPrice' | 'percentOff' | 'amountOff';
     value: number;
   }>;
+  /** Product ids offered as add-ons on this product's page, in order. */
+  addOns?: string[];
+  /** Size chart slug; unset means the category's chart. */
+  sizeChart?: string | null;
   totalRating?: number;
   reviewCount?: number;
   createdAt: string;

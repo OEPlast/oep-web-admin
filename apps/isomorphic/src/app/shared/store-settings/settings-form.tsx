@@ -82,6 +82,8 @@ export default function SettingsForm() {
       taxRate: 0,
       currency: 'USD',
       timezone: DEFAULT_TIMEZONE,
+      newArrivalDays: 30,
+      bestSellerCount: 20,
       socialLinks: {
         instagram: '',
         facebook: '',
@@ -125,6 +127,8 @@ export default function SettingsForm() {
         taxRate: settings.taxRate || 0,
         currency: settings.currency || 'USD',
         timezone: settings.timezone || DEFAULT_TIMEZONE,
+        newArrivalDays: settings.newArrivalDays ?? 30,
+        bestSellerCount: settings.bestSellerCount ?? 20,
         socialLinks: {
           instagram: settings.socialLinks?.instagram || '',
           facebook: settings.socialLinks?.facebook || '',
@@ -446,6 +450,37 @@ export default function SettingsForm() {
                     placeholder="0.00"
                     {...register('taxRate', { valueAsNumber: true })}
                     error={errors.taxRate?.message}
+                  />
+                </div>
+              </VerticalFormBlockWrapper>
+            </Element>
+
+            <Element name={settingsFormParts.catalog}>
+              <VerticalFormBlockWrapper
+                title="Storefront catalog"
+                description="How the storefront picks its New arrivals and Best sellers"
+                className="pt-7 @2xl:pt-9 @3xl:pt-11"
+              >
+                <div className="grid gap-4 @md:grid-cols-2">
+                  <Input
+                    label="New arrival window (days)"
+                    type="number"
+                    min="1"
+                    max="365"
+                    step="1"
+                    {...register('newArrivalDays', { valueAsNumber: true })}
+                    helperText="Products added within this many days count as new arrivals (1–365)."
+                    error={errors.newArrivalDays?.message}
+                  />
+                  <Input
+                    label="Best sellers"
+                    type="number"
+                    min="1"
+                    max="200"
+                    step="1"
+                    {...register('bestSellerCount', { valueAsNumber: true })}
+                    helperText="How many top-selling products count as best sellers (1–200)."
+                    error={errors.bestSellerCount?.message}
                   />
                 </div>
               </VerticalFormBlockWrapper>

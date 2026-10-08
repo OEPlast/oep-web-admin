@@ -25,6 +25,7 @@ import { LAYOUT_OPTIONS } from '@/config/enums';
 import { Product } from '@/hooks/queries/useProducts';
 import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fields';
 import ProductPerformance from '@/app/shared/ecommerce/product/create-edit/product-performance';
+import ProductMerchandising from '@/app/shared/ecommerce/product/create-edit/product-merchandising';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -34,6 +35,7 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.shipping]: ShippingInfo,
   [formParts.variantOptions]: ProductVariants,
   [formParts.tagsAndCategory]: ProductTaxonomies,
+  [formParts.merchandising]: ProductMerchandising,
   [formParts.seo]: ProductSeo,
   [formParts.customFields]: CustomFields,
   [formParts.performance]: ProductPerformance,
@@ -72,6 +74,8 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
 
       attributes: [],
       pricingTiers: [],
+      addOns: [],
+      sizeChart: '',
       stock: 0,
       lowStockThreshold: 5,
       status: 'inactive',
@@ -110,8 +114,13 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     width: product.width ?? 10,
     length: product.length ?? 10,
     isVolumetric: product.isVolumetric ?? false,
-    attributes: product.attributes || [],
+    attributes: (product.attributes || []).map((attr) => ({
+      ...attr,
+      children: (attr.children || []).map((child) => ({ ...child, images: child.images ?? [] })),
+    })),
     pricingTiers: product.pricingTiers || [],
+    addOns: (product.addOns || []).map(String),
+    sizeChart: product.sizeChart ?? '',
     stock: product.stock,
     lowStockThreshold: product.lowStockThreshold,
     status: product.status,
@@ -121,6 +130,29 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     mpn: product.mpn ?? '',
     condition: product.condition ?? 'new',
   };
+}
+
+/**
+ * Add-ons, the size chart and per-value images are optional extras: leave them out of the
+ * payload while they are empty and were empty before, so saving a product that doesn't use them
+ * sends exactly what it used to. Clearing a value that was set still sends the empty value.
+ */
+function withoutUnusedExtras(data: CreateProductInput, product?: Product): CreateProductInput {
+  const next: CreateProductInput = { ...data };
+  if (!next.addOns?.length && !product?.addOns?.length) delete next.addOns;
+  if (!next.sizeChart && !product?.sizeChart) delete next.sizeChart;
+  if (next.attributes) {
+    next.attributes = next.attributes.map((attr, a) => ({
+      ...attr,
+      children: attr.children.map((child) => {
+        const before = product?.attributes?.[a]?.children?.find((c) => c.name === child.name);
+        if (child.images?.length || before?.images?.length) return child;
+        const { images: _unused, ...rest } = child;
+        return rest;
+      }),
+    }));
+  }
+  return next;
 }
 
 export default function CreateEditProduct({
@@ -143,7 +175,7 @@ export default function CreateEditProduct({
   }, [product, methods]);
 
   const handleSubmit: SubmitHandler<CreateProductInput> = (data) => {
-    onSubmit(data);
+    onSubmit(withoutUnusedExtras(data, product));
   };
 
   return (
@@ -179,8 +211,9 @@ export default function CreateEditProduct({
               }
 
               // Performance links out to the product's analytics, so it needs
-              // the id. On create there is none, and the section says so.
-              if (componentKey === formParts.performance) {
+              // the id. On create there is none, and the section says so. The add-ons
+              // picker needs it too, to leave the product itself out.
+              if (componentKey === formParts.performance || componentKey === formParts.merchandising) {
                 return (
                   <Element key={key} name={componentKey}>
                     <Component

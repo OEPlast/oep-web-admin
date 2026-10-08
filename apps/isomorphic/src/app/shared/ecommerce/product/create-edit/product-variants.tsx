@@ -5,7 +5,9 @@ import { Input, Button, ActionIcon, Select } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import TrashIcon from '@core/components/icons/trash';
-import { PiPlusBold } from 'react-icons/pi';
+import { PiCheckBold, PiPlusBold } from 'react-icons/pi';
+import { getCdnUrl } from '@core/utils/cdn-url';
+import { isWholesaleEnabled } from '@/config/features';
 import { useState } from 'react';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import { formatToNaira } from '@/libs/currencyFormatter';
@@ -15,12 +17,12 @@ const ATTRIBUTE_TEMPLATES = {
   sizes: {
     name: 'Size',
     children: [
-      { name: 'XS', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'S', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'M', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'L', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'XL', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'XXL', price: undefined, stock: 0, image: '', pricingTiers: [] },
+      { name: 'XS', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'S', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'M', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'L', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'XL', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'XXL', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
     ],
   },
   colors: {
@@ -31,6 +33,7 @@ const ATTRIBUTE_TEMPLATES = {
         price: undefined,
         stock: 0,
         image: '',
+        images: [],
         pricingTiers: [],
       },
       {
@@ -38,18 +41,20 @@ const ATTRIBUTE_TEMPLATES = {
         price: undefined,
         stock: 0,
         image: '',
+        images: [],
         pricingTiers: [],
       },
-      { name: 'Red', price: undefined, stock: 0, image: '', pricingTiers: [] },
-      { name: 'Blue', price: undefined, stock: 0, image: '', pricingTiers: [] },
+      { name: 'Red', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'Blue', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
       {
         name: 'Green',
         price: undefined,
         stock: 0,
         image: '',
+        images: [],
         pricingTiers: [],
       },
-      { name: 'Gray', price: undefined, stock: 0, image: '', pricingTiers: [] },
+      { name: 'Gray', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
     ],
   },
 };
@@ -213,6 +218,7 @@ function VariantChildren({ attributeIndex }: { attributeIndex: number }) {
   });
 
   const productPrice = watch('price') || 0;
+  const wholesale = isWholesaleEnabled();
 
   return (
     <div className="mt-4 border-t border-gray-200 pt-4">
@@ -233,11 +239,12 @@ function VariantChildren({ attributeIndex }: { attributeIndex: number }) {
       {showChildren && (
         <div className="space-y-4">
           {/* Header row */}
-          <div className="grid grid-cols-9 gap-3 px-2 text-xs font-medium text-gray-600">
+          <div className="grid grid-cols-10 gap-3 px-2 text-xs font-medium text-gray-600">
             <div className="col-span-3">Value</div>
             <div className="col-span-2">Stock</div>
             <div className="col-span-2">Price</div>
-            <div className="col-span-1">Tiers</div>
+            <div className="col-span-1">Images</div>
+            <div className="col-span-1">{wholesale ? 'Tiers' : ''}</div>
             <div className="col-span-1"></div>
           </div>
 
@@ -261,6 +268,7 @@ function VariantChildren({ attributeIndex }: { attributeIndex: number }) {
                 price: undefined,
                 stock: undefined,
                 image: '',
+                images: [],
                 pricingTiers: [],
               })
             }
@@ -299,6 +307,11 @@ function VariantChildRow({
     formState: { errors },
   } = useFormContext();
   const [showPricingTiers, setShowPricingTiers] = useState(false);
+  const [showImages, setShowImages] = useState(false);
+  const wholesale = isWholesaleEnabled();
+  const imageCount = (
+    watch(`attributes.${attributeIndex}.children.${childIndex}.images`) || []
+  ).length;
 
   const childPrice = watch(
     `attributes.${attributeIndex}.children.${childIndex}.price`
@@ -314,7 +327,7 @@ function VariantChildRow({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-9 items-start gap-3">
+      <div className="grid grid-cols-10 items-start gap-3">
         <div className="col-span-3">
           <Input
             size="sm"
@@ -375,16 +388,35 @@ function VariantChildRow({
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setShowPricingTiers(!showPricingTiers)}
+            onClick={() => setShowImages(!showImages)}
             className="w-full px-2 text-xs"
           >
-            {showPricingTiers ? 'Hide' : 'Tiers'}
-            {tierCount > 0 && (
+            {showImages ? 'Hide' : 'Images'}
+            {imageCount > 0 && (
               <span className="ml-1 rounded-full bg-blue-500 px-1 text-xs text-white">
-                {tierCount}
+                {imageCount}
               </span>
             )}
           </Button>
+        </div>
+
+        <div className="col-span-1">
+          {wholesale && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setShowPricingTiers(!showPricingTiers)}
+              className="w-full px-2 text-xs"
+            >
+              {showPricingTiers ? 'Hide' : 'Tiers'}
+              {tierCount > 0 && (
+                <span className="ml-1 rounded-full bg-blue-500 px-1 text-xs text-white">
+                  {tierCount}
+                </span>
+              )}
+            </Button>
+          )}
         </div>
 
         <div className="col-span-1 flex justify-end">
@@ -394,7 +426,16 @@ function VariantChildRow({
         </div>
       </div>
 
-      {showPricingTiers && (
+      {showImages && (
+        <div className="ml-4 border-l-2 border-gray-200 pl-4">
+          <VariantImagesPicker
+            attributeIndex={attributeIndex}
+            childIndex={childIndex}
+          />
+        </div>
+      )}
+
+      {wholesale && showPricingTiers && (
         <div className="ml-4 border-l-2 border-gray-200 pl-4">
           <PricingTiers
             attributeIndex={attributeIndex}
@@ -404,6 +445,102 @@ function VariantChildRow({
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Picks which of the product's uploaded images belong to this value (e.g. the Rose Gold
+ * photos), so the storefront can switch the gallery when it is selected. Stores the images'
+ * bare url paths; nothing picked means the product gallery is used.
+ */
+function VariantImagesPicker({
+  attributeIndex,
+  childIndex,
+}: {
+  attributeIndex: number;
+  childIndex: number;
+}) {
+  const { control, watch } = useFormContext();
+  const media: Array<{ url: string; mediaType?: 'image' | 'video' }> =
+    watch('description_images') || [];
+  const images = media.filter((m) => (m.mediaType ?? 'image') === 'image');
+
+  return (
+    <Controller
+      name={`attributes.${attributeIndex}.children.${childIndex}.images`}
+      control={control}
+      render={({ field }) => {
+        const selected: string[] = field.value || [];
+        const toggle = (url: string) =>
+          field.onChange(
+            selected.includes(url)
+              ? selected.filter((u) => u !== url)
+              : [...selected, url]
+          );
+        return (
+          <div className="space-y-2 py-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-medium text-gray-700">
+                Images for this value
+              </h5>
+              {selected.length > 0 && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="text"
+                  className="h-auto p-0 text-xs"
+                  onClick={() => field.onChange([])}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+            {images.length === 0 ? (
+              <p className="py-2 text-xs text-gray-500">
+                Upload product images under Images &amp; Gallery first, then
+                pick the ones that show this value.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {images.map((img) => {
+                  const isSelected = selected.includes(img.url);
+                  return (
+                    <button
+                      key={img.url}
+                      type="button"
+                      onClick={() => toggle(img.url)}
+                      aria-pressed={isSelected}
+                      className={cn(
+                        'relative h-16 w-16 overflow-hidden rounded border-2 transition',
+                        isSelected
+                          ? 'border-primary'
+                          : 'border-transparent opacity-70 hover:opacity-100'
+                      )}
+                    >
+                      <img
+                        src={getCdnUrl(img.url)}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                      {isSelected && (
+                        <span className="absolute right-0.5 top-0.5 rounded-full bg-primary p-0.5 text-white">
+                          <PiCheckBold className="h-2.5 w-2.5" />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              {selected.length
+                ? `${selected.length} selected, shown in the order picked.`
+                : 'None picked: the full product gallery is shown.'}
+            </p>
+          </div>
+        );
+      }}
+    />
   );
 }
 

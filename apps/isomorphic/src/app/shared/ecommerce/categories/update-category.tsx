@@ -59,6 +59,10 @@ export default function UpdateCategory({
       slug: category.slug,
       createdAt: category.createdAt,
     };
+    // Only send the extras when they changed: an empty sizeChart clears it, and an untouched
+    // switch never overwrites a value the form didn't load.
+    if ((data.sizeChart ?? '') !== (category.sizeChart ?? '')) updateData.sizeChart = data.sizeChart ?? '';
+    if (!!data.isAddOnCategory !== !!category.isAddOnCategory) updateData.isAddOnCategory = !!data.isAddOnCategory;
 
     updateCategory.mutate({ id: category._id, data: updateData });
   };

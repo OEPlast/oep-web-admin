@@ -123,6 +123,8 @@ const baseProductSchema = z.object({
             price: preprocessedOptionalNumber,
             stock: z.number().int().min(0, 'Stock cannot be negative'),
             pricingTiers: z.array(pricingTierSchema).optional(),
+            // Gallery shown when this value is selected: url paths from description_images.
+            images: z.array(z.string()).optional(),
           })
         ),
       })
@@ -130,6 +132,12 @@ const baseProductSchema = z.object({
     .optional(),
 
   pricingTiers: z.array(pricingTierSchema).optional(),
+
+  // Products offered next to this one on its page (e.g. a gift box), in order. Main-server takes 10.
+  addOns: z.array(z.string()).max(10, 'Pick at most 10 add-ons').optional(),
+
+  // Size chart slug; empty means the category's chart is used.
+  sizeChart: z.string().optional(),
 
   packSizes: z.array(packSizeSchema).optional(),
 
