@@ -3,6 +3,7 @@ export const routes = {
     dashboard: '/',
     products: '/ecommerce/products',
     createProduct: '/ecommerce/products/create',
+    importVylux: '/ecommerce/products/import-vylux',
     // Redirects to the edit page; kept for links that still target it.
     productDetails: (slug: string) => `/ecommerce/products/${slug}`,
     /** The edit page looks products up by id, not slug. */

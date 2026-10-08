@@ -1,6 +1,15 @@
 import './src/env.mjs';
 /** @type {import('next').NextConfig} */
 
+// The deployment's own CDN (each store has its own Bunny pull zone), in addition to the fixed list.
+const cdnHost = (() => {
+  try {
+    return process.env.NEXT_PUBLIC_CDN_BASE_URL ? new URL(process.env.NEXT_PUBLIC_CDN_BASE_URL).hostname : null;
+  } catch {
+    return null;
+  }
+})();
+
 const nextConfig = {
   images: {
     unoptimized: false,
@@ -52,6 +61,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'placeholder.com',
       },
+      ...(cdnHost && cdnHost !== 'oeptest.b-cdn.net' ? [{ protocol: 'https', hostname: cdnHost }] : []),
     ],
   },
   reactStrictMode: true,

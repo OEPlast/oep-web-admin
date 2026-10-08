@@ -65,8 +65,10 @@ import {
 import { GoHome, GoPeople } from 'react-icons/go';
 import { MdOutlineCampaign, MdOutlineSell, MdPayments } from 'react-icons/md';
 import { IoReturnDownBack } from 'react-icons/io5';
+import { hasFeature, StoreFeature } from '@/config/features';
 // Note: do not add href in the label object, it is rendering as label
-export const menuItems = [
+// Items with a `feature` only appear when NEXT_PUBLIC_STORE_FEATURES lists it (see config/features.ts).
+const allMenuItems = [
   // label start
   {
     name: 'Overview',
@@ -82,6 +84,13 @@ export const menuItems = [
     href: routes.eCommerce.products,
     icon: <PiPackageDuotone />,
     permission: { resource: ['products'], action: 'read' },
+  },
+  {
+    name: 'Import from Vylux',
+    href: routes.eCommerce.importVylux,
+    icon: <PiArrowsOutDuotone />,
+    permission: { resource: ['products'], action: 'create' },
+    feature: 'vylux' as StoreFeature,
   },
   {
     name: 'Categories',
@@ -268,3 +277,5 @@ export const menuItems = [
     permission: { resource: ['settings'], action: 'update' },
   },
 ];
+
+export const menuItems = allMenuItems.filter((item) => !item.feature || hasFeature(item.feature));

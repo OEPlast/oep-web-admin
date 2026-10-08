@@ -353,6 +353,13 @@ export const api = {
     shipments: '/admin/gig/shipments',
     shipmentInfo: (waybill: string) => `/admin/gig/shipments/${waybill}`,
   },
+
+  // Vylux scraper import (answers 503 unless the deployment sets VYLUX_API_URL/VYLUX_API_KEY)
+  vylux: {
+    status: '/admin/vylux/status',
+    products: '/admin/vylux/products',
+    import: '/admin/vylux/import',
+  },
 } as const;
 
 export default api;

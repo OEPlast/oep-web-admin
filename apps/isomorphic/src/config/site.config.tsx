@@ -20,8 +20,8 @@ export const ADMIN_NAME = `${STORE_NAME} Admin`;
 export const siteConfig = {
   title: `${ADMIN_NAME} - Manage your store`,
   description: `${ADMIN_NAME}.`,
-  logo: '/images/brand/logoTransparent.png',
-  icon: '/images/brand/logoMiniLight.png',
+  logo: process.env.NEXT_PUBLIC_LOGO_URL || '/images/brand/logoTransparent.png',
+  icon: process.env.NEXT_PUBLIC_LOGO_ICON_URL || '/images/brand/logoMiniLight.png',
   mode: MODE.LIGHT,
   layout: LAYOUT_OPTIONS.HYDROGEN,
   // TODO: favicon
