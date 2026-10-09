@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CreateProduct from '@/app/shared/ecommerce/product/create-product';
 import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
@@ -28,7 +29,10 @@ export default function CreateProductPage() {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-      <CreateProduct />
+      {/* CreateProduct reads ?vylux= (a product from Import from Vylux) */}
+      <Suspense>
+        <CreateProduct />
+      </Suspense>
     </>
   );
 }

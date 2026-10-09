@@ -394,6 +394,7 @@ export const api = {
     status: '/admin/vylux/status',
     products: '/admin/vylux/products',
     import: '/admin/vylux/import',
+    prepare: (vyluxId: number) => `/admin/vylux/products/${vyluxId}/prepare`,
   },
 } as const;
 

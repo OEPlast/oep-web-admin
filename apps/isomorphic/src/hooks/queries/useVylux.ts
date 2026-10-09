@@ -1,15 +1,16 @@
 'use client';
 
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
-import { apiClient, handleApiError } from '@/libs/axios';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
+import { formatToNaira } from '@/libs/currencyFormatter';
 
 export type VyluxPriceLine = { label: string; raw: string; min: number | null; max: number | null };
 
 export type VyluxProduct = {
   vyluxId: number;
   title: string;
+  /** The Telegram caption without the lines that carry Vylux's prices. */
   description: string;
   prices: VyluxPriceLine[];
   postedAt: string | null;
@@ -20,19 +21,23 @@ export type VyluxProduct = {
 
 type VyluxPage = { items: VyluxProduct[]; hasMore: boolean; nextAfter: number | null };
 
-export type VyluxImportItem = {
-  vyluxId: number;
-  categoryId: string;
-  price: number;
-  name?: string;
-  description?: string;
+/** Pictures copied into this store's storage, in the product form's `description_images` shape. */
+export type VyluxCopiedMedia = { url: string; cover_image: boolean; mediaType: 'image' | 'video'; miniUrl?: string };
+
+export type VyluxPrepared = { product: VyluxProduct; images: VyluxCopiedMedia[]; suggestedSku: number };
+
+/** "Watch Alone: ₦175,000.00" — a Vylux price line for reference. */
+export const vyluxPriceLabel = (p: VyluxPriceLine) => {
+  if (p.min == null) return p.raw;
+  const range = p.max != null && p.max !== p.min ? `${formatToNaira(p.min)} – ${formatToNaira(p.max)}` : formatToNaira(p.min);
+  return p.label ? `${p.label}: ${range}` : range;
 };
 
-export type VyluxImportResult = { vyluxId: number; ok: boolean; productId?: string; error?: string };
+/** The first picture to show for a scraper product (a video's poster when it has no image). */
+export const vyluxCover = (p: VyluxProduct) =>
+  p.media.find((m) => m.type === 'image')?.url ?? p.media.find((m) => m.posterUrl)?.posterUrl ?? undefined;
 
-/** Main-server takes at most this many per import request. */
-export const VYLUX_IMPORT_BATCH = 10;
-
+/** Accepted scraper products that haven't been added to the store yet. */
 export const useVyluxProducts = () =>
   useInfiniteQuery<VyluxPage>({
     queryKey: ['vylux', 'products'],
@@ -48,30 +53,44 @@ export const useVyluxProducts = () =>
     staleTime: 30 * 1000,
   });
 
-/** Imports in batches of VYLUX_IMPORT_BATCH and returns every per-item result. */
-export const useImportVylux = () => {
-  const queryClient = useQueryClient();
-  return useMutation<VyluxImportResult[], Error, VyluxImportItem[]>({
-    mutationFn: async (items) => {
-      const results: VyluxImportResult[] = [];
-      for (let i = 0; i < items.length; i += VYLUX_IMPORT_BATCH) {
-        const response = await apiClient.post<VyluxImportResult[]>(api.vylux.import, {
-          items: items.slice(i, i + VYLUX_IMPORT_BATCH),
-        });
-        results.push(...(response.data ?? []));
+const preparedKey = (vyluxId: number) => `vylux-prepared:${vyluxId}`;
+
+/** Forget the copied pictures once the product is created. */
+export const clearPreparedVylux = (vyluxId: number) => {
+  try {
+    sessionStorage.removeItem(preparedKey(vyluxId));
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+};
+
+/**
+ * Copies one scraper product's pictures into this store and returns them with its title, caption
+ * and prices, for the prefilled product form. Kept in sessionStorage so a reload of the form
+ * reuses the copies instead of copying the pictures again.
+ */
+export const usePreparedVylux = (vyluxId: number | null) =>
+  useQuery<VyluxPrepared>({
+    queryKey: ['vylux', 'prepared', vyluxId],
+    enabled: vyluxId != null,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      try {
+        const saved = sessionStorage.getItem(preparedKey(vyluxId!));
+        if (saved) return JSON.parse(saved) as VyluxPrepared;
+      } catch {
+        // storage unavailable or corrupt: copy again
       }
-      return results;
-    },
-    onSuccess: (results) => {
-      queryClient.invalidateQueries({ queryKey: ['vylux'] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      const ok = results.filter((r) => r.ok).length;
-      const failed = results.length - ok;
-      if (ok) toast.success(`Imported ${ok} product${ok === 1 ? '' : 's'} as inactive drafts`);
-      if (failed) toast.error(`${failed} product${failed === 1 ? '' : 's'} could not be imported`);
-    },
-    onError: (error) => {
-      toast.error(handleApiError(error));
+      const response = await apiClient.post<VyluxPrepared>(api.vylux.prepare(vyluxId!));
+      if (!response.data) throw new Error('No data returned');
+      try {
+        sessionStorage.setItem(preparedKey(vyluxId!), JSON.stringify(response.data));
+      } catch {
+        // storage unavailable: a reload copies again
+      }
+      return response.data;
     },
   });
-};

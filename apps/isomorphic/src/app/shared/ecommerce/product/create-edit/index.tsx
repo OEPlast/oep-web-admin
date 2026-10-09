@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,6 +47,10 @@ interface IndexProps {
   product?: Product;
   onSubmit: (data: CreateProductInput) => void;
   isLoading?: boolean;
+  /** Create mode: values to start from (e.g. a Vylux product's pictures and name). */
+  initialValues?: Partial<CreateProductInput>;
+  /** Shown above the form, inside its context (can read and set fields). */
+  intro?: ReactNode;
 }
 
 function defaultValues(product?: Product): Partial<CreateProductInput> {
@@ -161,11 +165,13 @@ export default function CreateEditProduct({
   className,
   onSubmit,
   isLoading = false,
+  initialValues,
+  intro,
 }: IndexProps) {
   const { layout } = useLayout();
   const methods = useForm<CreateProductInput>({
     resolver: zodResolver(productSchema),
-    defaultValues: defaultValues(product),
+    defaultValues: { ...defaultValues(product), ...initialValues },
   });
 
   useEffect(() => {
@@ -186,6 +192,7 @@ export default function CreateEditProduct({
         )}
       />
       <FormProvider {...methods}>
+        {intro}
         <form
           onSubmit={methods.handleSubmit(handleSubmit)}
           className={cn(
