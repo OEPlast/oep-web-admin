@@ -69,8 +69,19 @@ export interface PaginationMeta {
   pages: number;
 }
 
+export interface HomeCta {
+  ctaLabel: string;
+  ctaHref: string;
+}
+
 export interface SiteContent {
   _id?: string;
+  /** Home page imagery: hero, the image tiles ("Shop Women" / "Shop Men") and the feature block. */
+  home?: {
+    hero: HomeCta & { image: string; title: string };
+    tiles: Array<{ image: string; label: string; href: string }>;
+    feature: HomeCta & { image: string; title: string; text: string };
+  };
   testimonials: Array<{ quote: string; author: string }>;
   instagram: Array<{ image: string; link?: string }>;
   popularSearches: string[];

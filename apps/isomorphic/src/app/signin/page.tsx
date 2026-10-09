@@ -1,6 +1,7 @@
 import SignInForm from '@/app/signin/sign-in-form';
 import AuthWrapperOne from '@/app/shared/auth-layout/auth-wrapper-one';
 import Image from 'next/image';
+import { Suspense } from 'react';
 import UnderlineShape from '@core/components/shape/underline';
 import { metaObject } from '@/config/site.config';
 import { redirect } from 'next/navigation';
@@ -48,7 +49,9 @@ export default async function SignIn() {
       }
       showBackButton={false}
     >
-      <SignInForm />
+      <Suspense>
+        <SignInForm />
+      </Suspense>
     </AuthWrapperOne>
   );
 }

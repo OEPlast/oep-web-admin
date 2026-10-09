@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler } from 'react-hook-form';
 import { PiArrowRightBold } from 'react-icons/pi';
 import { Checkbox, Password, Button, Input, Text } from 'rizzui';
@@ -22,6 +22,9 @@ export default function SignInForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  // Middleware sends signed-out visitors here with the page they wanted; only same-site paths.
+  const callbackUrl = useSearchParams().get('callbackUrl');
+  const destination = callbackUrl?.startsWith('/') && !callbackUrl.startsWith('//') ? callbackUrl : '/';
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     setSubmitError(null);
@@ -37,8 +40,8 @@ export default function SignInForm() {
       if (result?.error) {
         setSubmitError('Invalid credentials. Please try again.');
       } else if (result?.ok) {
-        // Redirect to dashboard on successful login
-        router.push('/');
+        // Back to the page that asked for a sign-in, or the dashboard
+        router.push(destination);
         router.refresh();
       }
     } catch (error) {

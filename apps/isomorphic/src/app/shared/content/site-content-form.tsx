@@ -16,8 +16,35 @@ import { useSiteContent } from '@/hooks/queries/useContent';
 import { useUpdateSiteContent } from '@/hooks/mutations/useContentMutations';
 import { SiteContent, toSlug } from '@/types/content.types';
 
+// Links are storefront paths ("/shop?gender=women") or full URLs.
+const link = z.string().trim().max(300, 'At most 300 characters');
+
 // Limits mirror Main-server's ContentValidator.siteContent.
 const siteContentSchema = z.object({
+  home: z.object({
+    hero: z.object({
+      image: z.string(),
+      title: z.string().trim().max(120, 'At most 120 characters'),
+      ctaLabel: z.string().trim().max(40, 'At most 40 characters'),
+      ctaHref: link,
+    }),
+    tiles: z
+      .array(
+        z.object({
+          image: z.string().min(1, 'Upload an image or remove this tile'),
+          label: z.string().trim().min(1, 'Label is required'),
+          href: link.min(1, 'Link is required'),
+        })
+      )
+      .max(4, 'At most 4 tiles'),
+    feature: z.object({
+      image: z.string(),
+      title: z.string().trim().max(120, 'At most 120 characters'),
+      text: z.string().trim().max(400, 'At most 400 characters'),
+      ctaLabel: z.string().trim().max(40, 'At most 40 characters'),
+      ctaHref: link,
+    }),
+  }),
   testimonials: z
     .array(
       z.object({
@@ -46,6 +73,22 @@ type SiteContentFormValues = z.infer<typeof siteContentSchema>;
 const useFormContextTyped = () => useFormContext<SiteContentFormValues>();
 
 const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
+  home: {
+    hero: {
+      image: c?.home?.hero?.image ?? '',
+      title: c?.home?.hero?.title ?? '',
+      ctaLabel: c?.home?.hero?.ctaLabel ?? '',
+      ctaHref: c?.home?.hero?.ctaHref ?? '',
+    },
+    tiles: c?.home?.tiles?.map((t) => ({ image: t.image, label: t.label, href: t.href })) ?? [],
+    feature: {
+      image: c?.home?.feature?.image ?? '',
+      title: c?.home?.feature?.title ?? '',
+      text: c?.home?.feature?.text ?? '',
+      ctaLabel: c?.home?.feature?.ctaLabel ?? '',
+      ctaHref: c?.home?.feature?.ctaHref ?? '',
+    },
+  },
   testimonials: c?.testimonials?.map((t) => ({ quote: t.quote, author: t.author })) ?? [],
   instagram: c?.instagram?.map((i) => ({ image: i.image, link: i.link ?? '' })) ?? [],
   popularSearches: c?.popularSearches ?? [],
@@ -59,6 +102,8 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
 });
 
 const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
+  // zod already trimmed every text field
+  home: v.home,
   testimonials: v.testimonials.map((t) => ({ quote: t.quote.trim(), author: t.author.trim() })),
   instagram: v.instagram.map((i) => ({ image: i.image, ...(i.link.trim() ? { link: i.link.trim() } : {}) })),
   popularSearches: v.popularSearches,
@@ -113,6 +158,7 @@ export default function SiteContentForm() {
         onSubmit={handleSubmit((values) => updateMutation.mutate(toPayload(values)))}
         className="@container flex flex-col gap-8"
       >
+        <HomeSection />
         <TestimonialsSection />
         <InstagramSection />
         <PopularSearchesSection />
@@ -161,6 +207,125 @@ function RowActions({
   );
 }
 
+function HomeSection() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContextTyped();
+  const { fields, append, remove, move } = useFieldArray({ control, name: 'home.tiles' });
+  const imageInput = (name: 'home.hero.image' | 'home.feature.image', label: string, previewClassName: string) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <ImageField label={label} value={field.value} onChange={field.onChange} previewClassName={previewClassName} />
+      )}
+    />
+  );
+  return (
+    <VerticalFormBlockWrapper
+      title="Home page"
+      description="The hero at the top, the image tiles under Best Sellers and the feature block beside them. Links are storefront paths such as /shop?gender=women."
+      className="max-w-none"
+    >
+      <div className="grid gap-6 @5xl:grid-cols-2">
+        <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+          <Text className="font-medium">Hero</Text>
+          {imageInput('home.hero.image', 'Image (wide; leave empty for a text-only hero)', 'aspect-[16/9] max-w-[420px]')}
+          <Input
+            label="Title"
+            placeholder="Jewellery for every day"
+            {...register('home.hero.title')}
+            error={errors.home?.hero?.title?.message}
+          />
+          <div className="grid gap-3 @2xl:grid-cols-2">
+            <Input
+              label="Button label"
+              placeholder="Shop new arrivals"
+              {...register('home.hero.ctaLabel')}
+              error={errors.home?.hero?.ctaLabel?.message}
+            />
+            <Input
+              label="Button link"
+              placeholder="/shop?tag=new-arrivals"
+              {...register('home.hero.ctaHref')}
+              error={errors.home?.hero?.ctaHref?.message}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+          <Text className="font-medium">Feature block</Text>
+          {imageInput('home.feature.image', 'Image', 'aspect-[4/3] max-w-[320px]')}
+          <Input
+            label="Title"
+            placeholder="Made to be worn every day"
+            {...register('home.feature.title')}
+            error={errors.home?.feature?.title?.message}
+          />
+          <Textarea label="Text" rows={2} {...register('home.feature.text')} error={errors.home?.feature?.text?.message} />
+          <div className="grid gap-3 @2xl:grid-cols-2">
+            <Input
+              label="Button label"
+              placeholder="Shop new arrivals"
+              {...register('home.feature.ctaLabel')}
+              error={errors.home?.feature?.ctaLabel?.message}
+            />
+            <Input
+              label="Button link"
+              placeholder="/shop?tag=new-arrivals"
+              {...register('home.feature.ctaHref')}
+              error={errors.home?.feature?.ctaHref?.message}
+            />
+          </div>
+        </div>
+      </div>
+      <Text className="font-medium">Image tiles</Text>
+      <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-4">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+            <div className="flex items-center justify-between">
+              <Text className="font-medium">Tile {index + 1}</Text>
+              <RowActions index={index} count={fields.length} move={move} remove={remove} />
+            </div>
+            <Controller
+              control={control}
+              name={`home.tiles.${index}.image`}
+              render={({ field: imageField }) => (
+                <ImageField
+                  value={imageField.value}
+                  onChange={imageField.onChange}
+                  previewClassName="aspect-[4/5] max-w-[220px]"
+                  error={errors.home?.tiles?.[index]?.image?.message}
+                />
+              )}
+            />
+            <Input
+              label="Label"
+              placeholder="Shop Women"
+              {...register(`home.tiles.${index}.label`)}
+              error={errors.home?.tiles?.[index]?.label?.message}
+            />
+            <Input
+              label="Link"
+              placeholder="/shop?gender=women"
+              {...register(`home.tiles.${index}.href`)}
+              error={errors.home?.tiles?.[index]?.href?.message}
+            />
+          </div>
+        ))}
+      </div>
+      {errors.home?.tiles?.message && <Text className="text-sm text-red-600">{errors.home.tiles.message}</Text>}
+      {fields.length < 4 && (
+        <Button type="button" variant="outline" className="w-fit" onClick={() => append({ image: '', label: '', href: '' })}>
+          <PiPlusBold className="me-1.5 h-4 w-4" />
+          Add tile
+        </Button>
+      )}
+    </VerticalFormBlockWrapper>
+  );
+}
+
 function TestimonialsSection() {
   const {
     control,
@@ -169,7 +334,11 @@ function TestimonialsSection() {
   } = useFormContextTyped();
   const { fields, append, remove, move } = useFieldArray({ control, name: 'testimonials' });
   return (
-    <VerticalFormBlockWrapper title="Testimonials" description="Customer quotes on the home page, in this order.">
+    <VerticalFormBlockWrapper
+      title="Testimonials"
+      description="Customer quotes on the home page, in this order."
+      className={sectionClass}
+    >
       {fields.map((field, index) => (
         <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-muted p-4">
           <div className="flex items-center justify-between">
