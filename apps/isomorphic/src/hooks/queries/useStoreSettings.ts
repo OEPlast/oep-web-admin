@@ -32,6 +32,8 @@ export interface StoreSettings {
   newArrivalDays?: number;
   /** How many top sellers get the best-seller badge and list (default 20). */
   bestSellerCount?: number;
+  /** Products that fill the Best Sellers list until real sales rank enough. */
+  bestSellerPicks?: string[];
   socialLinks?: {
     instagram?: string;
     facebook?: string;

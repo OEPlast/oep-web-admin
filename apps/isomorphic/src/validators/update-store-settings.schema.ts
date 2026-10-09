@@ -56,6 +56,7 @@ export const updateStoreSettingsSchema = z.object({
     .min(1, 'At least 1')
     .max(200, 'At most 200')
     .optional(),
+  bestSellerPicks: z.array(z.string()).max(50, 'At most 50 products').optional(),
   socialLinks: z
     .object({
       instagram: z

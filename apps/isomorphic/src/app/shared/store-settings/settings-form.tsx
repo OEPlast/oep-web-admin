@@ -39,6 +39,7 @@ import { getCdnUrl } from '@core/utils/cdn-url';
 import FormFooter from '@core/components/form-footer';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import SettingsFormNav, { settingsFormParts } from './settings-form-nav';
+import BestSellerPicksField from './best-seller-picks-field';
 import CheckoutDeliverySettingsCard, {
   type CheckoutDeliverySettingsHandle,
 } from './checkout-delivery-settings-card';
@@ -84,6 +85,7 @@ export default function SettingsForm() {
       timezone: DEFAULT_TIMEZONE,
       newArrivalDays: 30,
       bestSellerCount: 20,
+      bestSellerPicks: [],
       socialLinks: {
         instagram: '',
         facebook: '',
@@ -129,6 +131,7 @@ export default function SettingsForm() {
         timezone: settings.timezone || DEFAULT_TIMEZONE,
         newArrivalDays: settings.newArrivalDays ?? 30,
         bestSellerCount: settings.bestSellerCount ?? 20,
+        bestSellerPicks: (settings.bestSellerPicks ?? []).map(String),
         socialLinks: {
           instagram: settings.socialLinks?.instagram || '',
           facebook: settings.socialLinks?.facebook || '',
@@ -483,6 +486,7 @@ export default function SettingsForm() {
                     error={errors.bestSellerCount?.message}
                   />
                 </div>
+                <BestSellerPicksField />
               </VerticalFormBlockWrapper>
             </Element>
 
