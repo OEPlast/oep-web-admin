@@ -82,6 +82,13 @@ export interface SiteContent {
     tiles: Array<{ image: string; label: string; href: string }>;
     feature: HomeCta & { image: string; title: string; text: string };
   };
+  /** About page: hero, optional quote, mission block and milestone cards. */
+  about?: {
+    hero: { image: string; title: string; text: string };
+    quote: { text: string; author: string };
+    mission: { image: string; title: string; text: string };
+    milestones: Array<{ image: string; title: string; text: string }>;
+  };
   testimonials: Array<{ quote: string; author: string }>;
   instagram: Array<{ image: string; link?: string }>;
   popularSearches: string[];

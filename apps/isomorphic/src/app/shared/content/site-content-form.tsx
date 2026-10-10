@@ -45,6 +45,31 @@ const siteContentSchema = z.object({
       ctaHref: link,
     }),
   }),
+  about: z.object({
+    hero: z.object({
+      image: z.string(),
+      title: z.string().trim().max(120, 'At most 120 characters'),
+      text: z.string().trim().max(600, 'At most 600 characters'),
+    }),
+    quote: z.object({
+      text: z.string().trim().max(300, 'At most 300 characters'),
+      author: z.string().trim().max(120, 'At most 120 characters'),
+    }),
+    mission: z.object({
+      image: z.string(),
+      title: z.string().trim().max(120, 'At most 120 characters'),
+      text: z.string().trim().max(1200, 'At most 1200 characters'),
+    }),
+    milestones: z
+      .array(
+        z.object({
+          image: z.string(),
+          title: z.string().trim().min(1, 'Title is required'),
+          text: z.string().trim().max(600, 'At most 600 characters'),
+        })
+      )
+      .max(6, 'At most 6 milestones'),
+  }),
   testimonials: z
     .array(
       z.object({
@@ -89,6 +114,12 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
       ctaHref: c?.home?.feature?.ctaHref ?? '',
     },
   },
+  about: {
+    hero: { image: c?.about?.hero?.image ?? '', title: c?.about?.hero?.title ?? '', text: c?.about?.hero?.text ?? '' },
+    quote: { text: c?.about?.quote?.text ?? '', author: c?.about?.quote?.author ?? '' },
+    mission: { image: c?.about?.mission?.image ?? '', title: c?.about?.mission?.title ?? '', text: c?.about?.mission?.text ?? '' },
+    milestones: c?.about?.milestones?.map((m) => ({ image: m.image ?? '', title: m.title, text: m.text ?? '' })) ?? [],
+  },
   testimonials: c?.testimonials?.map((t) => ({ quote: t.quote, author: t.author })) ?? [],
   instagram: c?.instagram?.map((i) => ({ image: i.image, link: i.link ?? '' })) ?? [],
   popularSearches: c?.popularSearches ?? [],
@@ -104,6 +135,7 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
 const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
   // zod already trimmed every text field
   home: v.home,
+  about: v.about,
   testimonials: v.testimonials.map((t) => ({ quote: t.quote.trim(), author: t.author.trim() })),
   instagram: v.instagram.map((i) => ({ image: i.image, ...(i.link.trim() ? { link: i.link.trim() } : {}) })),
   popularSearches: v.popularSearches,
@@ -159,6 +191,7 @@ export default function SiteContentForm() {
         className="@container flex flex-col gap-8"
       >
         <HomeSection />
+        <AboutSection />
         <TestimonialsSection />
         <InstagramSection />
         <PopularSearchesSection />
@@ -320,6 +353,70 @@ function HomeSection() {
         <Button type="button" variant="outline" className="w-fit" onClick={() => append({ image: '', label: '', href: '' })}>
           <PiPlusBold className="me-1.5 h-4 w-4" />
           Add tile
+        </Button>
+      )}
+    </VerticalFormBlockWrapper>
+  );
+}
+
+function AboutSection() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContextTyped();
+  const { fields, append, remove, move } = useFieldArray({ control, name: 'about.milestones' });
+  const imageInput = (name: 'about.hero.image' | 'about.mission.image' | `about.milestones.${number}.image`, label: string, previewClassName: string) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => <ImageField label={label} value={field.value} onChange={field.onChange} previewClassName={previewClassName} />}
+    />
+  );
+  return (
+    <VerticalFormBlockWrapper
+      title="About page"
+      description="The storefront's About page. Anything left empty is hidden; with nothing set the page shows a short default introduction."
+      className={`max-w-none ${sectionClass}`}
+    >
+      <div className="grid gap-6 @5xl:grid-cols-2">
+        <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+          <Text className="font-medium">Hero</Text>
+          {imageInput('about.hero.image', 'Image (wide; leave empty for a text-only hero)', 'aspect-[16/9] max-w-[420px]')}
+          <Input label="Title" placeholder="About Doreti" {...register('about.hero.title')} error={errors.about?.hero?.title?.message} />
+          <Textarea label="Introduction" rows={3} {...register('about.hero.text')} error={errors.about?.hero?.text?.message} />
+        </div>
+        <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+          <Text className="font-medium">Mission</Text>
+          {imageInput('about.mission.image', 'Image (optional)', 'aspect-square max-w-[260px]')}
+          <Input label="Title" placeholder="Our promise" {...register('about.mission.title')} error={errors.about?.mission?.title?.message} />
+          <Textarea label="Text" rows={4} {...register('about.mission.text')} error={errors.about?.mission?.text?.message} />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+        <Text className="font-medium">Quote (optional)</Text>
+        <Textarea label="Quote" rows={2} {...register('about.quote.text')} error={errors.about?.quote?.text?.message} />
+        <Input label="Attribution" placeholder="Name, role" {...register('about.quote.author')} error={errors.about?.quote?.author?.message} />
+      </div>
+      <Text className="font-medium">Milestones</Text>
+      <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+            <div className="flex items-center justify-between">
+              <Text className="font-medium">Milestone {index + 1}</Text>
+              <RowActions index={index} count={fields.length} move={move} remove={remove} />
+            </div>
+            {imageInput(`about.milestones.${index}.image`, 'Image (optional)', 'aspect-square max-w-[220px]')}
+            <Input label="Title" {...register(`about.milestones.${index}.title`)} error={errors.about?.milestones?.[index]?.title?.message} />
+            <Textarea label="Text" rows={3} {...register(`about.milestones.${index}.text`)} error={errors.about?.milestones?.[index]?.text?.message} />
+          </div>
+        ))}
+      </div>
+      {errors.about?.milestones?.message && <Text className="text-sm text-red-600">{errors.about.milestones.message}</Text>}
+      {fields.length < 6 && (
+        <Button type="button" variant="outline" className="w-fit" onClick={() => append({ image: '', title: '', text: '' })}>
+          <PiPlusBold className="me-1.5 h-4 w-4" />
+          Add milestone
         </Button>
       )}
     </VerticalFormBlockWrapper>
