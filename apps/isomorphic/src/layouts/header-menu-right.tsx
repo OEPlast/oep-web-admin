@@ -4,9 +4,11 @@ import { ActionIcon, Badge } from 'rizzui';
 import { PiBellSimpleRingingDuotone } from 'react-icons/pi';
 import ProfileMenu from '@/layouts/profile-menu';
 import NotificationDropdown, { useUnreadNotificationCount } from '@/layouts/notification-dropdown';
+import { useStaffLiveUpdates } from '@/hooks/useStaffLiveUpdates';
 
 function NotificationBell() {
   const unread = useUnreadNotificationCount();
+  useStaffLiveUpdates();
   return (
     <NotificationDropdown>
       <ActionIcon
