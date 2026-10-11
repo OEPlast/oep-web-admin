@@ -82,6 +82,8 @@ export interface SiteContent {
     tiles: Array<{ image: string; label: string; href: string }>;
     feature: HomeCta & { image: string; title: string; text: string };
   };
+  /** Store-wide Warranty and Delivery & Returns blocks on every product page. */
+  productInfo?: { warranty: string; deliveryReturns: string };
   /** About page: hero, optional quote, mission block and milestone cards. */
   about?: {
     hero: { image: string; title: string; text: string };

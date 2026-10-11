@@ -45,6 +45,10 @@ const siteContentSchema = z.object({
       ctaHref: link,
     }),
   }),
+  productInfo: z.object({
+    warranty: z.string().trim().max(4000, 'At most 4000 characters'),
+    deliveryReturns: z.string().trim().max(4000, 'At most 4000 characters'),
+  }),
   about: z.object({
     hero: z.object({
       image: z.string(),
@@ -114,6 +118,7 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
       ctaHref: c?.home?.feature?.ctaHref ?? '',
     },
   },
+  productInfo: { warranty: c?.productInfo?.warranty ?? '', deliveryReturns: c?.productInfo?.deliveryReturns ?? '' },
   about: {
     hero: { image: c?.about?.hero?.image ?? '', title: c?.about?.hero?.title ?? '', text: c?.about?.hero?.text ?? '' },
     quote: { text: c?.about?.quote?.text ?? '', author: c?.about?.quote?.author ?? '' },
@@ -136,6 +141,7 @@ const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
   // zod already trimmed every text field
   home: v.home,
   about: v.about,
+  productInfo: v.productInfo,
   testimonials: v.testimonials.map((t) => ({ quote: t.quote.trim(), author: t.author.trim() })),
   instagram: v.instagram.map((i) => ({ image: i.image, ...(i.link.trim() ? { link: i.link.trim() } : {}) })),
   popularSearches: v.popularSearches,
@@ -192,6 +198,7 @@ export default function SiteContentForm() {
       >
         <HomeSection />
         <AboutSection />
+        <ProductInfoSection />
         <TestimonialsSection />
         <InstagramSection />
         <PopularSearchesSection />
@@ -419,6 +426,38 @@ function AboutSection() {
           Add milestone
         </Button>
       )}
+    </VerticalFormBlockWrapper>
+  );
+}
+
+function ProductInfoSection() {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContextTyped();
+  const help = 'A blank line starts a new paragraph. **Bold** and [link text](/returns) work.';
+  return (
+    <VerticalFormBlockWrapper
+      title="Product page"
+      description="Blocks shown on every product page, beside the product's own details and size guide. Leave one empty to hide it; Delivery & Returns then shows the delivery settings instead."
+      className={sectionClass}
+    >
+      <Textarea
+        label="Warranty"
+        rows={6}
+        placeholder={'What the warranty covers, how long, and how to claim.\n\nThe warranty does not cover accidental damage. [Read the full warranty](/terms-of-service)'}
+        helperText={help}
+        {...register('productInfo.warranty')}
+        error={errors.productInfo?.warranty?.message}
+      />
+      <Textarea
+        label="Delivery & Returns"
+        rows={6}
+        placeholder={'**Standard delivery**\nLagos: 1–2 working days. Rest of Nigeria: 2–5 working days.\n\n**Returns**\nUnworn pieces within 7 days. [Returns policy](/returns)'}
+        helperText={help}
+        {...register('productInfo.deliveryReturns')}
+        error={errors.productInfo?.deliveryReturns?.message}
+      />
     </VerticalFormBlockWrapper>
   );
 }
