@@ -19,7 +19,12 @@ const optionalNumber = (isInteger = false) => {
 };
 
 // Helper for preprocessing optional number fields that may come as empty strings
-const preprocessedOptionalNumber = z.coerce.number().min(0).optional();
+// An option's own price. Left empty it uses the product price: the input (valueAsNumber) gives
+// NaN for an empty box, which means "no price", not an error.
+const preprocessedOptionalNumber = z
+  .union([z.number().min(0, 'Price cannot be negative'), z.nan()])
+  .optional()
+  .transform((v) => (v === undefined || Number.isNaN(v) ? undefined : v));
 
 // Pricing tier schema
 const pricingTierSchema = z
@@ -125,6 +130,14 @@ const baseProductSchema = z.object({
             pricingTiers: z.array(pricingTierSchema).optional(),
             // Gallery shown when this value is selected: url paths from description_images.
             images: z.array(z.string()).optional(),
+            // Swatch colour on the storefront (e.g. "#D4AF37"); empty means none. Main-server
+            // rejects an empty string, so it is dropped rather than sent.
+            colorCode: z
+              .string()
+              .trim()
+              .optional()
+              .refine((v) => !v || /^#([0-9a-f]{3}){1,2}$/i.test(v), 'Use a colour like #D4AF37')
+              .transform((v) => v || undefined),
           })
         ),
       })

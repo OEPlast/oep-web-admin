@@ -1,14 +1,15 @@
 'use client';
 
 import { useFieldArray, useFormContext, Controller } from 'react-hook-form';
-import { Input, Button, ActionIcon, Select } from 'rizzui';
+import { Input, Button, ActionIcon, Select, Popover } from 'rizzui';
+import { HexColorPicker } from 'react-colorful';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import TrashIcon from '@core/components/icons/trash';
 import { PiCheckBold, PiPlusBold } from 'react-icons/pi';
 import { getCdnUrl } from '@core/utils/cdn-url';
 import { isWholesaleEnabled } from '@/config/features';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import VerticalFormBlockWrapper from '@/app/shared/VerticalFormBlockWrapper';
 import { formatToNaira } from '@/libs/currencyFormatter';
 
@@ -30,6 +31,7 @@ const ATTRIBUTE_TEMPLATES = {
     children: [
       {
         name: 'Black',
+        colorCode: '#1A1A1A',
         price: undefined,
         stock: 0,
         image: '',
@@ -38,23 +40,25 @@ const ATTRIBUTE_TEMPLATES = {
       },
       {
         name: 'White',
+        colorCode: '#FFFFFF',
         price: undefined,
         stock: 0,
         image: '',
         images: [],
         pricingTiers: [],
       },
-      { name: 'Red', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
-      { name: 'Blue', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'Red', colorCode: '#C8102E', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'Blue', colorCode: '#1F4FD1', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
       {
         name: 'Green',
+        colorCode: '#2E7D32',
         price: undefined,
         stock: 0,
         image: '',
         images: [],
         pricingTiers: [],
       },
-      { name: 'Gray', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
+      { name: 'Gray', colorCode: '#9E9E9E', price: undefined, stock: 0, image: '', images: [], pricingTiers: [] },
     ],
   },
 };
@@ -156,10 +160,10 @@ export default function ProductVariants({ className }: { className?: string }) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Input
               label="Variant Name"
-              placeholder="e.g. Color, Size, Material"
+              placeholder="e.g. Metal, Color, Chain Length, Diamond Tester"
               {...register(`attributes.${index}.name`)}
               error={(errors.attributes as any)?.[index]?.name?.message}
-              helperText="The attribute name (e.g., 'Color' for red, blue, green)"
+              helperText="Shown on the product page as written. Values with a colour (the swatch next to each value) appear as colour squares; the rest appear as buttons."
             />
           </div>
 
@@ -328,10 +332,12 @@ function VariantChildRow({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-10 items-start gap-3">
-        <div className="col-span-3">
+        <div className="col-span-3 flex items-start gap-2">
+          <ColorCodeField attributeIndex={attributeIndex} childIndex={childIndex} />
           <Input
             size="sm"
-            placeholder="e.g. Small, Red, Cotton"
+            className="min-w-0 flex-1"
+            placeholder="e.g. Small, Red, Yes"
             {...register(
               `attributes.${attributeIndex}.children.${childIndex}.name`
             )}
@@ -445,6 +451,76 @@ function VariantChildRow({
         </div>
       )}
     </div>
+  );
+}
+
+const HEX = /^#([0-9a-f]{3}){1,2}$/i;
+
+/**
+ * The value's swatch colour: a square that opens a colour picker (or takes a hex code). Values
+ * with a colour show as colour squares on the storefront; "No colour" makes it a text button.
+ */
+function ColorCodeField({ attributeIndex, childIndex }: { attributeIndex: number; childIndex: number }) {
+  const { control } = useFormContext();
+  return (
+    <Controller
+      name={`attributes.${attributeIndex}.children.${childIndex}.colorCode`}
+      control={control}
+      render={({ field }) => <ColorCodePicker value={field.value} onChange={field.onChange} />}
+    />
+  );
+}
+
+function ColorCodePicker({ value, onChange }: { value?: string; onChange: (value: string | undefined) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [text, setText] = useState(value ?? '');
+  useEffect(() => setText(value ?? ''), [value]);
+  const hasColor = !!value && HEX.test(value);
+
+  return (
+    <Popover isOpen={isOpen} setIsOpen={setIsOpen} placement="bottom-start" shadow="sm">
+      <Popover.Trigger>
+        <button
+          type="button"
+          title={hasColor ? `Colour ${value}` : 'Add a colour (shows a swatch on the storefront)'}
+          aria-label={hasColor ? `Colour ${value}, change` : 'Add a colour'}
+          className={cn(
+            'mt-1 h-7 w-7 shrink-0 rounded border border-gray-300 hover:border-gray-900',
+            !hasColor && 'bg-[repeating-linear-gradient(45deg,#f3f4f6_0_4px,#fff_4px_8px)]'
+          )}
+          style={hasColor ? { backgroundColor: value } : undefined}
+        />
+      </Popover.Trigger>
+      <Popover.Content className="z-[9999] w-[232px] space-y-3 p-3">
+        <HexColorPicker color={hasColor ? value : '#D4AF37'} onChange={(hex) => onChange(hex.toUpperCase())} />
+        <Input
+          size="sm"
+          value={text}
+          placeholder="#D4AF37"
+          onChange={(e) => {
+            setText(e.target.value);
+            if (HEX.test(e.target.value.trim())) onChange(e.target.value.trim().toUpperCase());
+          }}
+        />
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="flex-1"
+            onClick={() => {
+              onChange(undefined);
+              setIsOpen(false);
+            }}
+          >
+            No colour
+          </Button>
+          <Button type="button" size="sm" className="flex-1" onClick={() => setIsOpen(false)}>
+            Done
+          </Button>
+        </div>
+      </Popover.Content>
+    </Popover>
   );
 }
 
