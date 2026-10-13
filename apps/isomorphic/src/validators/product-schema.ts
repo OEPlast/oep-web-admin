@@ -146,6 +146,21 @@ const baseProductSchema = z.object({
 
   pricingTiers: z.array(pricingTierSchema).optional(),
 
+  // Price and stock per option combination (e.g. Gold + size 7). Empty means none: stock and
+  // prices come from the product and its single options. Main-server checks them against the
+  // option groups and sets the product's stock to their total.
+  variants: z
+    .array(
+      z.object({
+        key: z.string().optional(),
+        options: z.array(z.object({ name: z.string(), value: z.string() })).min(1),
+        price: preprocessedOptionalNumber,
+        stock: z.number({ invalid_type_error: 'Enter the stock' }).int().min(0, 'Stock cannot be negative'),
+        sku: z.string().trim().optional(),
+      })
+    )
+    .optional(),
+
   // Products offered next to this one on its page (e.g. a gift box), in order. Main-server takes 10.
   addOns: z.array(z.string()).max(10, 'Pick at most 10 add-ons').optional(),
 

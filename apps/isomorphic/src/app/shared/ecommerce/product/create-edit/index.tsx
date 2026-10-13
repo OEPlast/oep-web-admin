@@ -26,6 +26,7 @@ import { Product } from '@/hooks/queries/useProducts';
 import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fields';
 import ProductPerformance from '@/app/shared/ecommerce/product/create-edit/product-performance';
 import ProductMerchandising from '@/app/shared/ecommerce/product/create-edit/product-merchandising';
+import ProductCombinations from '@/app/shared/ecommerce/product/create-edit/product-combinations';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -34,6 +35,7 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
   [formParts.variantOptions]: ProductVariants,
+  [formParts.combinations]: ProductCombinations,
   [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.merchandising]: ProductMerchandising,
   [formParts.seo]: ProductSeo,
@@ -78,6 +80,7 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
 
       attributes: [],
       pricingTiers: [],
+      variants: [],
       addOns: [],
       sizeChart: '',
       stock: 0,
@@ -123,6 +126,7 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
       children: (attr.children || []).map((child) => ({ ...child, images: child.images ?? [] })),
     })),
     pricingTiers: product.pricingTiers || [],
+    variants: (product.variants || []).map((v) => ({ ...v, sku: v.sku ?? '' })),
     addOns: (product.addOns || []).map(String),
     sizeChart: product.sizeChart ?? '',
     stock: product.stock,
@@ -145,6 +149,8 @@ function withoutUnusedExtras(data: CreateProductInput, product?: Product): Creat
   const next: CreateProductInput = { ...data };
   if (!next.addOns?.length && !product?.addOns?.length) delete next.addOns;
   if (!next.sizeChart && !product?.sizeChart) delete next.sizeChart;
+  if (!next.variants?.length && !product?.variants?.length) delete next.variants;
+  if (next.variants) next.variants = next.variants.map(({ sku, ...v }) => (sku ? { ...v, sku } : v));
   if (next.attributes) {
     next.attributes = next.attributes.map((attr, a) => ({
       ...attr,

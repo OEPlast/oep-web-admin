@@ -79,6 +79,14 @@ export interface Product {
     strategy: 'fixedPrice' | 'percentOff' | 'amountOff';
     value: number;
   }>;
+  /** Price and stock per option combination; when set, `stock` is their total. */
+  variants?: {
+    key: string;
+    options: { name: string; value: string }[];
+    price?: number;
+    stock: number;
+    sku?: string;
+  }[];
   /** Product ids offered as add-ons on this product's page, in order. */
   addOns?: string[];
   /** Size chart slug; unset means the category's chart. */
