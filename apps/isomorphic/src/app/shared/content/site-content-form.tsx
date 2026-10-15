@@ -45,6 +45,17 @@ const siteContentSchema = z.object({
       ctaHref: link,
     }),
   }),
+  listingTiles: z
+    .array(
+      z.object({
+        title: z.string().trim().min(1, 'Title is required').max(80, 'At most 80 characters'),
+        text: z.string().trim().max(200, 'At most 200 characters'),
+        href: z.string().trim().max(300),
+        image: z.string(),
+        position: z.number({ invalid_type_error: 'Enter a number' }).int().min(1, 'At least 1').max(200),
+      })
+    )
+    .max(6, 'At most 6 tiles'),
   productInfo: z.object({
     warranty: z.string().trim().max(4000, 'At most 4000 characters'),
     deliveryReturns: z.string().trim().max(4000, 'At most 4000 characters'),
@@ -118,6 +129,7 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
       ctaHref: c?.home?.feature?.ctaHref ?? '',
     },
   },
+  listingTiles: c?.listingTiles?.map((t) => ({ title: t.title, text: t.text ?? '', href: t.href ?? '', image: t.image ?? '', position: t.position ?? 4 })) ?? [],
   productInfo: { warranty: c?.productInfo?.warranty ?? '', deliveryReturns: c?.productInfo?.deliveryReturns ?? '' },
   about: {
     hero: { image: c?.about?.hero?.image ?? '', title: c?.about?.hero?.title ?? '', text: c?.about?.hero?.text ?? '' },
@@ -142,6 +154,7 @@ const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
   home: v.home,
   about: v.about,
   productInfo: v.productInfo,
+  listingTiles: v.listingTiles,
   testimonials: v.testimonials.map((t) => ({ quote: t.quote.trim(), author: t.author.trim() })),
   instagram: v.instagram.map((i) => ({ image: i.image, ...(i.link.trim() ? { link: i.link.trim() } : {}) })),
   popularSearches: v.popularSearches,
@@ -199,6 +212,7 @@ export default function SiteContentForm() {
         <HomeSection />
         <AboutSection />
         <ProductInfoSection />
+        <ListingTilesSection />
         <TestimonialsSection />
         <InstagramSection />
         <PopularSearchesSection />
@@ -458,6 +472,56 @@ function ProductInfoSection() {
         {...register('productInfo.deliveryReturns')}
         error={errors.productInfo?.deliveryReturns?.message}
       />
+    </VerticalFormBlockWrapper>
+  );
+}
+
+function ListingTilesSection() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContextTyped();
+  const { fields, append, remove, move } = useFieldArray({ control, name: 'listingTiles' });
+  return (
+    <VerticalFormBlockWrapper
+      title="Shop page tiles"
+      description="Offer tiles placed among the products on shop and collection pages, e.g. “Free delivery nationwide” after the 4th product. The image is optional."
+      className={`max-w-none ${sectionClass}`}
+    >
+      <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+            <div className="flex items-center justify-between">
+              <Text className="font-medium">Tile {index + 1}</Text>
+              <RowActions index={index} count={fields.length} move={move} remove={remove} />
+            </div>
+            <Input label="Title" placeholder="Free delivery nationwide" {...register(`listingTiles.${index}.title`)} error={errors.listingTiles?.[index]?.title?.message} />
+            <Input label="Text (optional)" placeholder="On every order, to any state" {...register(`listingTiles.${index}.text`)} error={errors.listingTiles?.[index]?.text?.message} />
+            <Input label="Link (optional)" placeholder="/shop?tag=new-arrivals" {...register(`listingTiles.${index}.href`)} />
+            <Input
+              type="number"
+              label="After product number"
+              {...register(`listingTiles.${index}.position`, { valueAsNumber: true })}
+              error={errors.listingTiles?.[index]?.position?.message}
+            />
+            <Controller
+              control={control}
+              name={`listingTiles.${index}.image`}
+              render={({ field: imageField }) => (
+                <ImageField label="Image (optional)" value={imageField.value} onChange={imageField.onChange} previewClassName="aspect-[4/5] max-w-[200px]" />
+              )}
+            />
+          </div>
+        ))}
+      </div>
+      {errors.listingTiles?.message && <Text className="text-sm text-red-600">{errors.listingTiles.message}</Text>}
+      {fields.length < 6 && (
+        <Button type="button" variant="outline" className="w-fit" onClick={() => append({ title: '', text: '', href: '', image: '', position: 4 })}>
+          <PiPlusBold className="me-1.5 h-4 w-4" />
+          Add tile
+        </Button>
+      )}
     </VerticalFormBlockWrapper>
   );
 }

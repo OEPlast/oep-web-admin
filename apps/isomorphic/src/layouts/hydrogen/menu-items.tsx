@@ -1,6 +1,7 @@
 import { routes } from '@/config/routes';
 import {
   PiAirplaneTiltDuotone,
+  PiStackDuotone,
   PiApplePodcastsLogoDuotone,
   PiArticleDuotone,
   PiArrowsOutDuotone,
@@ -101,6 +102,13 @@ const allMenuItems = [
     href: routes.eCommerce.categories,
     icon: <PiSquaresFourDuotone />,
     permission: { resource: ['categories'], action: 'read' },
+  },
+  {
+    name: 'Collections',
+    href: routes.collections,
+    icon: <PiStackDuotone />,
+    permission: { resource: ['products'], action: 'read' },
+    feature: 'collections' as StoreFeature,
   },
   {
     name: 'Inventory',

@@ -82,6 +82,8 @@ export interface SiteContent {
     tiles: Array<{ image: string; label: string; href: string }>;
     feature: HomeCta & { image: string; title: string; text: string };
   };
+  /** Offer tiles placed among the products on shop and collection pages. */
+  listingTiles?: Array<{ title: string; text: string; href: string; image: string; position: number }>;
   /** Store-wide Warranty and Delivery & Returns blocks on every product page. */
   productInfo?: { warranty: string; deliveryReturns: string };
   /** About page: hero, optional quote, mission block and milestone cards. */

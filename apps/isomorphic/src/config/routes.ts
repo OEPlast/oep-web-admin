@@ -94,6 +94,7 @@ export const routes = {
     stockAlerts: '/support/stock-alerts',
   },
   pickupLocations: '/ecommerce/pickup-locations',
+  collections: '/ecommerce/collections',
   rolesPermissions: '/roles-permissions',
   storeSettings: '/store-settings',
   inventory: '/inventory',

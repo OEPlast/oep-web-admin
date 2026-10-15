@@ -384,6 +384,11 @@ export const api = {
   },
 
   // Pickup locations (feature `pickup`)
+  // Storefront collections (Main-server /admin/collections)
+  collections: {
+    list: '/admin/collections',
+    byId: (id: string) => `/admin/collections/${id}`,
+  },
   pickupLocations: {
     list: '/admin/pickup-locations',
     byId: (id: string) => `/admin/pickup-locations/${id}`,

@@ -6,7 +6,7 @@
  * Unset means none (wholesale tiers excepted, see isWholesaleEnabled), so a deployment that doesn't list a feature keeps the admin exactly as it
  * was. The backend still enforces its own checks; this only decides what the admin shows.
  */
-export type StoreFeature = 'vylux' | 'content' | 'support' | 'pickup' | 'stockAlerts' | 'wholesale';
+export type StoreFeature = 'vylux' | 'content' | 'support' | 'pickup' | 'stockAlerts' | 'wholesale' | 'collections';
 
 // Referenced literally so Next.js inlines it into the client bundle at build time.
 const enabled = new Set(
