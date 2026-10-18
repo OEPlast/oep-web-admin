@@ -83,6 +83,7 @@ export default function CategoryForm({
           priority: defaultValues?.priority ?? false,
           sizeChart: defaultValues?.sizeChart ?? '',
           isAddOnCategory: defaultValues?.isAddOnCategory ?? false,
+          showInMenu: defaultValues?.showInMenu ?? false,
         },
       }}
       className="flex flex-grow flex-col @container [&_label]:font-medium"
@@ -264,6 +265,34 @@ export default function CategoryForm({
                     )}
                   />
                 </VeritcalFormBlockWrapper>
+
+                {/* Storefront menu (top-level categories only; subcategories are on their category's page) */}
+                <Controller
+                  name="parent"
+                  control={control}
+                  render={({ field: { value: parents } }) =>
+                    (parents ?? []).length > 0 ? (
+                      <></>
+                    ) : (
+                      <VeritcalFormBlockWrapper
+                        title="Show in Menu"
+                        description="List this category in the storefront menu (up to 20). The rest are under All categories."
+                        className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                      >
+                        <Controller
+                          name="showInMenu"
+                          control={control}
+                          render={({ field: { value, onChange } }) => (
+                            <div className="flex items-center gap-3">
+                              <Switch checked={!!value} onChange={(e) => onChange(e.target.checked)} />
+                              <span className="text-sm text-gray-600">{value ? 'In the menu' : 'Only under All categories'}</span>
+                            </div>
+                          )}
+                        />
+                      </VeritcalFormBlockWrapper>
+                    )
+                  }
+                />
 
                 {/* Image Upload */}
                 <VeritcalFormBlockWrapper

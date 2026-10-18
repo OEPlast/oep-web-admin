@@ -63,6 +63,9 @@ export default function UpdateCategory({
     // switch never overwrites a value the form didn't load.
     if ((data.sizeChart ?? '') !== (category.sizeChart ?? '')) updateData.sizeChart = data.sizeChart ?? '';
     if (!!data.isAddOnCategory !== !!category.isAddOnCategory) updateData.isAddOnCategory = !!data.isAddOnCategory;
+    // A subcategory is never in the menu.
+    const inMenu = !!data.showInMenu && !data.parent?.length;
+    if (inMenu !== !!category.showInMenu) updateData.showInMenu = inMenu;
 
     updateCategory.mutate({ id: category._id, data: updateData });
   };

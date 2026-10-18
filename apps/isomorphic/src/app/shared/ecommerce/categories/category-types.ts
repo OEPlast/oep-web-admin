@@ -12,6 +12,8 @@ export type CategoryType = {
   sizeChart?: string;
   /** Products here are suggested as add-ons (e.g. gift boxes). */
   isAddOnCategory?: boolean;
+  /** Listed in the storefront menu (top-level categories, up to 20). */
+  showInMenu?: boolean;
   createdAt: Date;
   updatedAt: Date;
   subcategoryCount?: number;

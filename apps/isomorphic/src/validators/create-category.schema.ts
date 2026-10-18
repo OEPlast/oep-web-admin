@@ -16,6 +16,7 @@ export const createCategoryFormSchema = z.object({
   sizeChart: z.string().optional(),
   // Products in an add-on category (e.g. gift boxes) are suggested as add-ons on product pages.
   isAddOnCategory: z.boolean().optional(),
+  showInMenu: z.boolean().optional(),
 });
 
 // Update category schema - includes server fields
@@ -31,6 +32,7 @@ export const updateCategoryFormSchema = z.object({
   priority: z.boolean().default(false).optional(),
   sizeChart: z.string().optional(),
   isAddOnCategory: z.boolean().optional(),
+  showInMenu: z.boolean().optional(),
   _id: z.string().optional(),
   slug: z.string().min(1, 'Slug is required'),
   createdAt: z.date().optional(),

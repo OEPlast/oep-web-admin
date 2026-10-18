@@ -82,6 +82,16 @@ export const categoriesColumns = [
       </Badge>
     ),
   }),
+  columnHelper.accessor('showInMenu', {
+    id: 'showInMenu',
+    size: 100,
+    header: 'In Menu',
+    cell: ({ getValue }) => (
+      <Badge variant="flat" color={getValue() ? 'success' : 'secondary'} className="font-medium">
+        {getValue() ? 'Yes' : 'No'}
+      </Badge>
+    ),
+  }),
   columnHelper.display({
     id: 'parentCount',
     size: 100,

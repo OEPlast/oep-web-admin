@@ -42,11 +42,12 @@ export default function CreateCategory({ isModalView = true }: { isModalView?: b
     console.log(data);
     setApiErrors(null); // Clear previous errors
     // Leave the optional extras out while unused, so the payload is what it was before them.
-    const { sizeChart, isAddOnCategory, ...rest } = data;
+    const { sizeChart, isAddOnCategory, showInMenu, ...rest } = data;
     createCategory.mutate({
       ...rest,
       ...(sizeChart ? { sizeChart } : {}),
       ...(isAddOnCategory ? { isAddOnCategory } : {}),
+      ...(showInMenu && !rest.parent?.length ? { showInMenu } : {}),
     });
   };
 
