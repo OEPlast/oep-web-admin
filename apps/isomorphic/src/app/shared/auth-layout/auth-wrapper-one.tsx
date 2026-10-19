@@ -58,7 +58,7 @@ export default function AuthWrapperOne({
                 href={'/'}
                 className="mb-6 inline-flex max-w-[168px] xl:mb-8"
               >
-                {/* <Logo alwaysFull className="dark:invert" /> */}
+                <Logo alwaysFull className="dark:invert" />
               </Link>
               <Title
                 as="h2"
