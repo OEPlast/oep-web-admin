@@ -1,5 +1,6 @@
 import cn from '@core/utils/class-names';
 import { Link } from 'react-scroll';
+import { hasFeature } from '@/config/features';
 
 export const formParts = {
   summary: 'summary',
@@ -14,6 +15,7 @@ export const formParts = {
   tagsAndCategory: 'tagsAndCategory',
   merchandising: 'merchandising',
   customFields: 'customFields',
+  sources: 'sources',
   performance: 'performance',
 };
 
@@ -66,6 +68,8 @@ export const menuItems = [
     label: 'Custom Fields',
     value: formParts.customFields,
   },
+  // Only stores importing from a scraper (Vylux) record product sources.
+  ...(hasFeature('vylux') ? [{ label: 'Source', value: formParts.sources }] : []),
   {
     label: 'Performance',
     value: formParts.performance,

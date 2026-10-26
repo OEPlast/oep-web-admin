@@ -24,6 +24,7 @@ import {
 const GROUPS: { value: CollectionGroup; label: string }[] = [
   { value: 'collections', label: 'Collections' },
   { value: 'gifting', label: 'Gifting' },
+  { value: 'diamonds', label: 'Diamonds' },
   { value: 'men', label: 'Men' },
 ];
 const groupLabel = (g: CollectionGroup) => GROUPS.find((x) => x.value === g)?.label ?? g;
@@ -40,7 +41,7 @@ const schema = z
     slug: z.string().trim().max(80),
     description: z.string().trim().max(400, 'At most 400 characters'),
     image: z.string(),
-    group: z.enum(['collections', 'gifting', 'men']),
+    group: z.enum(['collections', 'gifting', 'men', 'diamonds']),
     order: z.number({ invalid_type_error: 'Order must be a whole number' }).int().min(0),
     showInMenu: z.boolean(),
     active: z.boolean(),

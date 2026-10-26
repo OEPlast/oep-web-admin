@@ -28,6 +28,8 @@ import ProductPerformance from '@/app/shared/ecommerce/product/create-edit/produ
 import ProductMerchandising from '@/app/shared/ecommerce/product/create-edit/product-merchandising';
 import ProductCombinations from '@/app/shared/ecommerce/product/create-edit/product-combinations';
 import ProductExtras from '@/app/shared/ecommerce/product/create-edit/product-extras';
+import ProductSources from '@/app/shared/ecommerce/product/create-edit/product-sources';
+import { hasFeature } from '@/config/features';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -42,6 +44,8 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.merchandising]: ProductMerchandising,
   [formParts.seo]: ProductSeo,
   [formParts.customFields]: CustomFields,
+  // Only stores importing from a scraper (Vylux) record product sources.
+  ...(hasFeature('vylux') ? { [formParts.sources]: ProductSources } : {}),
   [formParts.performance]: ProductPerformance,
 };
 
@@ -235,7 +239,7 @@ export default function CreateEditProduct({
               // Performance links out to the product's analytics, so it needs
               // the id. On create there is none, and the section says so. The add-ons
               // picker needs it too, to leave the product itself out.
-              if (componentKey === formParts.performance || componentKey === formParts.merchandising) {
+              if (componentKey === formParts.performance || componentKey === formParts.merchandising || componentKey === formParts.sources) {
                 return (
                   <Element key={key} name={componentKey}>
                     <Component

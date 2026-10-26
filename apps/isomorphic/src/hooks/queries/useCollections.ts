@@ -6,7 +6,7 @@ import { apiClient } from '@/libs/axios';
 import api from '@/libs/endpoints';
 import { describeApiError } from '@/libs/form-errors';
 
-export type CollectionGroup = 'collections' | 'gifting' | 'men';
+export type CollectionGroup = 'collections' | 'gifting' | 'men' | 'diamonds';
 
 export interface StoreCollection {
   _id: string;

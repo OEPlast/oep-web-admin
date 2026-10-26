@@ -44,6 +44,7 @@ export const api = {
     update: (id: string) => `/admin/products/${id}`,
     delete: (id: string) => `/admin/products/${id}`,
     duplicate: (id: string) => `/admin/products/duplicate/${id}`,
+    sources: (id: string) => `/admin/products/${id}/sources`,
     checkSku: (sku: string) => `/admin/products/does-sku-exist/${sku}`,
     checkSlug: '/admin/products/check-slug', // Check if slug is available
     updateCoverImage: (id: string) => `/admin/products/coverImage/update/${id}`,
