@@ -58,6 +58,8 @@ export interface Product {
   isVolumetric: boolean;
   attributes?: {
     name: string;
+    /** Can be left unpicked on the product page. */
+    optional?: boolean;
     children: {
       name: string;
       price: number;
@@ -87,6 +89,8 @@ export interface Product {
     stock: number;
     sku?: string;
   }[];
+  /** Optional add-ons that aren't products; price 0 is free. */
+  extras?: { name: string; price: number; description?: string }[];
   /** Product ids offered as add-ons on this product's page, in order. */
   addOns?: string[];
   /** Size chart slug; unset means the category's chart. */

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFieldArray, useFormContext, Controller } from 'react-hook-form';
-import { Input, Button, ActionIcon, Select, Popover } from 'rizzui';
+import { Input, Button, ActionIcon, Select, Popover, Switch } from 'rizzui';
 import { HexColorPicker } from 'react-colorful';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
@@ -79,6 +79,7 @@ export default function ProductVariants({ className }: { className?: string }) {
   const addVariant = () => {
     append({
       name: '',
+      optional: false,
       children: [],
     });
   };
@@ -164,6 +165,19 @@ export default function ProductVariants({ className }: { className?: string }) {
               {...register(`attributes.${index}.name`)}
               error={(errors.attributes as any)?.[index]?.name?.message}
               helperText="Shown on the product page as written. Values with a colour (the swatch next to each value) appear as colour squares; the rest appear as buttons."
+            />
+            <Controller
+              name={`attributes.${index}.optional`}
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  className="md:mt-7"
+                  label="Optional"
+                  helperText="Shoppers can leave this unpicked (nothing is pre-selected). Off: they must pick one."
+                  checked={Boolean(field.value)}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
+              )}
             />
           </div>
 

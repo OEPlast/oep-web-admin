@@ -27,6 +27,7 @@ import CustomFields from '@/app/shared/ecommerce/product/create-edit/custom-fiel
 import ProductPerformance from '@/app/shared/ecommerce/product/create-edit/product-performance';
 import ProductMerchandising from '@/app/shared/ecommerce/product/create-edit/product-merchandising';
 import ProductCombinations from '@/app/shared/ecommerce/product/create-edit/product-combinations';
+import ProductExtras from '@/app/shared/ecommerce/product/create-edit/product-extras';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -36,6 +37,7 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.shipping]: ShippingInfo,
   [formParts.variantOptions]: ProductVariants,
   [formParts.combinations]: ProductCombinations,
+  [formParts.extras]: ProductExtras,
   [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.merchandising]: ProductMerchandising,
   [formParts.seo]: ProductSeo,
@@ -81,6 +83,7 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
       attributes: [],
       pricingTiers: [],
       variants: [],
+      extras: [],
       addOns: [],
       sizeChart: '',
       stock: 0,
@@ -123,10 +126,12 @@ function defaultValues(product?: Product): Partial<CreateProductInput> {
     isVolumetric: product.isVolumetric ?? false,
     attributes: (product.attributes || []).map((attr) => ({
       ...attr,
+      optional: attr.optional ?? false,
       children: (attr.children || []).map((child) => ({ ...child, images: child.images ?? [] })),
     })),
     pricingTiers: product.pricingTiers || [],
     variants: (product.variants || []).map((v) => ({ ...v, sku: v.sku ?? '' })),
+    extras: (product.extras || []).map((e) => ({ name: e.name, price: e.price, description: e.description ?? '' })),
     addOns: (product.addOns || []).map(String),
     sizeChart: product.sizeChart ?? '',
     stock: product.stock,
@@ -150,10 +155,14 @@ function withoutUnusedExtras(data: CreateProductInput, product?: Product): Creat
   if (!next.addOns?.length && !product?.addOns?.length) delete next.addOns;
   if (!next.sizeChart && !product?.sizeChart) delete next.sizeChart;
   if (!next.variants?.length && !product?.variants?.length) delete next.variants;
+  if (!next.extras?.length && !product?.extras?.length) delete next.extras;
+  if (next.extras) next.extras = next.extras.map(({ description, ...e }) => (description ? { ...e, description } : e));
   if (next.variants) next.variants = next.variants.map(({ sku, ...v }) => (sku ? { ...v, sku } : v));
   if (next.attributes) {
-    next.attributes = next.attributes.map((attr, a) => ({
+    next.attributes = next.attributes.map(({ optional, ...attr }, a) => ({
       ...attr,
+      // Only sent when on, or when switching it off, so untouched groups save as before.
+      ...(optional || product?.attributes?.[a]?.optional ? { optional: Boolean(optional) } : {}),
       children: attr.children.map((child) => {
         const before = product?.attributes?.[a]?.children?.find((c) => c.name === child.name);
         if (child.images?.length || before?.images?.length) return child;

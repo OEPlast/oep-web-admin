@@ -10,6 +10,7 @@ export const formParts = {
   seo: 'seo',
   variantOptions: 'variantOptions',
   combinations: 'combinations',
+  extras: 'extras',
   tagsAndCategory: 'tagsAndCategory',
   merchandising: 'merchandising',
   customFields: 'customFields',
@@ -44,6 +45,10 @@ export const menuItems = [
   {
     label: 'Combinations',
     value: formParts.combinations,
+  },
+  {
+    label: 'Extras',
+    value: formParts.extras,
   },
   {
     label: 'Tags & Category',

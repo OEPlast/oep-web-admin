@@ -122,6 +122,8 @@ const baseProductSchema = z.object({
     .array(
       z.object({
         name: z.string().min(1, 'Attribute name is required'),
+        // Optional groups start unpicked on the product page and can be left that way.
+        optional: z.boolean().optional(),
         children: z.array(
           z.object({
             name: z.string().min(1, 'Child name is required'),
@@ -159,6 +161,19 @@ const baseProductSchema = z.object({
         sku: z.string().trim().optional(),
       })
     )
+    .optional(),
+
+  // Optional add-ons that aren't products (e.g. a tester, free polish), ticked on the product page.
+  extras: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1, 'Name the extra').max(60, 'At most 60 characters'),
+        price: z.number({ invalid_type_error: 'Enter a price (0 for free)' }).min(0, 'Price cannot be negative'),
+        description: z.string().trim().max(140, 'At most 140 characters').optional(),
+      })
+    )
+    .max(10, 'At most 10 extras')
+    .refine((list) => new Set(list.map((e) => e.name.toLowerCase())).size === list.length, 'Each extra needs a different name')
     .optional(),
 
   // Products offered next to this one on its page (e.g. a gift box), in order. Main-server takes 10.
