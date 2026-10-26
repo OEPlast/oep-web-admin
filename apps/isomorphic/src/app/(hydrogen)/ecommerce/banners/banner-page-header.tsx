@@ -4,7 +4,8 @@ import React from 'react';
 import PageHeader from '@/app/shared/page-header';
 import { Button, Title, ActionIcon } from 'rizzui';
 import CreateBanner from '@/app/shared/ecommerce/banners/create-banner';
-import { PiPlusBold, PiXBold } from 'react-icons/pi';
+import { PiArrowsDownUpBold, PiPlusBold, PiXBold } from 'react-icons/pi';
+import ArrangeBanners from '@/app/shared/ecommerce/banners/arrange-banners';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 
 function CreateBannerModalView() {
@@ -39,9 +40,19 @@ export default function BannerPageHeader({
   return (
     <>
       <PageHeader title={title} breadcrumb={breadcrumb} className={className}>
+        <div className="mt-4 flex w-full flex-col gap-3 @lg:mt-0 @lg:w-auto @lg:flex-row">
         <Button
           as="span"
-          className="mt-4 w-full cursor-pointer @lg:mt-0 @lg:w-auto"
+          variant="outline"
+          className="w-full cursor-pointer @lg:w-auto"
+          onClick={() => openModal({ view: <ArrangeBanners />, customSize: 720 })}
+        >
+          <PiArrowsDownUpBold className="me-1 h-4 w-4" />
+          Arrange order
+        </Button>
+        <Button
+          as="span"
+          className="w-full cursor-pointer @lg:w-auto"
           onClick={() =>
             openModal({
               view: <CreateBannerModalView />,
@@ -52,6 +63,7 @@ export default function BannerPageHeader({
           <PiPlusBold className="me-1 h-4 w-4" />
           Add Banner
         </Button>
+        </div>
       </PageHeader>
     </>
   );

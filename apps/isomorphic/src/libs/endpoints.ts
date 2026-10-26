@@ -147,6 +147,7 @@ export const api = {
     create: '/admin/banners',
     update: (id: string) => `/admin/banners/${id}`,
     delete: (id: string) => `/admin/banners/${id}`,
+    reorder: '/admin/banners/reorder',
   },
 
   // Review endpoints
