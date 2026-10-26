@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 import { ActionIcon, Alert, Button, Input, Loader, Switch, Text, Textarea } from 'rizzui';
 import { PiArrowDownBold, PiArrowUpBold, PiPlusBold, PiTrashBold, PiXBold } from 'react-icons/pi';
@@ -171,6 +172,18 @@ const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
   },
 });
 
+/** "home › tiles: At most 4 tiles" for the first invalid field, from react-hook-form's error tree. */
+function firstErrorPath(errors: object, path: string[] = []): string {
+  for (const [key, value] of Object.entries(errors)) {
+    if (!value || typeof value !== 'object') continue;
+    const here = [...path, /^\d+$/.test(key) ? `#${Number(key) + 1}` : key];
+    if (typeof (value as { message?: unknown }).message === 'string') return `${here.join(' › ')}: ${(value as { message: string }).message}`;
+    const deeper = firstErrorPath(value as object, here);
+    if (deeper) return deeper;
+  }
+  return path.join(' › ');
+}
+
 const sectionClass = 'border-t border-dashed border-muted pt-7';
 
 export default function SiteContentForm() {
@@ -206,7 +219,11 @@ export default function SiteContentForm() {
     <FormProvider {...methods}>
       <form
         noValidate
-        onSubmit={handleSubmit((values) => updateMutation.mutate(toPayload(values)))}
+        onSubmit={handleSubmit(
+          (values) => updateMutation.mutate(toPayload(values)),
+          // A blocked save says where, instead of doing nothing (the field error may be far down the page).
+          (errors) => toast.error(`Can't save yet: check ${firstErrorPath(errors)}`)
+        )}
         className="@container flex flex-col gap-8"
       >
         <HomeSection />
