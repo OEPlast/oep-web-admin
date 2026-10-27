@@ -15,7 +15,8 @@ import { routes } from '@/config/routes';
 import { handleApiError } from '@/libs/axios';
 import { useSiteContent } from '@/hooks/queries/useContent';
 import { useUpdateSiteContent } from '@/hooks/mutations/useContentMutations';
-import { SiteContent, toSlug } from '@/types/content.types';
+import { SiteContent, featureProductFrom, toSlug } from '@/types/content.types';
+import FeatureProductsPicker from '@/app/shared/content/feature-products-picker';
 
 // Links are storefront paths ("/shop?gender=women") or full URLs.
 const link = z.string().trim().max(300, 'At most 300 characters');
@@ -45,6 +46,18 @@ const siteContentSchema = z.object({
       ctaLabel: z.string().trim().max(40, 'At most 40 characters'),
       ctaHref: link,
     }),
+    features: z
+      .array(
+        z.object({
+          image: z.string().min(1, 'Upload a cover image or remove this block'),
+          title: z.string().trim().max(120, 'At most 120 characters'),
+          text: z.string().trim().max(400, 'At most 400 characters'),
+          ctaLabel: z.string().trim().max(40, 'At most 40 characters'),
+          ctaHref: link,
+          products: z.array(z.object({ _id: z.string(), name: z.string(), image: z.string().optional() })).max(3, 'At most 3 products'),
+        })
+      )
+      .max(12, 'At most 12 blocks'),
   }),
   listingTiles: z
     .array(
@@ -129,6 +142,15 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
       ctaLabel: c?.home?.feature?.ctaLabel ?? '',
       ctaHref: c?.home?.feature?.ctaHref ?? '',
     },
+    features:
+      c?.home?.features?.map((f) => ({
+        image: f.image,
+        title: f.title ?? '',
+        text: f.text ?? '',
+        ctaLabel: f.ctaLabel ?? '',
+        ctaHref: f.ctaHref ?? '',
+        products: (f.products ?? []).map(featureProductFrom),
+      })) ?? [],
   },
   listingTiles: c?.listingTiles?.map((t) => ({ title: t.title, text: t.text ?? '', href: t.href ?? '', image: t.image ?? '', position: t.position ?? 4 })) ?? [],
   productInfo: { warranty: c?.productInfo?.warranty ?? '', deliveryReturns: c?.productInfo?.deliveryReturns ?? '' },
@@ -152,7 +174,7 @@ const toFormValues = (c?: SiteContent): SiteContentFormValues => ({
 
 const toPayload = (v: SiteContentFormValues): Partial<SiteContent> => ({
   // zod already trimmed every text field
-  home: v.home,
+  home: { ...v.home, features: v.home.features.map((f) => ({ ...f, products: f.products.map((p) => p._id) })) },
   about: v.about,
   productInfo: v.productInfo,
   listingTiles: v.listingTiles,
@@ -227,6 +249,7 @@ export default function SiteContentForm() {
         className="@container flex flex-col gap-8"
       >
         <HomeSection />
+        <FeatureBlocksSection />
         <AboutSection />
         <ProductInfoSection />
         <ListingTilesSection />
@@ -327,6 +350,7 @@ function HomeSection() {
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-muted p-4">
           <Text className="font-medium">Feature block</Text>
+          <Text className="-mt-2 text-sm text-gray-500">Shown only when there are no Just Landed blocks below.</Text>
           {imageInput('home.feature.image', 'Image', 'aspect-[4/3] max-w-[320px]')}
           <Input
             label="Title"
@@ -391,6 +415,71 @@ function HomeSection() {
         <Button type="button" variant="outline" className="w-fit" onClick={() => append({ image: '', label: '', href: '' })}>
           <PiPlusBold className="me-1.5 h-4 w-4" />
           Add tile
+        </Button>
+      )}
+    </VerticalFormBlockWrapper>
+  );
+}
+
+const EMPTY_FEATURE = { image: '', title: '', text: '', ctaLabel: '', ctaHref: '', products: [] };
+
+/** "Just landed" blocks: each a cover image, copy, a button and 3 products; one shows at random per visit. */
+function FeatureBlocksSection() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContextTyped();
+  const { fields, append, remove, move } = useFieldArray({ control, name: 'home.features' });
+  return (
+    <VerticalFormBlockWrapper
+      title="Just Landed blocks"
+      description="The dark band on the home page. Add as many as you like: each visit shows one at random. Each has its own cover image, copy, button and up to 3 products."
+    >
+      <div className="grid gap-4 @4xl:grid-cols-2">
+        {fields.map((field, index) => {
+          const err = errors.home?.features?.[index];
+          return (
+            <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-muted p-4">
+              <div className="flex items-center justify-between">
+                <Text className="font-medium">Block {index + 1}</Text>
+                <RowActions index={index} count={fields.length} move={move} remove={remove} />
+              </div>
+              <Controller
+                control={control}
+                name={`home.features.${index}.image`}
+                render={({ field: imageField }) => (
+                  <ImageField
+                    label="Cover image"
+                    value={imageField.value}
+                    onChange={imageField.onChange}
+                    previewClassName="aspect-[4/3] max-w-[320px]"
+                    error={err?.image?.message}
+                  />
+                )}
+              />
+              <Input label="Title" placeholder="Fresh ice for the weekend" {...register(`home.features.${index}.title`)} error={err?.title?.message} />
+              <Textarea label="Text" rows={2} {...register(`home.features.${index}.text`)} error={err?.text?.message} />
+              <div className="grid gap-3 @2xl:grid-cols-2">
+                <Input label="Button label" placeholder="Shop the drop" {...register(`home.features.${index}.ctaLabel`)} error={err?.ctaLabel?.message} />
+                <Input label="Button link" placeholder="/shop?tag=new-arrivals" {...register(`home.features.${index}.ctaHref`)} error={err?.ctaHref?.message} />
+              </div>
+              <Controller
+                control={control}
+                name={`home.features.${index}.products`}
+                render={({ field: productsField }) => (
+                  <FeatureProductsPicker value={productsField.value} onChange={productsField.onChange} error={err?.products?.message} />
+                )}
+              />
+            </div>
+          );
+        })}
+      </div>
+      {errors.home?.features?.message && <Text className="text-sm text-red-600">{errors.home.features.message}</Text>}
+      {fields.length < 12 && (
+        <Button type="button" variant="outline" className="w-fit" onClick={() => append(EMPTY_FEATURE)}>
+          <PiPlusBold className="me-1.5 h-4 w-4" />
+          Add block
         </Button>
       )}
     </VerticalFormBlockWrapper>

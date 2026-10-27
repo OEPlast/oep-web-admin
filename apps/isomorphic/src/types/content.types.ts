@@ -81,6 +81,8 @@ export interface SiteContent {
     hero: HomeCta & { image: string; title: string };
     tiles: Array<{ image: string; label: string; href: string }>;
     feature: HomeCta & { image: string; title: string; text: string };
+    /** "Just landed" blocks; the storefront shows one at random per visit. Products come populated. */
+    features?: Array<HomeCta & { image: string; title: string; text: string; products: Array<FeatureProduct | string> }>;
   };
   /** Offer tiles placed among the products on shop and collection pages. */
   listingTiles?: Array<{ title: string; text: string; href: string; image: string; position: number }>;
@@ -197,3 +199,18 @@ export const toSlug = (value: string) =>
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/[\s-]+/g, '-');
+
+/** A product chosen for a home feature block, as the form shows it. */
+export interface FeatureProduct {
+  _id: string;
+  name: string;
+  image?: string;
+}
+
+/** Whatever the API returns for a product (populated or search result) → name and cover picture. */
+export function featureProductFrom(p: any): FeatureProduct {
+  if (typeof p === 'string') return { _id: p, name: 'Product no longer available' };
+  const imgs = p?.description_images?.length ? p.description_images : p?.images;
+  const cover = imgs?.find((i: any) => i.cover_image) ?? imgs?.[0];
+  return { _id: String(p._id), name: p.name ?? '', image: cover?.url };
+}
