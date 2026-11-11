@@ -73,6 +73,7 @@ export default function CreateCoupon() {
           active: true,
           couponType: 'normal',
           stackable: false,
+          excludeSaleItems: false,
           showOnCartPage: false,
         },
       }}
@@ -363,6 +364,20 @@ export default function CreateCoupon() {
                       <FormLabelWithTooltip
                         label="Stackable"
                         tooltip="Allow this coupon to be combined with other coupons in the same order."
+                      />
+                      <Switch checked={field.value} onChange={field.onChange} />
+                    </div>
+                  )}
+                />
+
+                <Controller
+                  name="excludeSaleItems"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <FormLabelWithTooltip
+                        label="Exclude items on sale"
+                        tooltip="Leave out cart items that already have a sale price, so this coupon never stacks on a store deal."
                       />
                       <Switch checked={field.value} onChange={field.onChange} />
                     </div>

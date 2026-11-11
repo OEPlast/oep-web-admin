@@ -143,6 +143,13 @@ export default function CouponDetails({ id }: { id: string }) {
         </div>
 
         <div>
+          <div className="text-sm font-medium text-gray-600">Excludes Sale Items</div>
+          <div className="mt-1 font-semibold text-gray-900">
+            {coupon.excludeSaleItems ? 'Yes' : 'No'}
+          </div>
+        </div>
+
+        <div>
           <div className="text-sm font-medium text-gray-600">Applies To</div>
           <div className="mt-1 font-semibold capitalize text-gray-900">
             {coupon.appliesTo?.scope || 'order'}

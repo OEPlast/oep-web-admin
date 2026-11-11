@@ -96,6 +96,9 @@ export const createCouponSchema = z
     // Stackable with other coupons
     stackable: z.boolean().default(false).optional(),
 
+    // Not on items that already have a sale price
+    excludeSaleItems: z.boolean().default(false).optional(),
+
     // Allowed User (for one-off-for-one-person type)
     allowedUser: z.string().nullable().optional(),
 
@@ -230,6 +233,7 @@ export const updateCouponSchema = z
       .optional(),
     appliesTo: appliesToSchema.optional(),
     stackable: z.boolean().optional(),
+    excludeSaleItems: z.boolean().optional(),
     allowedUser: z.string().nullable().optional(),
     notes: z
       .string()
@@ -308,5 +312,6 @@ export const defaultCouponValues: Partial<CreateCouponInput> = {
   active: true,
   discountType: 'percentage',
   stackable: false,
+  excludeSaleItems: false,
   couponType: 'normal',
 };

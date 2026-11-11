@@ -105,6 +105,7 @@ export default function EditCoupon({ id }: { id: string }) {
           active: couponData.active,
           couponType: couponData.couponType,
           stackable: couponData.stackable || false,
+          excludeSaleItems: couponData.excludeSaleItems ?? false,
           maxUsage: couponData.maxUsage || undefined,
           maxUsagePerUser: couponData.maxUsagePerUser || undefined,
           allowedUser: couponData.allowedUser || undefined,
@@ -420,6 +421,26 @@ export default function EditCoupon({ id }: { id: string }) {
                     <FormLabelWithTooltip
                       label="Stackable with other coupons"
                       tooltip="Allow this coupon to be combined with other coupons in the same order."
+                      placement="right-start"
+                    />
+                    <Switch
+                      checked={field.value}
+                      onChange={field.onChange}
+                      disabled={isDeleted}
+                    />
+                  </div>
+                )}
+              />
+
+              {/* Exclude Sale Items Switch */}
+              <Controller
+                name="excludeSaleItems"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center gap-2">
+                    <FormLabelWithTooltip
+                      label="Exclude items on sale"
+                      tooltip="Leave out cart items that already have a sale price, so this coupon never stacks on a store deal."
                       placement="right-start"
                     />
                     <Switch

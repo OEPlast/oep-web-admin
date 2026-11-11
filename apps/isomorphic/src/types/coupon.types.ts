@@ -14,6 +14,8 @@ export type CouponDataType = {
   minOrderValue?: number;
   appliesTo?: AppliesTo;
   stackable?: boolean;
+  /** Skip cart items that already have a sale price. */
+  excludeSaleItems?: boolean;
   showOnCartPage?: boolean;
   active: boolean;
   timesUsed: number;
